@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import Chart from 'react-apexcharts';
 import { complaintService } from '../services/complaintService';
 import type { StatSummary } from '../types';
+import { useTheme } from '../context/ThemeContext';
 import { MOCK_SUBDISTRICT_STATS, MOCK_CATEGORY_STATS } from '../services/mockData';
 import { StatCard } from '../components/ui/StatCard';
 import { BarChart3, CheckCircle2, Clock, AlertTriangle, Building, Award, PieChart } from 'lucide-react';
 
 export const StatsPage: React.FC = () => {
+  const { isDark } = useTheme();
   const [stats, setStats] = useState<StatSummary>({
     total: 148,
     menunggu: 18,
@@ -20,31 +22,54 @@ export const StatsPage: React.FC = () => {
     complaintService.getStatsSummary().then(setStats);
   }, []);
 
+  const textColor = isDark ? '#cbd5e1' : '#475569';
+  const gridColor = isDark ? '#334155' : '#e2e8f0';
+
   // ApexCharts Configs
   const statusChartOptions: ApexCharts.ApexOptions = {
-    chart: { type: 'donut', fontFamily: 'inherit' },
+    chart: { type: 'donut', fontFamily: 'inherit', background: 'transparent' },
+    theme: { mode: isDark ? 'dark' : 'light' },
     labels: ['Selesai Ditangani', 'Sedang Diproses', 'Menunggu Verifikasi', 'Ditolak'],
     colors: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444'],
-    legend: { position: 'bottom' },
+    legend: { position: 'bottom', labels: { colors: textColor } },
     dataLabels: { enabled: true },
+    stroke: { colors: [isDark ? '#1e293b' : '#ffffff'] },
   };
   const statusChartSeries = [stats.selesai, stats.diproses, stats.menunggu, stats.ditolak];
 
   const categoryChartOptions: ApexCharts.ApexOptions = {
-    chart: { type: 'bar', fontFamily: 'inherit', toolbar: { show: false } },
+    chart: { type: 'bar', fontFamily: 'inherit', toolbar: { show: false }, background: 'transparent' },
+    theme: { mode: isDark ? 'dark' : 'light' },
     plotOptions: { bar: { borderRadius: 8, horizontal: true } },
-    colors: ['#0f766e'],
-    xaxis: { categories: MOCK_CATEGORY_STATS.map((c) => c.category_name) },
+    colors: [isDark ? '#38bdf8' : '#0f766e'],
+    grid: { borderColor: gridColor },
+    xaxis: {
+      categories: MOCK_CATEGORY_STATS.map((c) => c.category_name),
+      labels: { style: { colors: textColor } }
+    },
+    yaxis: {
+      labels: { style: { colors: textColor } }
+    },
+    legend: { labels: { colors: textColor } },
   };
   const categoryChartSeries = [
     { name: 'Jumlah Pengaduan', data: MOCK_CATEGORY_STATS.map((c) => c.count) }
   ];
 
   const subdistrictChartOptions: ApexCharts.ApexOptions = {
-    chart: { type: 'bar', fontFamily: 'inherit', toolbar: { show: false } },
+    chart: { type: 'bar', fontFamily: 'inherit', toolbar: { show: false }, background: 'transparent' },
+    theme: { mode: isDark ? 'dark' : 'light' },
     plotOptions: { bar: { borderRadius: 8, columnWidth: '55%' } },
-    colors: ['#d97706'],
-    xaxis: { categories: MOCK_SUBDISTRICT_STATS.map((s) => s.subdistrict) },
+    colors: [isDark ? '#fbbf24' : '#d97706', isDark ? '#34d399' : '#059669'],
+    grid: { borderColor: gridColor },
+    xaxis: {
+      categories: MOCK_SUBDISTRICT_STATS.map((s) => s.subdistrict),
+      labels: { style: { colors: textColor } }
+    },
+    yaxis: {
+      labels: { style: { colors: textColor } }
+    },
+    legend: { labels: { colors: textColor } },
   };
   const subdistrictChartSeries = [
     { name: 'Total Laporan', data: MOCK_SUBDISTRICT_STATS.map((s) => s.count) },

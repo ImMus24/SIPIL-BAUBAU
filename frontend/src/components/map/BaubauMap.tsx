@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import type { Complaint, BaubauSubdistrict } from '../../types';
+import { useTheme } from '../../context/ThemeContext';
 import { StatusBadge, UrgencyBadge } from '../ui/Badge';
 import { MapPin, Navigation, Eye } from 'lucide-react';
 
@@ -57,12 +58,12 @@ const LocationPickerMarker: React.FC<{
   return (
     <Marker position={position} icon={icons.picker}>
       <Popup>
-        <div className="p-2 text-center">
-          <p className="text-xs font-bold text-sky-900">Lokasi Terpilih</p>
-          <p className="text-[10px] text-slate-500 font-mono mt-0.5">
+        <div className="p-2 text-center text-slate-900 dark:text-slate-100">
+          <p className="text-xs font-bold text-sky-900 dark:text-sky-300">Lokasi Terpilih</p>
+          <p className="text-[10px] text-slate-500 dark:text-slate-400 font-mono mt-0.5">
             {position[0].toFixed(5)}, {position[1].toFixed(5)}
           </p>
-          <p className="text-[11px] text-slate-600 mt-1">Klik area lain di peta Kota Baubau untuk memindahkan pin.</p>
+          <p className="text-[11px] text-slate-600 dark:text-slate-300 mt-1">Klik area lain di peta Kota Baubau untuk memindahkan pin.</p>
         </div>
       </Popup>
     </Marker>
@@ -79,6 +80,7 @@ export const BaubauMap: React.FC<BaubauMapProps> = ({
   height = '500px',
   selectedSubdistrict = 'all',
 }) => {
+  const { isDark } = useTheme();
   const [pickerPos, setPickerPos] = useState<[number, number]>([selectedLat, selectedLng]);
 
   useEffect(() => {
@@ -92,6 +94,9 @@ export const BaubauMap: React.FC<BaubauMapProps> = ({
     return true;
   });
 
+  const lightTileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+  const darkTileUrl = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+
   return (
     <div className="relative rounded-2xl overflow-hidden shadow-lg border border-slate-200 dark:border-slate-800" style={{ height }}>
       {/* Map Control Header Bar */}
@@ -102,7 +107,7 @@ export const BaubauMap: React.FC<BaubauMapProps> = ({
           </div>
           <div>
             <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">Pemetaan Lokasi GIS Kota Baubau</h4>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400">Sulawesi Tenggara • OpenStreetMap Live Data</p>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400">Sulawesi Tenggara • Live Interactive Map</p>
           </div>
         </div>
         <div className="hidden sm:flex items-center space-x-3 text-xs text-slate-700 dark:text-slate-300">
@@ -119,8 +124,13 @@ export const BaubauMap: React.FC<BaubauMapProps> = ({
         style={{ width: '100%', height: '100%' }}
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors • SIPIL BAUBAU'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          key={isDark ? 'dark-tiles' : 'light-tiles'}
+          attribution={
+            isDark
+              ? '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+              : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          }
+          url={isDark ? darkTileUrl : lightTileUrl}
         />
 
         {/* Location Picker Mode */}
@@ -143,16 +153,16 @@ export const BaubauMap: React.FC<BaubauMapProps> = ({
               icon={icons[item.status] || icons.menunggu}
             >
               <Popup>
-                <div className="p-3 max-w-xs space-y-2">
-                  <div className="flex items-center justify-between gap-2 border-b pb-2">
-                    <span className="font-mono text-[10px] font-bold text-sky-900 bg-sky-50 px-1.5 py-0.5 rounded border border-sky-200">
+                <div className="p-3 max-w-xs space-y-2 text-slate-900 dark:text-slate-100">
+                  <div className="flex items-center justify-between gap-2 border-b dark:border-slate-700 pb-2">
+                    <span className="font-mono text-[10px] font-bold text-sky-900 dark:text-sky-300 bg-sky-50 dark:bg-sky-950 px-1.5 py-0.5 rounded border border-sky-200 dark:border-sky-800">
                       {item.ticket_code}
                     </span>
                     <StatusBadge status={item.status} size="sm" />
                   </div>
-                  <h4 className="font-bold text-xs text-slate-800 line-clamp-2 leading-tight">{item.title}</h4>
-                  <div className="text-[11px] text-slate-600 flex items-center space-x-1">
-                    <Navigation className="w-3 h-3 text-sky-600 shrink-0" />
+                  <h4 className="font-bold text-xs text-slate-800 dark:text-white line-clamp-2 leading-tight">{item.title}</h4>
+                  <div className="text-[11px] text-slate-600 dark:text-slate-300 flex items-center space-x-1">
+                    <Navigation className="w-3 h-3 text-sky-600 dark:text-sky-400 shrink-0" />
                     <span className="truncate">{item.address} ({item.subdistrict})</span>
                   </div>
                   <div className="pt-1 flex items-center justify-between">
@@ -160,7 +170,7 @@ export const BaubauMap: React.FC<BaubauMapProps> = ({
                     {onSelectComplaint && (
                       <button
                         onClick={() => onSelectComplaint(item)}
-                        className="inline-flex items-center space-x-1 px-2.5 py-1 text-xs font-semibold bg-sky-700 hover:bg-sky-800 text-white rounded-md transition-colors"
+                        className="inline-flex items-center space-x-1 px-2.5 py-1 text-xs font-semibold bg-sky-700 dark:bg-sky-600 hover:bg-sky-800 dark:hover:bg-sky-500 text-white rounded-md transition-colors"
                       >
                         <Eye className="w-3 h-3" />
                         <span>Detail</span>

@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
-import { ShieldCheck, LogOut, Menu, X, LayoutDashboard, Sun, Moon } from 'lucide-react';
+import { ShieldCheck, LogOut, Menu, X, LayoutDashboard, Sun, Moon, Monitor } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
   const { user, isAuthenticated, role, logout } = useAuth();
-  const { isDark, toggleTheme } = useTheme();
+  const { mode, toggleTheme } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -40,9 +40,15 @@ export const Navbar: React.FC = () => {
     navigate('/login');
   };
 
+  const getThemeTitle = () => {
+    if (mode === 'light') return 'Mode Terang (Klik untuk Gelap)';
+    if (mode === 'dark') return 'Mode Gelap (Klik untuk Sistem OS)';
+    return 'Mode Sistem OS (Klik untuk Terang)';
+  };
+
   return (
     <nav
-      className={`fixed top-0 w-full z-50 transition-all duration-300 ease-in-out border-b border-sky-100 dark:border-slate-700 ${
+      className={`fixed top-0 w-full z-50 transition-all duration-300 ease-in-out border-b border-sky-100 dark:border-slate-800 ${
         scrolled
           ? 'bg-white/95 dark:bg-slate-900/95 shadow-md backdrop-blur-xl'
           : 'bg-white/85 dark:bg-slate-900/85 backdrop-blur-xl'
@@ -88,15 +94,17 @@ export const Navbar: React.FC = () => {
           })}
         </div>
 
-        {/* User Auth Action Button + Dark Mode Toggle */}
+        {/* User Auth Action Button + 3-Way Dark/Light/System Mode Toggle */}
         <div className="hidden lg:flex items-center space-x-3">
-          {/* Dark Mode Toggle */}
           <button
             onClick={toggleTheme}
-            className="p-2.5 rounded-full text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all hover:scale-110 active:scale-95"
-            title={isDark ? 'Mode Terang' : 'Mode Gelap'}
+            className="flex items-center space-x-1.5 px-3 py-2 rounded-full border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all hover:scale-105 text-xs font-bold"
+            title={getThemeTitle()}
           >
-            {isDark ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5" />}
+            {mode === 'light' && <Sun className="w-4 h-4 text-amber-500" />}
+            {mode === 'dark' && <Moon className="w-4 h-4 text-sky-400" />}
+            {mode === 'system' && <Monitor className="w-4 h-4 text-emerald-500" />}
+            <span className="capitalize">{mode}</span>
           </button>
 
           {isAuthenticated && user ? (
@@ -131,10 +139,12 @@ export const Navbar: React.FC = () => {
         <div className="lg:hidden flex items-center space-x-2">
           <button
             onClick={toggleTheme}
-            className="p-2.5 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-            title={isDark ? 'Mode Terang' : 'Mode Gelap'}
+            className="p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 transition-colors"
+            title={getThemeTitle()}
           >
-            {isDark ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5" />}
+            {mode === 'light' && <Sun className="w-5 h-5 text-amber-500" />}
+            {mode === 'dark' && <Moon className="w-5 h-5 text-sky-400" />}
+            {mode === 'system' && <Monitor className="w-5 h-5 text-emerald-500" />}
           </button>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -161,7 +171,11 @@ export const Navbar: React.FC = () => {
               {link.label}
             </Link>
           ))}
-          <div className="pt-3 border-t border-slate-100 dark:border-slate-700">
+          <div className="pt-3 border-t border-slate-100 dark:border-slate-700 flex flex-col gap-3">
+            <div className="flex items-center justify-between text-xs font-bold text-slate-500 dark:text-slate-400">
+              <span>Tema Tampilan:</span>
+              <span className="capitalize text-sky-600 dark:text-sky-400">{mode}</span>
+            </div>
             {isAuthenticated ? (
               <button
                 onClick={() => {
