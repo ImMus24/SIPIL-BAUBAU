@@ -3,8 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\ComplaintController;
-use App\Http\Controllers\Api\V1\CategoryController;
-use App\Http\Controllers\Api\V1\AgencyController;
+use App\Http\Controllers\Api\V1\DataController;
 use App\Http\Controllers\Api\V1\StatController;
 use App\Http\Middleware\SecurityHeaders;
 use App\Http\Middleware\RoleMiddleware;
@@ -17,9 +16,9 @@ Route::middleware([SecurityHeaders::class])->prefix('v1')->group(function () {
         Route::post('/auth/login', [AuthController::class, 'login']);
     });
 
-    // Public Categories & Agencies
-    Route::get('/categories', [CategoryController::class, 'index']);
-    Route::get('/agencies', [AgencyController::class, 'index']);
+    // Public Categories & Agencies (cached 1 hour)
+    Route::get('/categories', [DataController::class, 'categories']);
+    Route::get('/agencies', [DataController::class, 'agencies']);
 
     // Public Complaints & Lookup
     Route::get('/complaints', [ComplaintController::class, 'index']);

@@ -28,6 +28,7 @@ class ComplaintResource extends JsonResource
             'longitude' => $this->longitude,
             'urgency' => $this->urgency,
             'status' => $this->status,
+            'rejection_reason' => $this->when($this->status === 'ditolak', $this->rejection_reason),
             'completed_at' => $this->completed_at?->toIso8601String(),
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),

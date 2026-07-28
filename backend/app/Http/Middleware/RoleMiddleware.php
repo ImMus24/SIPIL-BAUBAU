@@ -14,15 +14,15 @@ class RoleMiddleware
 
         if (!$user) {
             return response()->json([
-                'status' => 'error',
-                'message' => 'Unauthenticated.',
+                'success' => false,
+                'message' => 'Sesi Anda telah berakhir. Silakan login kembali.',
             ], 401);
         }
 
         if (!in_array($user->role, $roles)) {
             return response()->json([
-                'status' => 'error',
-                'message' => 'Unauthorized action. Invalid role permission.',
+                'success' => false,
+                'message' => 'Aksi ini hanya dapat dilakukan oleh role dengan izin yang sesuai.',
             ], 403);
         }
 

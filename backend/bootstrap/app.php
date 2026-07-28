@@ -46,4 +46,27 @@ return Application::configure(basePath: dirname(__DIR__))
                 ], 422);
             }
         });
+
+        // Handle custom BaseException
+        $exceptions->render(function (\App\Exceptions\BaseException $e, Request $request) {
+            if ($request->is('api/*')) {
+                return $e->render();
+            }
+        });
+
+        // Catch-all for 500 errors - never expose stack traces
+        $exceptions->render(function (\Throwable $e, Request $request) {
+            if ($request->is('api/*')) {
+                logger()->error($e->getMessage(), [
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                    'trace' => $e->getTraceAsString(),
+                ]);
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Terjadi kesalahan internal server. Silakan coba lagi.',
+                ], 500);
+            }
+        });
     })->create();

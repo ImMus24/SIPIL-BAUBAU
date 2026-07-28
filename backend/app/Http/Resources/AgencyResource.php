@@ -13,9 +13,9 @@ class AgencyResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'code' => $this->code,
-            'head_name' => $this->head_name,
-            'contact_email' => $this->contact_email,
-            'contact_phone' => $this->contact_phone,
+            'description' => $this->description,
+            'email' => $this->contact_email,
+            'phone' => $this->phone,
         ];
     }
 }

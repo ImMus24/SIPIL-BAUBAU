@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Contracts\ComplaintRepositoryInterface;
+use Illuminate\Support\Facades\Cache;
 
 class StatService
 {
@@ -12,6 +13,8 @@ class StatService
 
     public function getSummary(): array
     {
-        return $this->complaintRepository->getSummaryStats();
+        return Cache::remember('stats_summary', 300, function () {
+            return $this->complaintRepository->getSummaryStats();
+        });
     }
 }

@@ -29,11 +29,10 @@ class ComplaintPolicy
             return true;
         }
 
-        if ($user->isOfficer() && $user->agency_id && $complaint->agency_id === $user->agency_id) {
-            return true;
-        }
-
-        return $user->isOfficer() || $user->isAdmin();
+        // Officer can only update complaints assigned to their agency
+        return $user->isOfficer()
+            && $user->agency_id
+            && $complaint->agency_id === $user->agency_id;
     }
 
     public function delete(User $user, Complaint $complaint): bool
