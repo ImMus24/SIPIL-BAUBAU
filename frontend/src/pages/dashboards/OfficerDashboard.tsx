@@ -6,7 +6,6 @@ import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Skeleton } from '../../components/dashboard/LoadingSkeleton';
 import { ErrorState } from '../../components/dashboard/ErrorState';
-import { StatusBadge } from '../../components/ui/Badge';
 import { OfficerWelcomeHeader } from '../../components/officer/OfficerWelcomeHeader';
 import { OfficerKPIGrid } from '../../components/officer/OfficerKPIGrid';
 import { OfficerQuickActions } from '../../components/officer/OfficerQuickActions';
@@ -22,7 +21,7 @@ import type {
   Complaint, OfficerDashboardData, PerformanceDay,
 } from '../../types';
 import {
-  ClipboardList, ChevronRight, Clock, ArrowUpRight, ArrowUpCircle,
+  ClipboardList, ArrowUpCircle, Navigation,
 } from 'lucide-react';
 
 type TabId = 'semua' | 'menunggu' | 'diproses' | 'selesai';

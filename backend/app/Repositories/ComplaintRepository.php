@@ -357,8 +357,14 @@ class ComplaintRepository implements ComplaintRepositoryInterface
             $query->where('agency_id', $agencyId);
         }
 
+        $driver = DB::getDriverName();
+        // SQLite: julianday diff × 24; MySQL: TIMESTAMPDIFF
+        $expr = $driver === 'sqlite'
+            ? "AVG((julianday(completed_at) - julianday(created_at)) * 24)"
+            : "AVG(TIMESTAMPDIFF(HOUR, created_at, completed_at))";
+
         $avg = $query
-            ->selectRaw('AVG(TIMESTAMPDIFF(HOUR, created_at, completed_at)) as avg_hours')
+            ->selectRaw("{$expr} as avg_hours")
             ->first()
             ->avg_hours ?? 0;
 

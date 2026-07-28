@@ -222,7 +222,7 @@ export const OfficerProgressModal: React.FC<OfficerProgressModalProps> = ({
                     <Camera className="w-6 h-6 text-muted-foreground" />
                     <span className="text-[10px] text-muted-foreground font-medium">Upload Foto</span>
                     <input
-                      ref={el => fileInputRefs.current[photo.type] = el}
+                      ref={el => { fileInputRefs.current[photo.type] = el; }}
                       type="file"
                       accept="image/*"
                       className="hidden"
