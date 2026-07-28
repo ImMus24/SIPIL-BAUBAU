@@ -1,14 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { BaubauMap } from '../components/map/BaubauMap';
 import { complaintService } from '../services/complaintService';
-import type { Category, BaubauSubdistrict, UrgencyLevel, Complaint } from '../types';
+import type { BaubauSubdistrict, UrgencyLevel, Complaint } from '../types';
 import { Modal } from '../components/ui/Modal';
-import {
-  FilePlus,
-  CheckCircle2,
-  UploadCloud
-} from 'lucide-react';
+import { CheckCircle2, UploadCloud, ArrowRight, ArrowLeft } from 'lucide-react';
 
 const SUBDISTRICTS: BaubauSubdistrict[] = [
   'Wolio',
@@ -21,20 +17,29 @@ const SUBDISTRICTS: BaubauSubdistrict[] = [
   'Batupoaro',
 ];
 
+const CATEGORIES_WIZARD = [
+  { id: 1, name: 'Jalan & Jembatan', icon: 'edit_road' },
+  { id: 3, name: 'Penerangan Jalan', icon: 'light' },
+  { id: 2, name: 'Drainase & Air', icon: 'waves' },
+  { id: 5, name: 'Fasilitas Publik', icon: 'park' },
+  { id: 4, name: 'Sampah & Kebersihan', icon: 'delete_sweep' },
+  { id: 6, name: 'Lalu Lintas', icon: 'traffic' },
+  { id: 7, name: 'Gedung Pemerintah', icon: 'domain' },
+  { id: 8, name: 'Lainnya', icon: 'more_horiz' },
+];
+
 export const SubmitComplaintPage: React.FC = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const initialCategory = searchParams.get('category') ? Number(searchParams.get('category')) : 1;
-
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [currentStep, setCurrentStep] = useState<number>(1);
   const [loading, setLoading] = useState(false);
   const [createdResult, setCreatedResult] = useState<Complaint | null>(null);
 
   // Form States
+  const [categoryId, setCategoryId] = useState<number>(1);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [categoryId, setCategoryId] = useState<number>(initialCategory);
   const [urgency, setUrgency] = useState<UrgencyLevel>('sedang');
+  const [photos, setPhotos] = useState<File[]>([]);
   const [subdistrict, setSubdistrict] = useState<BaubauSubdistrict>('Wolio');
   const [address, setAddress] = useState('');
   const [lat, setLat] = useState<number>(-5.4642);
@@ -43,11 +48,6 @@ export const SubmitComplaintPage: React.FC = () => {
   const [reporterPhone, setReporterPhone] = useState('');
   const [reporterEmail, setReporterEmail] = useState('');
   const [isAnonymous, setIsAnonymous] = useState(false);
-  const [photos, setPhotos] = useState<File[]>([]);
-
-  useEffect(() => {
-    complaintService.getCategories().then(setCategories);
-  }, []);
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -55,13 +55,27 @@ export const SubmitComplaintPage: React.FC = () => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!title || !description || !address) {
-      alert('Harap lengkapi judul, deskripsi, dan alamat pengaduan.');
-      return;
+  const handleNextStep = () => {
+    if (currentStep === 1) {
+      setCurrentStep(2);
+    } else if (currentStep === 2) {
+      if (!title || !description) {
+        alert('Harap isi judul dan deskripsi laporan terlebih dahulu.');
+        return;
+      }
+      setCurrentStep(3);
+    } else if (currentStep === 3) {
+      setCurrentStep(4);
+    } else if (currentStep === 4) {
+      if (!address) {
+        alert('Harap isi alamat lengkap atau patokan lokasi.');
+        return;
+      }
+      setCurrentStep(5);
     }
+  };
 
+  const handleSubmit = async () => {
     setLoading(true);
     try {
       const res = await complaintService.createComplaint({
@@ -88,298 +102,385 @@ export const SubmitComplaintPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
-      
-      {/* Header */}
-      <div className="text-center space-y-2">
-        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-teal-50 text-teal-800 border border-teal-200 text-xs font-bold uppercase tracking-wider">
-          <FilePlus className="w-4 h-4 text-teal-600" />
-          <span>Formulir Pengaduan Resmi Kota Baubau</span>
-        </div>
-        <h1 className="text-3xl font-black text-slate-900 tracking-tight">Laporkan Kerusakan Infrastruktur</h1>
-        <p className="text-sm text-slate-600 max-w-xl mx-auto">
-          Laporan Anda langsung dikirimkan ke Dashboard Admin dan OPD Kota Baubau terkait.
-        </p>
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-8">
+    <div className="min-h-screen bg-[#f3f3fe] py-12 px-4 sm:px-6 lg:px-8 font-sans">
+      <div className="max-w-4xl mx-auto space-y-8">
         
-        {/* Step 1: Informasi Pengaduan */}
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
-          <div className="flex items-center space-x-3 border-b pb-4">
-            <div className="w-8 h-8 rounded-xl bg-teal-700 text-white font-bold text-sm flex items-center justify-center">
-              1
-            </div>
-            <div>
-              <h3 className="font-bold text-base text-slate-900">Detail Kerusakan Infrastruktur</h3>
-              <p className="text-xs text-slate-500">Jelaskan judul, kategori, dan deskripsi masalah</p>
-            </div>
-          </div>
+        {/* Top Header */}
+        <div className="space-y-2">
+          <h1 className="font-headline text-3xl sm:text-4xl font-extrabold text-[#191b23]">
+            Buat Laporan Baru
+          </h1>
+          <p className="text-sm text-[#434655] leading-relaxed max-w-2xl">
+            Sampaikan keluhan atau aspirasi Anda terkait infrastruktur di Kota Baubau. Kami berkomitmen untuk merespons setiap laporan dengan cepat dan tepat.
+          </p>
+        </div>
 
-          <div className="space-y-4 text-xs">
-            <div>
-              <label className="block font-bold text-slate-800 mb-1">Judul Laporan Pengaduan *</label>
-              <input
-                type="text"
-                required
-                placeholder="Contoh: Jalan Berlubang Parah di Depan Benteng Keraton Wolio"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="w-full text-xs font-medium rounded-xl border border-slate-200 p-3 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-teal-500"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block font-bold text-slate-800 mb-1">Kategori Infrastruktur *</label>
-                <select
-                  value={categoryId}
-                  onChange={(e) => setCategoryId(Number(e.target.value))}
-                  className="w-full text-xs font-semibold rounded-xl border border-slate-200 p-3 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-teal-500"
-                >
-                  {categories.map((cat) => (
-                    <option key={cat.id} value={cat.id}>{cat.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-800 mb-1">Tingkat Urgensi *</label>
-                <select
-                  value={urgency}
-                  onChange={(e) => setUrgency(e.target.value as UrgencyLevel)}
-                  className="w-full text-xs font-semibold rounded-xl border border-slate-200 p-3 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-teal-500"
-                >
-                  <option value="rendah">Rendah (Kerusakan Ringan)</option>
-                  <option value="sedang">Sedang (Mengganggu kenyamanan)</option>
-                  <option value="tinggi">Tinggi (Beresiko kecelakaan)</option>
-                  <option value="darurat">Darurat (Bencana/Membahayakan nyawa)</option>
-                </select>
-              </div>
-            </div>
-
-            <div>
-              <label className="block font-bold text-slate-800 mb-1">Deskripsi Lengkap Kerusakan *</label>
-              <textarea
-                required
-                rows={4}
-                placeholder="Ceritakan detail kerusakan, kedalaman lubang, waktu terjadinya, atau dampaknya terhadap warga..."
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="w-full text-xs font-medium rounded-xl border border-slate-200 p-3 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-teal-500"
-              ></textarea>
-            </div>
+        {/* 5-Step Progress Indicator Header */}
+        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#e1e2ed] shadow-xs">
+          <div className="grid grid-cols-5 gap-2 relative">
+            <div className="absolute top-5 left-[10%] right-[10%] h-0.5 bg-[#e1e2ed] -z-0"></div>
+            
+            {[
+              { num: 1, label: 'Kategori' },
+              { num: 2, label: 'Detail' },
+              { num: 3, label: 'Foto' },
+              { num: 4, label: 'Lokasi' },
+              { num: 5, label: 'Review' },
+            ].map((step) => {
+              const active = currentStep === step.num;
+              const completed = currentStep > step.num;
+              return (
+                <div key={step.num} className="flex flex-col items-center gap-2 relative z-10">
+                  <div
+                    className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all ${
+                      active
+                        ? 'bg-[#004ac6] text-white shadow-md shadow-[#004ac6]/20 ring-4 ring-[#dbe1ff]'
+                        : completed
+                        ? 'bg-[#004ac6] text-white'
+                        : 'bg-[#e1e2ed] text-slate-500'
+                    }`}
+                  >
+                    {step.num}
+                  </div>
+                  <span
+                    className={`text-xs font-semibold ${
+                      active ? 'text-[#004ac6] font-bold' : 'text-slate-500'
+                    }`}
+                  >
+                    {step.label}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </div>
 
-        {/* Step 2: Lokasi & Map Pin Picker */}
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
-          <div className="flex items-center space-x-3 border-b pb-4">
-            <div className="w-8 h-8 rounded-xl bg-teal-700 text-white font-bold text-sm flex items-center justify-center">
-              2
-            </div>
-            <div>
-              <h3 className="font-bold text-base text-slate-900">Lokasi Presisi & Pemetaan GIS</h3>
-              <p className="text-xs text-slate-500">Pilih Kecamatan dan klik titik pada peta Kota Baubau</p>
-            </div>
-          </div>
+        {/* Step Wizard Container */}
+        <div className="bg-white rounded-3xl p-6 sm:p-10 border border-[#e1e2ed] shadow-xs space-y-8">
+          
+          {/* STEP 1: Pilih Kategori Laporan */}
+          {currentStep === 1 && (
+            <div className="space-y-6">
+              <h3 className="font-headline text-xl font-bold text-[#191b23]">
+                Pilih Kategori Laporan
+              </h3>
 
-          <div className="space-y-4 text-xs">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block font-bold text-slate-800 mb-1">Kecamatan di Kota Baubau *</label>
-                <select
-                  value={subdistrict}
-                  onChange={(e) => setSubdistrict(e.target.value as BaubauSubdistrict)}
-                  className="w-full text-xs font-semibold rounded-xl border border-slate-200 p-3 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-teal-500"
-                >
-                  {SUBDISTRICTS.map((sub) => (
-                    <option key={sub} value={sub}>Kecamatan {sub}</option>
-                  ))}
-                </select>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {CATEGORIES_WIZARD.map((cat) => {
+                  const selected = categoryId === cat.id;
+                  return (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => setCategoryId(cat.id)}
+                      className={`p-6 rounded-2xl border text-center transition-all flex flex-col items-center justify-center space-y-3 min-h-[140px] ${
+                        selected
+                          ? 'border-[#004ac6] bg-[#dbe1ff]/40 shadow-md ring-2 ring-[#004ac6]/20'
+                          : 'border-[#e1e2ed] bg-white hover:border-[#004ac6] hover:bg-slate-50'
+                      }`}
+                    >
+                      <span className={`material-symbols-outlined text-3xl ${selected ? 'text-[#004ac6]' : 'text-slate-600'}`}>
+                        {cat.icon}
+                      </span>
+                      <span className={`text-xs sm:text-sm font-bold ${selected ? 'text-[#004ac6]' : 'text-slate-800'}`}>
+                        {cat.name}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
+            </div>
+          )}
 
-              <div>
-                <label className="block font-bold text-slate-800 mb-1">Alamat Jalan / Patokan *</label>
+          {/* STEP 2: Detail Laporan */}
+          {currentStep === 2 && (
+            <div className="space-y-6">
+              <h3 className="font-headline text-xl font-bold text-[#191b23]">
+                Isi Detail Pengaduan Kerusakan
+              </h3>
+
+              <div className="space-y-5 text-sm">
+                <div>
+                  <label className="block font-bold text-slate-800 mb-2">Judul Laporan Pengaduan *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Contoh: Jalan Berlubang Parah di Depan Benteng Keraton Wolio"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className="w-full text-sm font-medium rounded-xl border border-[#e1e2ed] p-3.5 bg-[#f8fafc] focus:bg-white focus:outline-none focus:border-[#004ac6]"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-800 mb-2">Tingkat Urgensi Kerusakan *</label>
+                  <select
+                    value={urgency}
+                    onChange={(e) => setUrgency(e.target.value as UrgencyLevel)}
+                    className="w-full text-sm font-semibold rounded-xl border border-[#e1e2ed] p-3.5 bg-[#f8fafc] focus:bg-white focus:outline-none focus:border-[#004ac6]"
+                  >
+                    <option value="rendah">Rendah (Kerusakan Ringan)</option>
+                    <option value="sedang">Sedang (Mengganggu Kenyamanan Warga)</option>
+                    <option value="tinggi">Tinggi (Beresiko Kecelakaan Lalu Lintas)</option>
+                    <option value="darurat">Darurat (Bencana / Membahayakan Nyawa)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-800 mb-2">Deskripsi Lengkap Kerusakan *</label>
+                  <textarea
+                    required
+                    rows={5}
+                    placeholder="Ceritakan detail kerusakan, estimasi ukuran lubang/panjang kerusakan, waktu terjadinya, atau dampaknya terhadap warga..."
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    className="w-full text-sm font-medium rounded-xl border border-[#e1e2ed] p-3.5 bg-[#f8fafc] focus:bg-white focus:outline-none focus:border-[#004ac6]"
+                  ></textarea>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* STEP 3: Upload Foto Bukti */}
+          {currentStep === 3 && (
+            <div className="space-y-6">
+              <h3 className="font-headline text-xl font-bold text-[#191b23]">
+                Upload Foto Bukti Kerusakan
+              </h3>
+              <p className="text-xs text-slate-500">Lampirkan foto jernih dari lokasi untuk mempermudah tim teknis OPD.</p>
+
+              <div className="border-2 border-dashed border-[#e1e2ed] rounded-3xl p-8 text-center hover:border-[#004ac6] transition-colors bg-[#f8fafc]">
+                <UploadCloud className="w-12 h-12 text-[#004ac6] mx-auto mb-3" />
+                <p className="text-sm font-bold text-slate-800">Pilih file foto dari perangkat Anda</p>
+                <p className="text-xs text-slate-500 mt-1">Format JPG, PNG, atau WEBP (Maksimal 5MB per file)</p>
                 <input
-                  type="text"
-                  required
-                  placeholder="Contoh: Jl. Sultan Murhum No. 45 dekat Gerbang Keraton"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  className="w-full text-xs font-medium rounded-xl border border-slate-200 p-3 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-teal-500"
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handlePhotoUpload}
+                  className="mt-4 text-xs mx-auto"
                 />
+                {photos.length > 0 && (
+                  <p className="text-xs font-bold text-[#004ac6] mt-3">
+                    Terpilih {photos.length} file foto bukti.
+                  </p>
+                )}
               </div>
             </div>
+          )}
 
-            <div>
-              <label className="block font-bold text-slate-800 mb-2">Pin Lokasi Peta Interaktif (Klik pada peta):</label>
-              <BaubauMap
-                pickLocation={true}
-                selectedLat={lat}
-                selectedLng={lng}
-                onLocationSelect={(latitude, longitude) => {
-                  setLat(latitude);
-                  setLng(longitude);
-                }}
-                height="350px"
-              />
-              <div className="mt-2 text-[11px] text-teal-700 bg-teal-50 p-2.5 rounded-xl border border-teal-200 flex items-center justify-between font-mono">
-                <span>Koordinat Terpilih:</span>
-                <span>Lat: {lat.toFixed(5)}, Lng: {lng.toFixed(5)}</span>
+          {/* STEP 4: Pilih Lokasi Peta GIS */}
+          {currentStep === 4 && (
+            <div className="space-y-6">
+              <h3 className="font-headline text-xl font-bold text-[#191b23]">
+                Penentuan Lokasi Presisi GIS
+              </h3>
+
+              <div className="space-y-4 text-sm">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block font-bold text-slate-800 mb-2">Kecamatan di Kota Baubau *</label>
+                    <select
+                      value={subdistrict}
+                      onChange={(e) => setSubdistrict(e.target.value as BaubauSubdistrict)}
+                      className="w-full text-sm font-semibold rounded-xl border border-[#e1e2ed] p-3.5 bg-[#f8fafc] focus:bg-white focus:outline-none focus:border-[#004ac6]"
+                    >
+                      {SUBDISTRICTS.map((sub) => (
+                        <option key={sub} value={sub}>Kecamatan {sub}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block font-bold text-slate-800 mb-2">Alamat / Patokan Jalan *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Contoh: Jl. Sultan Murhum No. 45 dekat Gerbang Keraton"
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                      className="w-full text-sm font-medium rounded-xl border border-[#e1e2ed] p-3.5 bg-[#f8fafc] focus:bg-white focus:outline-none focus:border-[#004ac6]"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-slate-800 mb-2">Tandai Lokasi Presisi di Peta GIS (Klik pada peta):</label>
+                  <BaubauMap
+                    pickLocation={true}
+                    selectedLat={lat}
+                    selectedLng={lng}
+                    onLocationSelect={(latitude, longitude) => {
+                      setLat(latitude);
+                      setLng(longitude);
+                    }}
+                    height="360px"
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+          )}
 
-        {/* Step 3: Lampiran Foto */}
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
-          <div className="flex items-center space-x-3 border-b pb-4">
-            <div className="w-8 h-8 rounded-xl bg-teal-700 text-white font-bold text-sm flex items-center justify-center">
-              3
-            </div>
-            <div>
-              <h3 className="font-bold text-base text-slate-900">Upload Foto Bukti Lapangan</h3>
-              <p className="text-xs text-slate-500">Sertakan 1-3 foto jernih lokasi kerusakan</p>
-            </div>
-          </div>
+          {/* STEP 5: Review & Konfirmasi Pelapor */}
+          {currentStep === 5 && (
+            <div className="space-y-6">
+              <h3 className="font-headline text-xl font-bold text-[#191b23]">
+                Review & Konfirmasi Identitas Pelapor
+              </h3>
 
-          <div className="border-2 border-dashed border-slate-200 rounded-2xl p-6 text-center hover:border-teal-500 transition-colors">
-            <UploadCloud className="w-10 h-10 text-teal-600 mx-auto mb-2" />
-            <p className="text-xs font-bold text-slate-700">Pilih file foto dari perangkat Anda</p>
-            <p className="text-[11px] text-slate-400 mt-0.5">Format JPG, PNG, atau WEBP (Maksimal 5MB per file)</p>
-            <input
-              type="file"
-              multiple
-              accept="image/*"
-              onChange={handlePhotoUpload}
-              className="mt-3 text-xs mx-auto"
-            />
-            {photos.length > 0 && (
-              <p className="text-xs font-bold text-teal-700 mt-2">
-                Terpilih {photos.length} file foto bukti.
-              </p>
+              <div className="bg-[#f8fafc] p-6 rounded-2xl border border-[#e1e2ed] space-y-3 text-xs sm:text-sm text-slate-700">
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-semibold text-slate-500">Judul Laporan:</span>
+                  <span className="font-bold text-slate-900">{title}</span>
+                </div>
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-semibold text-slate-500">Kecamatan / Lokasi:</span>
+                  <span className="font-bold text-slate-900">{subdistrict} ({address})</span>
+                </div>
+                <div className="flex justify-between border-b pb-2">
+                  <span className="font-semibold text-slate-500">Urgensi:</span>
+                  <span className="font-bold text-[#004ac6] capitalize">{urgency}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-semibold text-slate-500">Foto Lampiran:</span>
+                  <span className="font-bold text-slate-900">{photos.length} Foto</span>
+                </div>
+              </div>
+
+              <div className="space-y-4 pt-2">
+                <label className="flex items-center space-x-3 text-xs sm:text-sm font-bold text-slate-800 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={isAnonymous}
+                    onChange={(e) => setIsAnonymous(e.target.checked)}
+                    className="w-4 h-4 text-[#004ac6] rounded"
+                  />
+                  <span>Kirimkan laporan secara Anonim (Identitas dirahasiakan)</span>
+                </label>
+
+                {!isAnonymous && (
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+                    <div>
+                      <label className="block font-bold text-slate-800 mb-1">Nama Lengkap</label>
+                      <input
+                        type="text"
+                        placeholder="Nama lengkap Anda"
+                        value={reporterName}
+                        onChange={(e) => setReporterName(e.target.value)}
+                        className="w-full p-3.5 bg-[#f8fafc] border border-[#e1e2ed] rounded-xl text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-bold text-slate-800 mb-1">No. WhatsApp / HP</label>
+                      <input
+                        type="tel"
+                        placeholder="0812XXXXXXXX"
+                        value={reporterPhone}
+                        onChange={(e) => setReporterPhone(e.target.value)}
+                        className="w-full p-3.5 bg-[#f8fafc] border border-[#e1e2ed] rounded-xl text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-bold text-slate-800 mb-1">Email (Opsional)</label>
+                      <input
+                        type="email"
+                        placeholder="email@domain.com"
+                        value={reporterEmail}
+                        onChange={(e) => setReporterEmail(e.target.value)}
+                        className="w-full p-3.5 bg-[#f8fafc] border border-[#e1e2ed] rounded-xl text-sm"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Action Buttons: Batal & Lanjut */}
+          <div className="pt-6 border-t border-[#e1e2ed] flex items-center justify-between">
+            {currentStep > 1 ? (
+              <button
+                type="button"
+                onClick={() => setCurrentStep(currentStep - 1)}
+                className="px-6 py-3 border border-[#e1e2ed] text-slate-700 font-bold text-sm rounded-full hover:bg-slate-50 transition-colors flex items-center space-x-2"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Kembali</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => navigate('/')}
+                className="text-rose-600 hover:underline text-sm font-bold"
+              >
+                Batal
+              </button>
+            )}
+
+            {currentStep < 5 ? (
+              <button
+                type="button"
+                onClick={handleNextStep}
+                className="px-8 py-3.5 bg-[#004ac6] hover:bg-[#2563eb] text-white text-sm font-bold rounded-full shadow-lg shadow-[#004ac6]/20 transition-all flex items-center space-x-2"
+              >
+                <span>Lanjut</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={loading}
+                className="px-8 py-3.5 bg-[#004ac6] hover:bg-[#2563eb] text-white text-sm font-bold rounded-full shadow-lg shadow-[#004ac6]/20 transition-all flex items-center space-x-2"
+              >
+                <span>{loading ? 'Mengirim...' : 'Kirim Pengaduan'}</span>
+                <CheckCircle2 className="w-4 h-4 text-amber-300" />
+              </button>
             )}
           </div>
+
         </div>
 
-        {/* Step 4: Identitas Pelapor */}
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
-          <div className="flex items-center justify-between border-b pb-4">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 rounded-xl bg-teal-700 text-white font-bold text-sm flex items-center justify-center">
-                4
-              </div>
-              <div>
-                <h3 className="font-bold text-base text-slate-900">Identitas Kontak Pelapor</h3>
-                <p className="text-xs text-slate-500">Untuk verifikasi dan notifikasi status penanganan</p>
-              </div>
-            </div>
-            <label className="flex items-center space-x-2 text-xs font-bold text-slate-700 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={isAnonymous}
-                onChange={(e) => setIsAnonymous(e.target.checked)}
-                className="w-4 h-4 text-teal-600 rounded"
-              />
-              <span>Kirimkan Anonim</span>
-            </label>
-          </div>
-
-          {!isAnonymous && (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
-              <div>
-                <label className="block font-bold text-slate-800 mb-1">Nama Lengkap</label>
-                <input
-                  type="text"
-                  placeholder="Contoh: La Ode Ahmad"
-                  value={reporterName}
-                  onChange={(e) => setReporterName(e.target.value)}
-                  className="w-full text-xs font-medium rounded-xl border border-slate-200 p-3 bg-slate-50 focus:bg-white"
-                />
+        {/* Success Modal */}
+        {createdResult && (
+          <Modal
+            isOpen={!!createdResult}
+            onClose={() => {
+              setCreatedResult(null);
+              navigate(`/track?ticket=${createdResult.ticket_code}`);
+            }}
+            title="Laporan Pengaduan Berhasil Terdaftar!"
+            maxWidth="md"
+          >
+            <div className="text-center space-y-4 py-4">
+              <div className="w-16 h-16 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto shadow-inner">
+                <CheckCircle2 className="w-10 h-10" />
               </div>
 
               <div>
-                <label className="block font-bold text-slate-800 mb-1">No. WhatsApp / HP</label>
-                <input
-                  type="tel"
-                  placeholder="0812XXXXXXXX"
-                  value={reporterPhone}
-                  onChange={(e) => setReporterPhone(e.target.value)}
-                  className="w-full text-xs font-medium rounded-xl border border-slate-200 p-3 bg-slate-50 focus:bg-white"
-                />
+                <p className="text-xs text-slate-500">Kode Tiket Pelacakan Resmi Anda:</p>
+                <div className="inline-block my-2 px-5 py-2.5 bg-slate-900 text-amber-400 font-mono font-black text-2xl rounded-2xl shadow-md border border-slate-800">
+                  {createdResult.ticket_code}
+                </div>
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Simpan kode tiket ini untuk mengecek progres penanganan oleh Dinas terkait di Kota Baubau.
+                </p>
               </div>
 
-              <div>
-                <label className="block font-bold text-slate-800 mb-1">Email (Opsional)</label>
-                <input
-                  type="email"
-                  placeholder="email@domain.com"
-                  value={reporterEmail}
-                  onChange={(e) => setReporterEmail(e.target.value)}
-                  className="w-full text-xs font-medium rounded-xl border border-slate-200 p-3 bg-slate-50 focus:bg-white"
-                />
-              </div>
+              <button
+                onClick={() => {
+                  setCreatedResult(null);
+                  navigate(`/track?ticket=${createdResult.ticket_code}`);
+                }}
+                className="w-full py-3.5 bg-[#004ac6] text-white font-bold text-sm rounded-xl shadow-md hover:bg-[#2563eb] transition-colors"
+              >
+                Lihat Progres Laporan Saya
+              </button>
             </div>
-          )}
-        </div>
+          </Modal>
+        )}
 
-        {/* Submit Button */}
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full py-4 bg-gradient-to-r from-teal-700 to-teal-900 hover:from-teal-800 hover:to-slate-900 text-white font-black text-sm rounded-2xl shadow-xl hover:shadow-2xl transition-all flex items-center justify-center space-x-2"
-        >
-          {loading ? (
-            <span>Mengirimkan Laporan ke Pemkot Baubau...</span>
-          ) : (
-            <>
-              <CheckCircle2 className="w-5 h-5 text-amber-400" />
-              <span>Kirim Pengaduan Infrastruktur Sekarang</span>
-            </>
-          )}
-        </button>
-      </form>
-
-      {/* Success Dialog Modal */}
-      {createdResult && (
-        <Modal
-          isOpen={!!createdResult}
-          onClose={() => {
-            setCreatedResult(null);
-            navigate(`/track?ticket=${createdResult.ticket_code}`);
-          }}
-          title="Laporan Pengaduan Berhasil Terdaftar!"
-          maxWidth="md"
-        >
-          <div className="text-center space-y-4 py-2">
-            <div className="w-16 h-16 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto shadow-inner">
-              <CheckCircle2 className="w-10 h-10" />
-            </div>
-
-            <div>
-              <p className="text-xs text-slate-500">Kode Tiket Resmi Pelacakan Anda:</p>
-              <div className="inline-block my-2 px-4 py-2 bg-slate-900 text-amber-400 font-mono font-black text-xl rounded-xl border border-slate-800 shadow-md">
-                {createdResult.ticket_code}
-              </div>
-              <p className="text-xs text-slate-600">
-                Simpan kode unik ini untuk mengecek progres penanganan oleh Dinas terkait di Kota Baubau.
-              </p>
-            </div>
-
-            <button
-              onClick={() => {
-                setCreatedResult(null);
-                navigate(`/track?ticket=${createdResult.ticket_code}`);
-              }}
-              className="w-full py-3 bg-teal-700 text-white font-bold text-xs rounded-xl shadow-md hover:bg-teal-800 transition-colors"
-            >
-              Lihat Progres Laporan Saya
-            </button>
-          </div>
-        </Modal>
-      )}
-
+      </div>
     </div>
   );
 };
