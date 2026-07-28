@@ -10,39 +10,39 @@ export const AboutPage: React.FC = () => {
         <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-teal-700 to-slate-900 text-white flex items-center justify-center mx-auto shadow-lg">
           <ShieldCheck className="w-8 h-8 text-amber-400" />
         </div>
-        <h1 className="text-3xl font-black text-slate-900">Tentang SIPIL BAUBAU</h1>
-        <p className="text-sm text-slate-600 max-w-xl mx-auto">
+        <h1 className="text-3xl font-black text-slate-900 dark:text-white">Tentang SIPIL BAUBAU</h1>
+        <p className="text-sm text-slate-600 dark:text-slate-400 max-w-xl mx-auto">
           Sistem Pengaduan Infrastruktur Berbasis Web dengan Pemetaan Lokasi GIS dan Monitoring Penanganan Laporan Real-Time di Kota Baubau
         </p>
       </div>
 
       {/* Main Vision */}
-      <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-4">
-        <h3 className="font-extrabold text-lg text-slate-900">Maksud & Tujuan Aplikasi</h3>
-        <p className="text-xs text-slate-600 leading-relaxed">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+        <h3 className="font-extrabold text-lg text-slate-900 dark:text-white">Maksud & Tujuan Aplikasi</h3>
+        <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
           SIPIL BAUBAU dikembangkan sebagai wujud komitmen Pemerintah Kota Baubau dalam mewujudkan tata kelola pemerintahan yang responsif, transparan, dan akuntabel. Aplikasi ini mempermudah masyarakat Kota Baubau di 8 Kecamatan (Wolio, Betoambari, Murhum, Kokalukuna, Lea-Lea, Sorawolio, Bungi, dan Batupoaro) dalam melaporkan setiap kerusakan jalan, jembatan, saluran air/drainase, lampu jalan (PJU), fasilitas publik, dan kebersihan.
         </p>
       </div>
 
       {/* OPD Partners Grid */}
       <div className="space-y-4">
-        <h3 className="font-extrabold text-lg text-slate-900 text-center">Organisasi Perangkat Daerah (OPD) Terkait</h3>
+        <h3 className="font-extrabold text-lg text-slate-900 dark:text-white text-center">Organisasi Perangkat Daerah (OPD) Terkait</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-1">
-            <h4 className="font-bold text-sm text-teal-800">Dinas PUPR Kota Baubau</h4>
-            <p className="text-xs text-slate-500">Penanganan perbaikan badan jalan, jembatan, drainase perkotaan, dan tata ruang.</p>
+          <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-1">
+            <h4 className="font-bold text-sm text-teal-800 dark:text-sky-400">Dinas PUPR Kota Baubau</h4>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Penanganan perbaikan badan jalan, jembatan, drainase perkotaan, dan tata ruang.</p>
           </div>
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-1">
-            <h4 className="font-bold text-sm text-teal-800">Dinas PERKIM Kota Baubau</h4>
-            <p className="text-xs text-slate-500">Pengelolaan jaringan Penerangan Jalan Umum (PJU) dan pemukiman warga.</p>
+          <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-1">
+            <h4 className="font-bold text-sm text-teal-800 dark:text-sky-400">Dinas PERKIM Kota Baubau</h4>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Pengelolaan jaringan Penerangan Jalan Umum (PJU) dan pemukiman warga.</p>
           </div>
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-1">
-            <h4 className="font-bold text-sm text-teal-800">Dinas Lingkungan Hidup Kota Baubau</h4>
-            <p className="text-xs text-slate-500">Pengangkutan sampah liar, kebersihan TPS, dan pemangkasan pohon tumbang.</p>
+          <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-1">
+            <h4 className="font-bold text-sm text-teal-800 dark:text-sky-400">Dinas Lingkungan Hidup Kota Baubau</h4>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Pengangkutan sampah liar, kebersihan TPS, dan pemangkasan pohon tumbang.</p>
           </div>
-          <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-1">
-            <h4 className="font-bold text-sm text-teal-800">Dinas Perhubungan Kota Baubau</h4>
-            <p className="text-xs text-slate-500">Perbaikan rambu lalu lintas, cermin tikungan, dan penerangan markah jalan.</p>
+          <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-1">
+            <h4 className="font-bold text-sm text-teal-800 dark:text-sky-400">Dinas Perhubungan Kota Baubau</h4>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Perbaikan rambu lalu lintas, cermin tikungan, dan penerangan markah jalan.</p>
           </div>
         </div>
       </div>

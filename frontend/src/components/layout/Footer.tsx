@@ -4,7 +4,7 @@ import { ShieldCheck, MapPin, Phone, Mail, Globe, ExternalLink } from 'lucide-re
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="bg-slate-950 text-slate-300 border-t border-sky-900/60 w-full py-16">
+    <footer className="bg-slate-950 text-slate-300 border-t border-sky-900/60 dark:border-slate-800 w-full py-16">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-10 px-4 sm:px-8 max-w-[1280px] mx-auto">
         
         {/* Brand Col */}
@@ -76,7 +76,7 @@ export const Footer: React.FC = () => {
 
       </div>
 
-      <div className="mt-14 pt-7 border-t border-slate-900 text-center text-sm text-slate-500 flex flex-col sm:flex-row items-center justify-between max-w-[1280px] mx-auto px-4 sm:px-8">
+      <div className="mt-14 pt-7 border-t border-slate-900 dark:border-slate-800 text-center text-sm text-slate-500 flex flex-col sm:flex-row items-center justify-between max-w-[1280px] mx-auto px-4 sm:px-8">
         <p>© {new Date().getFullYear()} Pemerintah Kota Baubau. Sistem Pengaduan Infrastruktur Kota.</p>
         <p className="mt-2 sm:mt-0 font-mono text-xs text-amber-400/90">GovTech Kota Baubau v1.0.0</p>
       </div>

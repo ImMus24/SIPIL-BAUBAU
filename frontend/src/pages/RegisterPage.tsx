@@ -45,10 +45,10 @@ export const RegisterPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#faf8ff] flex flex-col lg:flex-row font-sans">
+    <div className="min-h-screen bg-[#faf8ff] dark:bg-slate-950 flex flex-col lg:flex-row font-sans transition-colors duration-300">
       
       {/* Left Blue Hero Panel */}
-      <div className="lg:w-5/12 bg-[#004ac6] text-white p-8 sm:p-14 flex flex-col justify-between relative overflow-hidden">
+      <div className="lg:w-5/12 bg-[#004ac6] dark:bg-sky-950 text-white p-8 sm:p-14 flex flex-col justify-between relative overflow-hidden">
         <div className="space-y-8 relative z-10">
           <div className="flex items-center space-x-3">
             <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-amber-300 ring-2 ring-white/40 shadow-lg">
@@ -94,18 +94,18 @@ export const RegisterPage: React.FC = () => {
       </div>
 
       {/* Right Register Form Panel */}
-      <div className="lg:w-7/12 p-8 sm:p-14 flex items-center justify-center">
+      <div className="lg:w-7/12 p-8 sm:p-14 flex items-center justify-center dark:bg-slate-900">
         <div className="max-w-xl w-full space-y-8">
           
           <div className="space-y-2">
-            <h2 className="font-headline text-3xl font-extrabold text-slate-900">Buat Akun Baru</h2>
-            <p className="text-sm text-slate-500 font-medium leading-relaxed">
+            <h2 className="font-headline text-3xl font-extrabold text-slate-900 dark:text-white">Buat Akun Baru</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
               Silakan lengkapi data diri Anda untuk memulai.
             </p>
           </div>
 
           {errorMsg && (
-            <div className="p-4 bg-rose-50 border border-rose-200 text-rose-700 text-sm font-bold rounded-2xl">
+            <div className="p-4 bg-rose-50 dark:bg-rose-950/80 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-sm font-bold rounded-2xl">
               {errorMsg}
             </div>
           )}
@@ -114,7 +114,7 @@ export const RegisterPage: React.FC = () => {
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block font-bold text-slate-800 mb-2 text-sm">Nama Lengkap *</label>
+                <label className="block font-bold text-slate-800 dark:text-slate-200 mb-2 text-sm">Nama Lengkap *</label>
                 <div className="relative">
                   <User className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
                   <input
@@ -123,13 +123,13 @@ export const RegisterPage: React.FC = () => {
                     placeholder="Masukkan nama"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3.5 bg-[#f8fafc] border border-[#e1e2ed] rounded-2xl text-base font-medium focus:bg-white focus:outline-none focus:border-[#004ac6] transition-colors"
+                    className="w-full pl-12 pr-4 py-3.5 bg-[#f8fafc] dark:bg-slate-800 border border-[#e1e2ed] dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl text-base font-medium focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:border-[#004ac6] dark:focus:border-sky-500 transition-colors"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block font-bold text-slate-800 mb-2 text-sm">NIK (KTP)</label>
+                <label className="block font-bold text-slate-800 dark:text-slate-200 mb-2 text-sm">NIK (KTP)</label>
                 <div className="relative">
                   <CreditCard className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
                   <input
@@ -137,7 +137,7 @@ export const RegisterPage: React.FC = () => {
                     placeholder="16 digit NIK"
                     value={nik}
                     onChange={(e) => setNik(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3.5 bg-[#f8fafc] border border-[#e1e2ed] rounded-2xl text-base font-medium focus:bg-white focus:outline-none focus:border-[#004ac6] transition-colors"
+                    className="w-full pl-12 pr-4 py-3.5 bg-[#f8fafc] dark:bg-slate-800 border border-[#e1e2ed] dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl text-base font-medium focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:border-[#004ac6] dark:focus:border-sky-500 transition-colors"
                   />
                 </div>
               </div>
@@ -145,7 +145,7 @@ export const RegisterPage: React.FC = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block font-bold text-slate-800 mb-2 text-sm">No HP *</label>
+                <label className="block font-bold text-slate-800 dark:text-slate-200 mb-2 text-sm">No HP *</label>
                 <div className="relative">
                   <Phone className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
                   <input
@@ -153,13 +153,13 @@ export const RegisterPage: React.FC = () => {
                     placeholder="08xx..."
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3.5 bg-[#f8fafc] border border-[#e1e2ed] rounded-2xl text-base font-medium focus:bg-white focus:outline-none focus:border-[#004ac6] transition-colors"
+                    className="w-full pl-12 pr-4 py-3.5 bg-[#f8fafc] dark:bg-slate-800 border border-[#e1e2ed] dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl text-base font-medium focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:border-[#004ac6] dark:focus:border-sky-500 transition-colors"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block font-bold text-slate-800 mb-2 text-sm">Email *</label>
+                <label className="block font-bold text-slate-800 dark:text-slate-200 mb-2 text-sm">Email *</label>
                 <div className="relative">
                   <Mail className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
                   <input
@@ -168,14 +168,14 @@ export const RegisterPage: React.FC = () => {
                     placeholder="contoh@mail.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3.5 bg-[#f8fafc] border border-[#e1e2ed] rounded-2xl text-base font-medium focus:bg-white focus:outline-none focus:border-[#004ac6] transition-colors"
+                    className="w-full pl-12 pr-4 py-3.5 bg-[#f8fafc] dark:bg-slate-800 border border-[#e1e2ed] dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl text-base font-medium focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:border-[#004ac6] dark:focus:border-sky-500 transition-colors"
                   />
                 </div>
               </div>
             </div>
 
             <div>
-              <label className="block font-bold text-slate-800 mb-2 text-sm">Alamat</label>
+              <label className="block font-bold text-slate-800 dark:text-slate-200 mb-2 text-sm">Alamat</label>
               <div className="relative">
                 <MapPin className="w-5 h-5 text-slate-400 absolute left-4 top-4" />
                 <textarea
@@ -183,14 +183,14 @@ export const RegisterPage: React.FC = () => {
                   placeholder="Alamat lengkap sesuai KTP"
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3.5 bg-[#f8fafc] border border-[#e1e2ed] rounded-2xl text-base font-medium focus:bg-white focus:outline-none focus:border-[#004ac6] transition-colors"
+                  className="w-full pl-12 pr-4 py-3.5 bg-[#f8fafc] dark:bg-slate-800 border border-[#e1e2ed] dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl text-base font-medium focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:border-[#004ac6] dark:focus:border-sky-500 transition-colors"
                 ></textarea>
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block font-bold text-slate-800 mb-2 text-sm">Password *</label>
+                <label className="block font-bold text-slate-800 dark:text-slate-200 mb-2 text-sm">Password *</label>
                 <div className="relative">
                   <Lock className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
                   <input
@@ -199,13 +199,13 @@ export const RegisterPage: React.FC = () => {
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3.5 bg-[#f8fafc] border border-[#e1e2ed] rounded-2xl text-base font-medium focus:bg-white focus:outline-none focus:border-[#004ac6] transition-colors"
+                    className="w-full pl-12 pr-4 py-3.5 bg-[#f8fafc] dark:bg-slate-800 border border-[#e1e2ed] dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl text-base font-medium focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:border-[#004ac6] dark:focus:border-sky-500 transition-colors"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block font-bold text-slate-800 mb-2 text-sm">Konfirmasi Password *</label>
+                <label className="block font-bold text-slate-800 dark:text-slate-200 mb-2 text-sm">Konfirmasi Password *</label>
                 <div className="relative">
                   <Lock className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
                   <input
@@ -214,22 +214,22 @@ export const RegisterPage: React.FC = () => {
                     placeholder="••••••••"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3.5 bg-[#f8fafc] border border-[#e1e2ed] rounded-2xl text-base font-medium focus:bg-white focus:outline-none focus:border-[#004ac6] transition-colors"
+                    className="w-full pl-12 pr-4 py-3.5 bg-[#f8fafc] dark:bg-slate-800 border border-[#e1e2ed] dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl text-base font-medium focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:border-[#004ac6] dark:focus:border-sky-500 transition-colors"
                   />
                 </div>
               </div>
             </div>
 
             <div className="pt-1">
-              <label className="flex items-center space-x-3 text-sm text-slate-600 font-semibold cursor-pointer">
+              <label className="flex items-center space-x-3 text-sm text-slate-600 dark:text-slate-300 font-semibold cursor-pointer">
                 <input
                   type="checkbox"
                   checked={agreeTerms}
                   onChange={(e) => setAgreeTerms(e.target.checked)}
-                  className="w-4 h-4 text-[#004ac6] rounded"
+                  className="w-4 h-4 text-[#004ac6] dark:text-sky-500 rounded"
                 />
                 <span>
-                  Saya menyetujui <a href="#terms" onClick={(e) => e.preventDefault()} className="text-[#004ac6] font-bold underline">Syarat & Ketentuan</a> serta <a href="#privacy" onClick={(e) => e.preventDefault()} className="text-[#004ac6] font-bold underline">Kebijakan Privasi</a> SIPIL BAUBAU.
+                  Saya menyetujui <a href="#terms" onClick={(e) => e.preventDefault()} className="text-[#004ac6] dark:text-sky-400 font-bold underline">Syarat & Ketentuan</a> serta <a href="#privacy" onClick={(e) => e.preventDefault()} className="text-[#004ac6] dark:text-sky-400 font-bold underline">Kebijakan Privasi</a> SIPIL BAUBAU.
                 </span>
               </label>
             </div>
@@ -237,16 +237,16 @@ export const RegisterPage: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 bg-[#004ac6] hover:bg-[#2563eb] text-white text-base font-extrabold rounded-full shadow-lg shadow-[#004ac6]/20 transition-all flex items-center justify-center space-x-2 active:scale-95"
+              className="w-full py-4 bg-[#004ac6] hover:bg-[#2563eb] dark:bg-sky-600 dark:hover:bg-sky-500 text-white text-base font-extrabold rounded-full shadow-lg shadow-[#004ac6]/20 transition-all flex items-center justify-center space-x-2 active:scale-95"
             >
               <span>{loading ? 'Mendaftarkan Akun...' : 'Daftar Sekarang'}</span>
               <ArrowRight className="w-5 h-5" />
             </button>
           </form>
 
-          <div className="text-center text-sm text-slate-600 pt-5 border-t border-[#e1e2ed]">
+          <div className="text-center text-sm text-slate-600 dark:text-slate-400 pt-5 border-t border-[#e1e2ed] dark:border-slate-800">
             Sudah punya akun?{' '}
-            <Link to="/login" className="font-bold text-[#004ac6] hover:underline">
+            <Link to="/login" className="font-bold text-[#004ac6] dark:text-sky-400 hover:underline">
               Masuk di sini
             </Link>
           </div>

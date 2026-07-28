@@ -151,40 +151,40 @@ export const HomePage: React.FC = () => {
       </section>
 
       {/* 2. Statistics Section */}
-      <section className="py-20 bg-slate-100/70 border-b border-sky-100">
+      <section className="py-20 bg-slate-100/70 dark:bg-slate-900/60 border-b border-sky-100 dark:border-slate-800">
         <div className="px-4 sm:px-8 max-w-[1280px] mx-auto">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             
-            <div className="bg-white p-8 rounded-2xl shadow-xs border border-slate-200 flex flex-col items-center text-center group hover:border-sky-600 transition-all">
-              <div className="w-16 h-16 bg-sky-100 rounded-2xl flex items-center justify-center text-sky-700 mb-4 group-hover:scale-110 transition-transform">
+            <div className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-xs border border-slate-200 dark:border-slate-800 flex flex-col items-center text-center group hover:border-sky-600 transition-all">
+              <div className="w-16 h-16 bg-sky-100 dark:bg-sky-950/80 rounded-2xl flex items-center justify-center text-sky-700 dark:text-sky-300 mb-4 group-hover:scale-110 transition-transform">
                 <span className="material-symbols-outlined text-[32px]">description</span>
               </div>
-              <h4 className="text-slate-600 text-sm font-bold mb-1 uppercase tracking-wider">Total Pengaduan</h4>
-              <div className="font-headline text-[40px] font-black text-sky-800">{stats.total}</div>
+              <h4 className="text-slate-600 dark:text-slate-400 text-sm font-bold mb-1 uppercase tracking-wider">Total Pengaduan</h4>
+              <div className="font-headline text-[40px] font-black text-sky-800 dark:text-sky-400">{stats.total}</div>
             </div>
 
-            <div className="bg-white p-8 rounded-2xl shadow-xs border border-slate-200 flex flex-col items-center text-center group hover:border-amber-500 transition-all">
-              <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center text-amber-700 mb-4 group-hover:scale-110 transition-transform">
+            <div className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-xs border border-slate-200 dark:border-slate-800 flex flex-col items-center text-center group hover:border-amber-500 transition-all">
+              <div className="w-16 h-16 bg-amber-100 dark:bg-amber-950/80 rounded-2xl flex items-center justify-center text-amber-700 dark:text-amber-300 mb-4 group-hover:scale-110 transition-transform">
                 <span className="material-symbols-outlined text-[32px]">sync</span>
               </div>
-              <h4 className="text-slate-600 text-sm font-bold mb-1 uppercase tracking-wider">Sedang Diproses</h4>
-              <div className="font-headline text-[40px] font-black text-amber-600">{stats.diproses}</div>
+              <h4 className="text-slate-600 dark:text-slate-400 text-sm font-bold mb-1 uppercase tracking-wider">Sedang Diproses</h4>
+              <div className="font-headline text-[40px] font-black text-amber-600 dark:text-amber-400">{stats.diproses}</div>
             </div>
 
-            <div className="bg-white p-8 rounded-2xl shadow-xs border border-slate-200 flex flex-col items-center text-center group hover:border-emerald-600 transition-all">
-              <div className="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center text-emerald-700 mb-4 group-hover:scale-110 transition-transform">
+            <div className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-xs border border-slate-200 dark:border-slate-800 flex flex-col items-center text-center group hover:border-emerald-600 transition-all">
+              <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-950/80 rounded-2xl flex items-center justify-center text-emerald-700 dark:text-emerald-300 mb-4 group-hover:scale-110 transition-transform">
                 <span className="material-symbols-outlined text-[32px]">verified</span>
               </div>
-              <h4 className="text-slate-600 text-sm font-bold mb-1 uppercase tracking-wider">Selesai Ditangani</h4>
-              <div className="font-headline text-[40px] font-black text-emerald-600">{stats.selesai}</div>
+              <h4 className="text-slate-600 dark:text-slate-400 text-sm font-bold mb-1 uppercase tracking-wider">Selesai Ditangani</h4>
+              <div className="font-headline text-[40px] font-black text-emerald-600 dark:text-emerald-400">{stats.selesai}</div>
             </div>
 
-            <div className="bg-white p-8 rounded-2xl shadow-xs border border-slate-200 flex flex-col items-center text-center group hover:border-sky-800 transition-all">
+            <div className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-xs border border-slate-200 dark:border-slate-800 flex flex-col items-center text-center group hover:border-sky-800 transition-all">
               <div className="w-16 h-16 bg-sky-900 text-amber-300 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                 <span className="material-symbols-outlined text-[32px]">engineering</span>
               </div>
-              <h4 className="text-slate-600 text-sm font-bold mb-1 uppercase tracking-wider">Petugas OPD Aktif</h4>
-              <div className="font-headline text-[40px] font-black text-slate-900">86</div>
+              <h4 className="text-slate-600 dark:text-slate-400 text-sm font-bold mb-1 uppercase tracking-wider">Petugas OPD Aktif</h4>
+              <div className="font-headline text-[40px] font-black text-slate-900 dark:text-white">86</div>
             </div>
 
           </div>
@@ -192,12 +192,12 @@ export const HomePage: React.FC = () => {
       </section>
 
       {/* 3. Category Section */}
-      <section className="py-20">
+      <section className="py-20 bg-white dark:bg-slate-950">
         <div className="px-4 sm:px-8 max-w-[1280px] mx-auto">
           
           <div className="text-center mb-14 space-y-3">
-            <h2 className="font-headline text-3xl sm:text-4xl font-extrabold text-slate-900">Kategori Pengaduan Infrastruktur</h2>
-            <p className="text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
+            <h2 className="font-headline text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white">Kategori Pengaduan Infrastruktur</h2>
+            <p className="text-base text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
               Pilih kategori infrastruktur yang ingin Anda laporkan untuk mempercepat proses penugasan tim teknis lapangan.
             </p>
           </div>
@@ -207,12 +207,12 @@ export const HomePage: React.FC = () => {
               <button
                 key={idx}
                 onClick={() => navigate(`/submit?category=${cat.catId}`)}
-                className="bg-white p-8 rounded-2xl border border-slate-200 hover:border-sky-600 hover:shadow-xl hover:shadow-sky-600/10 transition-all text-center group"
+                className="bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-sky-600 dark:hover:border-sky-500 hover:shadow-xl hover:shadow-sky-600/10 transition-all text-center group"
               >
-                <div className="w-14 h-14 bg-sky-50 mx-auto rounded-xl flex items-center justify-center text-sky-800 group-hover:bg-sky-700 group-hover:text-white transition-colors mb-4">
+                <div className="w-14 h-14 bg-sky-50 dark:bg-slate-800 mx-auto rounded-xl flex items-center justify-center text-sky-800 dark:text-sky-300 group-hover:bg-sky-700 group-hover:text-white transition-colors mb-4">
                   <span className="material-symbols-outlined text-[28px]">{cat.icon}</span>
                 </div>
-                <span className="font-bold text-sm text-slate-900 group-hover:text-sky-800 transition-colors">
+                <span className="font-bold text-sm text-slate-900 dark:text-slate-200 group-hover:text-sky-800 dark:group-hover:text-sky-400 transition-colors">
                   {cat.name}
                 </span>
               </button>
@@ -223,35 +223,35 @@ export const HomePage: React.FC = () => {
       </section>
 
       {/* 4. Interactive Map Section */}
-      <section className="py-20 bg-white overflow-hidden border-t border-b border-slate-200">
+      <section className="py-20 bg-slate-50 dark:bg-slate-900 overflow-hidden border-t border-b border-slate-200 dark:border-slate-800">
         <div className="px-4 sm:px-8 max-w-[1280px] mx-auto">
           <div className="flex flex-col lg:flex-row gap-12 items-start">
             
             <div className="lg:w-1/3 space-y-6">
-              <h2 className="font-headline text-3xl sm:text-4xl font-extrabold text-slate-900">Pantau Kondisi Kota Real-Time</h2>
-              <p className="text-base text-slate-600 leading-relaxed">
+              <h2 className="font-headline text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white">Pantau Kondisi Kota Real-Time</h2>
+              <p className="text-base text-slate-600 dark:text-slate-400 leading-relaxed">
                 Peta interaktif menunjukkan titik-titik kerusakan yang sedang dilaporkan oleh warga Kota Baubau. Kami menjaga transparansi setiap laporan.
               </p>
 
               <div className="space-y-3 pt-2">
                 <div className="flex items-center gap-3">
                   <div className="w-4 h-4 rounded-full bg-amber-500"></div>
-                  <span className="text-sm font-bold text-slate-800">Menunggu Verifikasi</span>
+                  <span className="text-sm font-bold text-slate-800 dark:text-slate-200">Menunggu Verifikasi</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-4 h-4 rounded-full bg-sky-600"></div>
-                  <span className="text-sm font-bold text-slate-800">Dalam Pengerjaan OPD</span>
+                  <span className="text-sm font-bold text-slate-800 dark:text-slate-200">Dalam Pengerjaan OPD</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="w-4 h-4 rounded-full bg-emerald-600"></div>
-                  <span className="text-sm font-bold text-slate-800">Selesai Diperbaiki</span>
+                  <span className="text-sm font-bold text-slate-800 dark:text-slate-200">Selesai Diperbaiki</span>
                 </div>
               </div>
 
               <div className="pt-4">
-                <div className="p-5 bg-sky-50 rounded-xl border border-sky-200 flex gap-3 items-start">
-                  <span className="material-symbols-outlined text-sky-700 shrink-0">info</span>
-                  <p className="text-sm text-sky-900 font-medium leading-relaxed">
+                <div className="p-5 bg-sky-50 dark:bg-sky-950/60 rounded-xl border border-sky-200 dark:border-sky-800 flex gap-3 items-start">
+                  <span className="material-symbols-outlined text-sky-700 dark:text-sky-300 shrink-0">info</span>
+                  <p className="text-sm text-sky-900 dark:text-sky-200 font-medium leading-relaxed">
                     Peta diperbarui secara otomatis berdasarkan data sistem pengaduan terbaru di 8 Kecamatan se-Kota Baubau.
                   </p>
                 </div>
@@ -267,54 +267,54 @@ export const HomePage: React.FC = () => {
       </section>
 
       {/* 5. Timeline Section */}
-      <section className="py-20 bg-slate-100/80">
+      <section className="py-20 bg-slate-100/80 dark:bg-slate-950">
         <div className="px-4 sm:px-8 max-w-[1280px] mx-auto">
           <div className="text-center mb-16 space-y-3">
-            <h2 className="font-headline text-3xl sm:text-4xl font-extrabold text-slate-900">Cara Kerja SIPIL BAUBAU</h2>
-            <p className="text-base text-slate-600 max-w-xl mx-auto leading-relaxed">
+            <h2 className="font-headline text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white">Cara Kerja SIPIL BAUBAU</h2>
+            <p className="text-base text-slate-600 dark:text-slate-400 max-w-xl mx-auto leading-relaxed">
               Alur pelaporan yang mudah dan sistematis untuk memastikan aspirasi Anda didengar.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
-            <div className="hidden md:block absolute top-12 left-0 w-full h-0.5 bg-sky-300 z-0"></div>
+            <div className="hidden md:block absolute top-12 left-0 w-full h-0.5 bg-sky-300 dark:bg-sky-800 z-0"></div>
             
             <div className="relative z-10 space-y-4 text-center md:text-left">
               <div className="w-16 h-16 rounded-full bg-sky-800 text-amber-300 flex items-center justify-center font-headline text-2xl font-black shadow-lg shadow-sky-800/20 mx-auto md:mx-0 ring-2 ring-amber-400">
                 1
               </div>
-              <h4 className="font-headline font-bold text-lg text-slate-900">Pilih Lokasi</h4>
-              <p className="text-sm text-slate-600 leading-relaxed">
+              <h4 className="font-headline font-bold text-lg text-slate-900 dark:text-white">Pilih Lokasi</h4>
+              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                 Tandai titik kerusakan secara akurat menggunakan sistem GPS atau peta interaktif.
               </p>
             </div>
 
             <div className="relative z-10 space-y-4 text-center md:text-left">
-              <div className="w-16 h-16 rounded-full bg-white text-sky-800 flex items-center justify-center font-headline text-2xl font-black shadow-sm border border-slate-300 mx-auto md:mx-0">
+              <div className="w-16 h-16 rounded-full bg-white dark:bg-slate-800 text-sky-800 dark:text-sky-300 flex items-center justify-center font-headline text-2xl font-black shadow-sm border border-slate-300 dark:border-slate-700 mx-auto md:mx-0">
                 2
               </div>
-              <h4 className="font-headline font-bold text-lg text-slate-900">Upload Foto</h4>
-              <p className="text-sm text-slate-600 leading-relaxed">
+              <h4 className="font-headline font-bold text-lg text-slate-900 dark:text-white">Upload Foto</h4>
+              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                 Lampirkan bukti foto kerusakan dari berbagai sisi untuk memudahkan verifikasi tim.
               </p>
             </div>
 
             <div className="relative z-10 space-y-4 text-center md:text-left">
-              <div className="w-16 h-16 rounded-full bg-white text-sky-800 flex items-center justify-center font-headline text-2xl font-black shadow-sm border border-slate-300 mx-auto md:mx-0">
+              <div className="w-16 h-16 rounded-full bg-white dark:bg-slate-800 text-sky-800 dark:text-sky-300 flex items-center justify-center font-headline text-2xl font-black shadow-sm border border-slate-300 dark:border-slate-700 mx-auto md:mx-0">
                 3
               </div>
-              <h4 className="font-headline font-bold text-lg text-slate-900">Isi Pengaduan</h4>
-              <p className="text-sm text-slate-600 leading-relaxed">
+              <h4 className="font-headline font-bold text-lg text-slate-900 dark:text-white">Isi Pengaduan</h4>
+              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                 Berikan deskripsi detail mengenai jenis kerusakan dan dampak yang dirasakan warga.
               </p>
             </div>
 
             <div className="relative z-10 space-y-4 text-center md:text-left">
-              <div className="w-16 h-16 rounded-full bg-white text-sky-800 flex items-center justify-center font-headline text-2xl font-black shadow-sm border border-slate-300 mx-auto md:mx-0">
+              <div className="w-16 h-16 rounded-full bg-white dark:bg-slate-800 text-sky-800 dark:text-sky-300 flex items-center justify-center font-headline text-2xl font-black shadow-sm border border-slate-300 dark:border-slate-700 mx-auto md:mx-0">
                 4
               </div>
-              <h4 className="font-headline font-bold text-lg text-slate-900">Pantau Progress</h4>
-              <p className="text-sm text-slate-600 leading-relaxed">
+              <h4 className="font-headline font-bold text-lg text-slate-900 dark:text-white">Pantau Progress</h4>
+              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                 Terima notifikasi real-time saat status laporan Anda berubah hingga selesai diperbaiki.
               </p>
             </div>
@@ -323,11 +323,11 @@ export const HomePage: React.FC = () => {
       </section>
 
       {/* 6. Testimonials Section */}
-      <section className="py-20">
+      <section className="py-20 bg-white dark:bg-slate-900">
         <div className="px-4 sm:px-8 max-w-[1280px] mx-auto">
           <div className="text-center mb-14 space-y-3">
-            <h2 className="font-headline text-3xl sm:text-4xl font-extrabold text-slate-900">Suara Warga Baubau</h2>
-            <p className="text-base text-slate-600">
+            <h2 className="font-headline text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white">Suara Warga Baubau</h2>
+            <p className="text-base text-slate-600 dark:text-slate-400">
               Kepuasan masyarakat adalah prioritas kami dalam membangun infrastruktur kota yang lebih baik.
             </p>
           </div>
@@ -340,40 +340,40 @@ export const HomePage: React.FC = () => {
                   <span key={i} className="material-symbols-outlined fill-current text-base">star</span>
                 ))}
               </div>
-              <p className="text-sm italic text-slate-600 leading-relaxed">
+              <p className="text-sm italic text-slate-600 dark:text-slate-300 leading-relaxed">
                 "Sangat terbantu dengan aplikasi ini. Laporan lampu jalan mati di depan rumah direspon hanya dalam waktu 24 jam!"
               </p>
               <div className="flex items-center gap-4 pt-2">
                 <img
-                  className="w-12 h-12 rounded-full object-cover border border-slate-300"
+                  className="w-12 h-12 rounded-full object-cover border border-slate-300 dark:border-slate-700"
                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6v1ntwT_US2lztpx4xgK63UULwhtBcBkVgR1V3LBWzQbH7IQcrT5rhqYA03S6GauBM4CUaCsCPXOLiWDkpBONpxeaqrBLWA2cGhB0CTjMsXai6lMwik5K83DlzY3d0Fs9w2RaU6nVbwaXchdlFmFn4sE695bHZuouIurQ5nTE64vj0vjTsocx6HQMXLDhJKXpVAeHwpx25cNsRbDMAsgTfr8Vlx4XZr_MhcZCBosm7TxnF3T-NEFsTd88ZElRsWCE_ANxKPjgAL4"
                   alt="Herman Susilo"
                 />
                 <div>
-                  <h6 className="font-bold text-sm text-slate-900">Herman Susilo</h6>
-                  <p className="text-xs text-slate-500">Warga Kelurahan Batulo</p>
+                  <h6 className="font-bold text-sm text-slate-900 dark:text-white">Herman Susilo</h6>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Warga Kelurahan Batulo</p>
                 </div>
               </div>
             </div>
 
-            <div className="glass-card p-8 rounded-3xl border-sky-300 space-y-5 hover:-translate-y-2 transition-all shadow-xl shadow-sky-600/5">
+            <div className="glass-card p-8 rounded-3xl border-sky-300 dark:border-sky-700 space-y-5 hover:-translate-y-2 transition-all shadow-xl shadow-sky-600/5">
               <div className="flex gap-1 text-amber-400">
                 {[...Array(5)].map((_, i) => (
                   <span key={i} className="material-symbols-outlined fill-current text-base">star</span>
                 ))}
               </div>
-              <p className="text-sm italic text-slate-600 leading-relaxed">
+              <p className="text-sm italic text-slate-600 dark:text-slate-300 leading-relaxed">
                 "Transparansi pengerjaannya bagus sekali. Saya bisa melihat foto tim teknis saat memperbaiki drainase yang mampet."
               </p>
               <div className="flex items-center gap-4 pt-2">
                 <img
-                  className="w-12 h-12 rounded-full object-cover border border-slate-300"
+                  className="w-12 h-12 rounded-full object-cover border border-slate-300 dark:border-slate-700"
                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuChz8nVzY6iL4a5Xl0HrWbMC5fVieBwAa7uYTIU0yi_ed8jJi_znuJPRuSARJzi0_b1jGI2CiJ0172X45vHy8wRODX9O6QRkUzFERO8lUuJagw-mIbq2W-GgnK33tiLSAHtQDDYVH6cnF3wsnMwAKSs_DFi_AfF6oUC_0tgJfJRvfkcPznvaLlaBN9tAZy3bHb1fDaKJQQjLoX9LAYW2rdqFej3wVSt3tP96nX2Ra2ng6whp9EE4OPtRRPPRdmY3WATNKS9852NZ_o"
                   alt="Siti Rahmawati"
                 />
                 <div>
-                  <h6 className="font-bold text-sm text-slate-900">Siti Rahmawati</h6>
-                  <p className="text-xs text-slate-500">Warga Kelurahan Wameo</p>
+                  <h6 className="font-bold text-sm text-slate-900 dark:text-white">Siti Rahmawati</h6>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Warga Kelurahan Wameo</p>
                 </div>
               </div>
             </div>
@@ -384,18 +384,18 @@ export const HomePage: React.FC = () => {
                   <span key={i} className="material-symbols-outlined fill-current text-base">star</span>
                 ))}
               </div>
-              <p className="text-sm italic text-slate-600 leading-relaxed">
+              <p className="text-sm italic text-slate-600 dark:text-slate-300 leading-relaxed">
                 "Aplikasi yang sangat modern untuk pemerintah kota. Semoga semua fasilitas publik di Baubau semakin terawat."
               </p>
               <div className="flex items-center gap-4 pt-2">
                 <img
-                  className="w-12 h-12 rounded-full object-cover border border-slate-300"
+                  className="w-12 h-12 rounded-full object-cover border border-slate-300 dark:border-slate-700"
                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuAjqylzQWtDlqGL31rsnFQx8o-fkcQc53SJCmDAZPgvNs8wwg1alH0uozPU65qOFKXozyddyyU3Jniih8VmW2UfFM7ao63IN5S9p4PDOpv6sujwc9kboNfnKznI0FlhD26srG9rKbD1dwvUiFSphUfdQZqImmVSrhSesAcFfjMrmPVLQUm13G8QFL-2Evn0mOQ7BoUgLqY-PKlEHXX4Kvp2nNXDdz14PkeAH32YxU6zLiXhlwykKclUej1ok1nWsAFJ0TGcWHXpXQ0"
                   alt="Drs. M. Nasir"
                 />
                 <div>
-                  <h6 className="font-bold text-sm text-slate-900">Drs. M. Nasir</h6>
-                  <p className="text-xs text-slate-500">Tokoh Masyarakat</p>
+                  <h6 className="font-bold text-sm text-slate-900 dark:text-white">Drs. M. Nasir</h6>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Tokoh Masyarakat</p>
                 </div>
               </div>
             </div>
@@ -405,9 +405,9 @@ export const HomePage: React.FC = () => {
       </section>
 
       {/* 7. CTA Section */}
-      <section className="py-20">
+      <section className="py-20 bg-slate-50 dark:bg-slate-950">
         <div className="px-4 sm:px-8 max-w-[1280px] mx-auto">
-          <div className="bg-gradient-to-r from-sky-900 via-sky-800 to-sky-950 rounded-[3rem] p-10 sm:p-16 text-center text-white relative overflow-hidden shadow-2xl border border-amber-400/30">
+          <div className="bg-gradient-to-r from-sky-900 via-sky-800 to-sky-950 dark:from-slate-900 dark:via-sky-950 dark:to-slate-900 rounded-[3rem] p-10 sm:p-16 text-center text-white relative overflow-hidden shadow-2xl border border-amber-400/30">
             <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] border-[40px] border-amber-400 rounded-full"></div>
             </div>

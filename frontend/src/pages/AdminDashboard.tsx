@@ -144,7 +144,7 @@ export const AdminDashboard: React.FC = () => {
 
         <button
           onClick={exportCSV}
-          className="px-5 py-3 bg-teal-700 hover:bg-teal-800 text-white font-bold text-xs rounded-2xl shadow-md transition-all flex items-center justify-center space-x-2 shrink-0"
+          className="px-5 py-3 bg-teal-700 hover:bg-teal-800 dark:bg-sky-600 dark:hover:bg-sky-500 text-white font-bold text-xs rounded-2xl shadow-md transition-all flex items-center justify-center space-x-2 shrink-0"
         >
           <FileSpreadsheet className="w-4 h-4 text-amber-300" />
           <span>Export Rekap Data (CSV)</span>
@@ -157,37 +157,37 @@ export const AdminDashboard: React.FC = () => {
           title="Total Masuk"
           value={total}
           icon={Building}
-          colorBg="bg-slate-100"
-          colorIcon="text-slate-800"
+          colorBg="bg-slate-100 dark:bg-slate-800"
+          colorIcon="text-slate-800 dark:text-slate-200"
         />
         <StatCard
           title="Butuh Verifikasi"
           value={menunggu}
           icon={AlertTriangle}
-          colorBg="bg-amber-50"
-          colorIcon="text-amber-600"
+          colorBg="bg-amber-50 dark:bg-amber-950/80"
+          colorIcon="text-amber-600 dark:text-amber-400"
         />
         <StatCard
           title="Sedang Diproses OPD"
           value={diproses}
           icon={Clock}
-          colorBg="bg-blue-50"
-          colorIcon="text-blue-600"
+          colorBg="bg-blue-50 dark:bg-blue-950/80"
+          colorIcon="text-blue-600 dark:text-blue-400"
         />
         <StatCard
           title="Selesai Ditangani"
           value={selesai}
           icon={CheckCircle2}
-          colorBg="bg-emerald-50"
-          colorIcon="text-emerald-600"
+          colorBg="bg-emerald-50 dark:bg-emerald-950/80"
+          colorIcon="text-emerald-600 dark:text-emerald-400"
         />
       </div>
 
       {/* Data Table Container */}
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-xs overflow-hidden space-y-4">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden space-y-4">
         
         {/* Table Filters Header */}
-        <div className="p-6 border-b border-slate-100 grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="p-6 border-b border-slate-100 dark:border-slate-800 grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="relative">
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
             <input
@@ -195,7 +195,7 @@ export const AdminDashboard: React.FC = () => {
               placeholder="Cari Kode Tiket, Judul, Alamat..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-xs font-semibold rounded-xl border border-slate-200 bg-slate-50 focus:bg-white"
+              className="w-full pl-9 pr-3 py-2 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-800"
             />
           </div>
 
@@ -203,7 +203,7 @@ export const AdminDashboard: React.FC = () => {
             <select
               value={selectedSubdistrict}
               onChange={(e) => setSelectedSubdistrict(e.target.value as BaubauSubdistrict | 'all')}
-              className="w-full text-xs font-semibold rounded-xl border border-slate-200 p-2 bg-slate-50 focus:bg-white"
+              className="w-full text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 p-2 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-800"
             >
               <option value="all">Semua Kecamatan Baubau</option>
               {SUBDISTRICTS.map((sub) => (
@@ -216,7 +216,7 @@ export const AdminDashboard: React.FC = () => {
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value as ComplaintStatus | 'all')}
-              className="w-full text-xs font-semibold rounded-xl border border-slate-200 p-2 bg-slate-50 focus:bg-white"
+              className="w-full text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 p-2 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-800"
             >
               <option value="all">Semua Status Penanganan</option>
               <option value="menunggu">Menunggu Verifikasi</option>
@@ -230,7 +230,7 @@ export const AdminDashboard: React.FC = () => {
         {/* Table */}
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase tracking-wider">
+            <thead className="bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
               <tr>
                 <th className="p-4">Kode Tiket</th>
                 <th className="p-4">Judul & Alamat</th>
@@ -242,17 +242,17 @@ export const AdminDashboard: React.FC = () => {
                 <th className="p-4 text-center">Kelola Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 font-medium">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-medium text-slate-800 dark:text-slate-200">
               {filtered.map((item) => (
-                <tr key={item.id} className="hover:bg-slate-50 transition-colors">
-                  <td className="p-4 font-mono font-bold text-teal-800">{item.ticket_code}</td>
+                <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                  <td className="p-4 font-mono font-bold text-teal-800 dark:text-sky-400">{item.ticket_code}</td>
                   <td className="p-4 max-w-xs">
-                    <p className="font-bold text-slate-800 line-clamp-1">{item.title}</p>
+                    <p className="font-bold text-slate-800 dark:text-white line-clamp-1">{item.title}</p>
                     <p className="text-[11px] text-slate-400 truncate">{item.address}</p>
                   </td>
-                  <td className="p-4 text-slate-700 font-semibold">{item.reporter_name}</td>
-                  <td className="p-4 text-slate-700">{item.subdistrict}</td>
-                  <td className="p-4 text-teal-800 font-bold">
+                  <td className="p-4 text-slate-700 dark:text-slate-300 font-semibold">{item.reporter_name}</td>
+                  <td className="p-4 text-slate-700 dark:text-slate-300">{item.subdistrict}</td>
+                  <td className="p-4 text-teal-800 dark:text-sky-400 font-bold">
                     {item.agency?.code || 'PUPR'}
                   </td>
                   <td className="p-4"><UrgencyBadge urgency={item.urgency} /></td>
@@ -260,9 +260,9 @@ export const AdminDashboard: React.FC = () => {
                   <td className="p-4 text-center">
                     <button
                       onClick={() => handleOpenEdit(item)}
-                      className="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl transition-colors inline-flex items-center space-x-1"
+                      className="px-3 py-1.5 bg-slate-900 dark:bg-sky-600 hover:bg-slate-800 dark:hover:bg-sky-500 text-white font-bold rounded-xl transition-colors inline-flex items-center space-x-1"
                     >
-                      <Edit className="w-3.5 h-3.5 text-teal-400" />
+                      <Edit className="w-3.5 h-3.5 text-teal-400 dark:text-amber-300" />
                       <span>Update</span>
                     </button>
                   </td>
@@ -284,17 +284,17 @@ export const AdminDashboard: React.FC = () => {
         >
           <form onSubmit={handleSaveStatus} className="space-y-4 text-xs">
             <div>
-              <p className="font-bold text-slate-800 text-sm">{editingComplaint.title}</p>
-              <p className="text-slate-500 text-xs">Lokasi: {editingComplaint.address} ({editingComplaint.subdistrict})</p>
+              <p className="font-bold text-slate-800 dark:text-white text-sm">{editingComplaint.title}</p>
+              <p className="text-slate-500 dark:text-slate-400 text-xs">Lokasi: {editingComplaint.address} ({editingComplaint.subdistrict})</p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block font-bold text-slate-800 mb-1">Status Penanganan Baru *</label>
+                <label className="block font-bold text-slate-800 dark:text-slate-200 mb-1">Status Penanganan Baru *</label>
                 <select
                   value={newStatus}
                   onChange={(e) => setNewStatus(e.target.value as ComplaintStatus)}
-                  className="w-full text-xs font-semibold rounded-xl border border-slate-200 p-2.5 bg-slate-50 focus:bg-white"
+                  className="w-full text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 p-2.5 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-800"
                 >
                   <option value="menunggu">Menunggu Verifikasi</option>
                   <option value="diproses">Sedang Diproses Lapangan</option>
@@ -304,11 +304,11 @@ export const AdminDashboard: React.FC = () => {
               </div>
 
               <div>
-                <label className="block font-bold text-slate-800 mb-1">Tugaskan OPD Penanggung Jawab *</label>
+                <label className="block font-bold text-slate-800 dark:text-slate-200 mb-1">Tugaskan OPD Penanggung Jawab *</label>
                 <select
                   value={newAgencyId}
                   onChange={(e) => setNewAgencyId(Number(e.target.value))}
-                  className="w-full text-xs font-semibold rounded-xl border border-slate-200 p-2.5 bg-slate-50 focus:bg-white"
+                  className="w-full text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 p-2.5 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-800"
                 >
                   {agencies.map((ag) => (
                     <option key={ag.id} value={ag.id}>{ag.name}</option>
@@ -318,20 +318,20 @@ export const AdminDashboard: React.FC = () => {
             </div>
 
             <div>
-              <label className="block font-bold text-slate-800 mb-1">Catatan Teknisi / Alasan Verifikasi *</label>
+              <label className="block font-bold text-slate-800 dark:text-slate-200 mb-1">Catatan Teknisi / Alasan Verifikasi *</label>
               <textarea
                 required
                 rows={3}
                 placeholder="Tuliskan catatan teknisi, progres pengerjaan di lapangan, atau alasan jika ditolak..."
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                className="w-full text-xs font-medium rounded-xl border border-slate-200 p-2.5 bg-slate-50 focus:bg-white"
+                className="w-full text-xs font-medium rounded-xl border border-slate-200 dark:border-slate-700 p-2.5 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-800"
               ></textarea>
             </div>
 
             {newStatus === 'selesai' && (
               <div>
-                <label className="block font-bold text-slate-800 mb-1">Foto Bukti Penanganan Selesai (Opsional):</label>
+                <label className="block font-bold text-slate-800 dark:text-slate-200 mb-1">Foto Bukti Penanganan Selesai (Opsional):</label>
                 <input
                   type="file"
                   accept="image/*"
@@ -340,23 +340,23 @@ export const AdminDashboard: React.FC = () => {
                       setPhotoProof(e.target.files[0]);
                     }
                   }}
-                  className="w-full text-xs"
+                  className="w-full text-xs text-slate-700 dark:text-slate-300"
                 />
               </div>
             )}
 
-            <div className="pt-3 border-t flex justify-end space-x-2">
+            <div className="pt-3 border-t dark:border-slate-700 flex justify-end space-x-2">
               <button
                 type="button"
                 onClick={() => setEditingComplaint(null)}
-                className="px-4 py-2 bg-slate-100 text-slate-700 font-bold rounded-xl"
+                className="px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl"
               >
                 Batal
               </button>
               <button
                 type="submit"
                 disabled={updating}
-                className="px-5 py-2 bg-teal-700 hover:bg-teal-800 text-white font-bold rounded-xl shadow-md"
+                className="px-5 py-2 bg-teal-700 hover:bg-teal-800 dark:bg-sky-600 dark:hover:bg-sky-500 text-white font-bold rounded-xl shadow-md"
               >
                 {updating ? 'Menyimpan...' : 'Simpan Status Penanganan'}
               </button>

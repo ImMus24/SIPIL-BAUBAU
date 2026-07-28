@@ -46,30 +46,30 @@ export const TrackComplaintPage: React.FC = () => {
       
       {/* Search Header */}
       <div className="text-center space-y-3">
-        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-teal-50 text-teal-800 border border-teal-200 text-xs font-bold uppercase tracking-wider">
-          <Search className="w-4 h-4 text-teal-600" />
+        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-teal-50 dark:bg-sky-950/80 text-teal-800 dark:text-sky-300 border border-teal-200 dark:border-sky-800 text-xs font-bold uppercase tracking-wider">
+          <Search className="w-4 h-4 text-teal-600 dark:text-sky-400" />
           <span>Monitoring Transparan Kota Baubau</span>
         </div>
-        <h1 className="text-3xl font-black text-slate-900 tracking-tight">Cek Status & Progress Laporan</h1>
-        <p className="text-sm text-slate-600 max-w-lg mx-auto">
-          Masukkan Kode Tiket Pengaduan (contoh: <span className="font-mono font-bold text-teal-700">SIPIL-2026-8A91</span>) untuk memantau pengerjaan oleh Dinas terkait.
+        <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Cek Status & Progress Laporan</h1>
+        <p className="text-sm text-slate-600 dark:text-slate-400 max-w-lg mx-auto">
+          Masukkan Kode Tiket Pengaduan (contoh: <span className="font-mono font-bold text-teal-700 dark:text-sky-400">SIPIL-2026-8A91</span>) untuk memantau pengerjaan oleh Dinas terkait.
         </p>
       </div>
 
       {/* Search Input Bar */}
-      <form onSubmit={handleSearch} className="max-w-2xl mx-auto flex gap-2 bg-white p-2 rounded-2xl border border-slate-200 shadow-lg">
+      <form onSubmit={handleSearch} className="max-w-2xl mx-auto flex gap-2 bg-white dark:bg-slate-900 p-2 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-lg">
         <input
           type="text"
           required
           placeholder="Masukkan Kode Tiket (SIPIL-2026-XXXX)"
           value={ticketInput}
           onChange={(e) => setTicketInput(e.target.value)}
-          className="flex-1 px-4 py-3 text-sm font-mono font-bold text-slate-800 focus:outline-none uppercase"
+          className="flex-1 px-4 py-3 text-sm font-mono font-bold text-slate-800 dark:text-white bg-transparent focus:outline-none uppercase"
         />
         <button
           type="submit"
           disabled={loading}
-          className="px-6 py-3 bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold rounded-xl shadow-md transition-colors flex items-center space-x-2"
+          className="px-6 py-3 bg-teal-700 hover:bg-teal-800 dark:bg-sky-600 dark:hover:bg-sky-500 text-white text-xs font-bold rounded-xl shadow-md transition-colors flex items-center space-x-2"
         >
           {loading ? <span>Mencari...</span> : <><Search className="w-4 h-4" /><span>Lacak Status</span></>}
         </button>
@@ -79,12 +79,12 @@ export const TrackComplaintPage: React.FC = () => {
       {searched && (
         <>
           {!complaint ? (
-            <div className="bg-white rounded-3xl p-10 text-center border border-slate-200 shadow-sm space-y-4">
-              <div className="w-16 h-16 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto">
+            <div className="bg-white dark:bg-slate-900 rounded-3xl p-10 text-center border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+              <div className="w-16 h-16 rounded-full bg-rose-50 dark:bg-rose-950/80 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto">
                 <AlertTriangle className="w-8 h-8" />
               </div>
-              <h3 className="text-lg font-bold text-slate-800">Kode Tiket Tidak Ditemukan</h3>
-              <p className="text-xs text-slate-500 max-w-md mx-auto">
+              <h3 className="text-lg font-bold text-slate-800 dark:text-white">Kode Tiket Tidak Ditemukan</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">
                 Pastikan Anda memasukkan kode tiket dengan benar. Silakan periksa kembali tanda terima pengaduan Anda.
               </p>
             </div>
@@ -92,7 +92,7 @@ export const TrackComplaintPage: React.FC = () => {
             <div className="space-y-6">
               
               {/* Status Header Card */}
-              <div className="bg-slate-900 text-white rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
+              <div className="bg-slate-900 dark:bg-slate-900 text-white rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl border border-slate-800">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
                   <div>
                     <span className="text-[11px] font-mono font-bold text-amber-400 uppercase tracking-wider">
@@ -111,7 +111,7 @@ export const TrackComplaintPage: React.FC = () => {
                   </div>
                   <div className="bg-white/5 p-3 rounded-xl border border-white/10">
                     <p className="text-[10px] uppercase font-bold text-slate-400">OPD Penanggung Jawab</p>
-                    <p className="font-bold text-teal-300 mt-0.5">{complaint.agency?.name || 'Dinas PUPR / PERKIM Kota Baubau'}</p>
+                    <p className="font-bold text-teal-300 dark:text-sky-300 mt-0.5">{complaint.agency?.name || 'Dinas PUPR / PERKIM Kota Baubau'}</p>
                   </div>
                   <div className="bg-white/5 p-3 rounded-xl border border-white/10">
                     <p className="text-[10px] uppercase font-bold text-slate-400">Tanggal Pengaduan</p>
@@ -121,32 +121,32 @@ export const TrackComplaintPage: React.FC = () => {
               </div>
 
               {/* Progress Timeline */}
-              <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
-                <h3 className="font-extrabold text-base text-slate-900 border-b pb-3">
+              <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
+                <h3 className="font-extrabold text-base text-slate-900 dark:text-white border-b dark:border-slate-800 pb-3">
                   Riwayat Progres & Timeline Penanganan
                 </h3>
 
-                <div className="relative pl-6 border-l-2 border-slate-200 space-y-8 my-4">
+                <div className="relative pl-6 border-l-2 border-slate-200 dark:border-slate-700 space-y-8 my-4">
                   {complaint.status_logs && complaint.status_logs.map((log) => (
                     <div key={log.id} className="relative group">
-                      <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full bg-teal-600 border-2 border-white ring-4 ring-teal-50"></div>
+                      <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full bg-teal-600 dark:bg-sky-500 border-2 border-white dark:border-slate-900 ring-4 ring-teal-50 dark:ring-sky-950"></div>
                       <div className="space-y-1">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold text-slate-900 uppercase">{log.status}</span>
+                          <span className="text-xs font-bold text-slate-900 dark:text-white uppercase">{log.status}</span>
                           <span className="text-[10px] text-slate-400 font-mono">{log.created_at}</span>
                         </div>
-                        <p className="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                        <p className="text-xs text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 p-3 rounded-xl border border-slate-100 dark:border-slate-700">
                           {log.notes}
                         </p>
                         <p className="text-[10px] text-slate-400 font-semibold">Oleh: {log.updated_by}</p>
                         
                         {log.photo_proof && (
                           <div className="mt-2">
-                            <p className="text-[11px] font-bold text-emerald-700 mb-1">Bukti Foto Penanganan Selesai:</p>
+                            <p className="text-[11px] font-bold text-emerald-700 dark:text-emerald-400 mb-1">Bukti Foto Penanganan Selesai:</p>
                             <img
                               src={log.photo_proof}
                               alt="Bukti Selesai"
-                              className="w-48 h-32 object-cover rounded-xl border border-slate-200 shadow-xs"
+                              className="w-48 h-32 object-cover rounded-xl border border-slate-200 dark:border-slate-700 shadow-xs"
                             />
                           </div>
                         )}
@@ -157,8 +157,8 @@ export const TrackComplaintPage: React.FC = () => {
               </div>
 
               {/* Map GIS Location Preview */}
-              <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-4">
-                <h4 className="font-bold text-xs text-slate-800 uppercase tracking-wider">Lokasi Titik Laporan di Peta Baubau</h4>
+              <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+                <h4 className="font-bold text-xs text-slate-800 dark:text-slate-200 uppercase tracking-wider">Lokasi Titik Laporan di Peta Baubau</h4>
                 <BaubauMap
                   complaints={[complaint]}
                   height="300px"

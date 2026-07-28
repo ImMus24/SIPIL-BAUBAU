@@ -93,19 +93,19 @@ export const BaubauMap: React.FC<BaubauMapProps> = ({
   });
 
   return (
-    <div className="relative rounded-2xl overflow-hidden shadow-lg border border-slate-200" style={{ height }}>
+    <div className="relative rounded-2xl overflow-hidden shadow-lg border border-slate-200 dark:border-slate-800" style={{ height }}>
       {/* Map Control Header Bar */}
-      <div className="absolute top-3 left-3 right-3 z-10 bg-white/95 backdrop-blur-md rounded-xl p-3 shadow-md border border-sky-100 flex items-center justify-between pointer-events-auto">
+      <div className="absolute top-3 left-3 right-3 z-10 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-xl p-3 shadow-md border border-sky-100 dark:border-slate-800 flex items-center justify-between pointer-events-auto">
         <div className="flex items-center space-x-2">
-          <div className="p-2 bg-sky-700 text-white rounded-lg">
+          <div className="p-2 bg-sky-700 dark:bg-sky-600 text-white rounded-lg">
             <MapPin className="w-4 h-4 text-amber-300" />
           </div>
           <div>
-            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Pemetaan Lokasi GIS Kota Baubau</h4>
-            <p className="text-[11px] text-slate-500">Sulawesi Tenggara • OpenStreetMap Live Data</p>
+            <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">Pemetaan Lokasi GIS Kota Baubau</h4>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400">Sulawesi Tenggara • OpenStreetMap Live Data</p>
           </div>
         </div>
-        <div className="hidden sm:flex items-center space-x-3 text-xs">
+        <div className="hidden sm:flex items-center space-x-3 text-xs text-slate-700 dark:text-slate-300">
           <span className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-amber-500 mr-1.5"></span>Menunggu</span>
           <span className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-sky-600 mr-1.5"></span>Diproses</span>
           <span className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-emerald-600 mr-1.5"></span>Selesai</span>

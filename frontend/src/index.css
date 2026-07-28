@@ -9,8 +9,12 @@
   }
 
   body {
-    @apply bg-slate-50 text-slate-900 font-sans antialiased selection:bg-sky-600 selection:text-amber-300;
+    @apply bg-slate-50 text-slate-900 font-sans antialiased selection:bg-sky-600 selection:text-amber-300 dark:bg-slate-950 dark:text-slate-100;
     line-height: 1.65;
+  }
+
+  html, body {
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -45,6 +49,11 @@
   border: 1px solid rgba(2, 132, 199, 0.15);
 }
 
+.dark .glass-card {
+  background: rgba(30, 41, 59, 0.85);
+  border: 1px solid rgba(56, 189, 248, 0.15);
+}
+
 @keyframes float {
   0% { transform: translateY(0px); }
   50% { transform: translateY(-16px); }
@@ -72,11 +81,27 @@
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
   padding: 0;
   overflow: hidden;
+  background: #ffffff;
+  color: #0f172a;
+}
+
+.dark .leaflet-popup-content-wrapper {
+  background: #0f172a;
+  color: #f8fafc;
+  border: 1px solid #334155;
+}
+
+.dark .leaflet-popup-tip {
+  background: #0f172a;
 }
 
 .leaflet-popup-content {
   margin: 0;
   line-height: 1.5;
+}
+
+.dark .leaflet-tile {
+  filter: brightness(0.7) invert(1) contrast(1.2) hue-rotate(200deg);
 }
 
 /* Scrollbar styling */
@@ -98,10 +123,29 @@
   background: #0369a1;
 }
 
+/* Dark scrollbar */
+.dark ::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #38bdf8;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #0ea5e9;
+}
+
 /* Focus ring utility */
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
   outline: 2px solid #004ac6;
   outline-offset: 1px;
+}
+
+.dark input:focus-visible,
+.dark select:focus-visible,
+.dark textarea:focus-visible {
+  outline-color: #38bdf8;
 }

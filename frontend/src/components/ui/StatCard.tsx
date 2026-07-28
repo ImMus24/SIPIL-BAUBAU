@@ -21,13 +21,13 @@ export const StatCard: React.FC<StatCardProps> = ({
   trend,
 }) => {
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition-shadow">
+    <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-5 shadow-sm hover:shadow-md transition-shadow">
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">{title}</p>
-          <p className="text-2xl font-black text-slate-900 mt-1">{value}</p>
-          {subtitle && <p className="text-xs text-slate-500 mt-0.5">{subtitle}</p>}
-          {trend && <p className="text-xs font-semibold text-emerald-600 mt-1">{trend}</p>}
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">{title}</p>
+          <p className="text-2xl font-black text-slate-900 dark:text-white mt-1">{value}</p>
+          {subtitle && <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{subtitle}</p>}
+          {trend && <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 mt-1">{trend}</p>}
         </div>
         <div className={`p-3.5 rounded-xl ${colorBg}`}>
           <Icon className={`w-6 h-6 ${colorIcon}`} />

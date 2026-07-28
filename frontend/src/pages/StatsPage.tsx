@@ -55,20 +55,20 @@ export const StatsPage: React.FC = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
       
       {/* Header */}
-      <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center space-x-2 text-xs font-bold text-teal-700 uppercase tracking-wider">
+          <div className="flex items-center space-x-2 text-xs font-bold text-teal-700 dark:text-sky-400 uppercase tracking-wider">
             <BarChart3 className="w-4 h-4" />
             <span>Transparansi Publik Kota Baubau</span>
           </div>
-          <h1 className="text-3xl font-black text-slate-900 mt-1">Statistik & Analisis Penanganan</h1>
-          <p className="text-xs text-slate-500">
+          <h1 className="text-3xl font-black text-slate-900 dark:text-white mt-1">Statistik & Analisis Penanganan</h1>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
             Laporan kinerja pelayanan infrastruktur publik Pemkot Baubau
           </p>
         </div>
-        <div className="px-4 py-2 bg-teal-50 border border-teal-200 rounded-2xl text-right">
-          <p className="text-[10px] uppercase font-bold text-teal-800">Tingkat Penyelesaian OPD</p>
-          <p className="text-2xl font-black text-teal-700">{stats.completion_rate}%</p>
+        <div className="px-4 py-2 bg-teal-50 dark:bg-sky-950/80 border border-teal-200 dark:border-sky-800 rounded-2xl text-right">
+          <p className="text-[10px] uppercase font-bold text-teal-800 dark:text-sky-300">Tingkat Penyelesaian OPD</p>
+          <p className="text-2xl font-black text-teal-700 dark:text-sky-400">{stats.completion_rate}%</p>
         </div>
       </div>
 
@@ -79,32 +79,32 @@ export const StatsPage: React.FC = () => {
           value={stats.total}
           subtitle="Semua kategori"
           icon={Building}
-          colorBg="bg-slate-100"
-          colorIcon="text-slate-800"
+          colorBg="bg-slate-100 dark:bg-slate-800"
+          colorIcon="text-slate-800 dark:text-slate-200"
         />
         <StatCard
           title="Selesai Ditangani"
           value={stats.selesai}
           subtitle="Telah ditutup dengan bukti"
           icon={CheckCircle2}
-          colorBg="bg-emerald-50"
-          colorIcon="text-emerald-600"
+          colorBg="bg-emerald-50 dark:bg-emerald-950/80"
+          colorIcon="text-emerald-600 dark:text-emerald-400"
         />
         <StatCard
           title="Sedang Diproses"
           value={stats.diproses}
           subtitle="Teknisi OPD di lapangan"
           icon={Clock}
-          colorBg="bg-blue-50"
-          colorIcon="text-blue-600"
+          colorBg="bg-blue-50 dark:bg-blue-950/80"
+          colorIcon="text-blue-600 dark:text-blue-400"
         />
         <StatCard
           title="Menunggu Verifikasi"
           value={stats.menunggu}
           subtitle="Laporan baru masuk"
           icon={AlertTriangle}
-          colorBg="bg-amber-50"
-          colorIcon="text-amber-600"
+          colorBg="bg-amber-50 dark:bg-amber-950/80"
+          colorIcon="text-amber-600 dark:text-amber-400"
         />
       </div>
 
@@ -112,9 +112,9 @@ export const StatsPage: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
         {/* Donut Chart Status */}
-        <div className="lg:col-span-5 bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
-          <h3 className="font-bold text-base text-slate-900 border-b pb-3 flex items-center gap-2">
-            <PieChart className="w-5 h-5 text-teal-600" />
+        <div className="lg:col-span-5 bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
+          <h3 className="font-bold text-base text-slate-900 dark:text-white border-b dark:border-slate-800 pb-3 flex items-center gap-2">
+            <PieChart className="w-5 h-5 text-teal-600 dark:text-sky-400" />
             <span>Persentase Status Laporan</span>
           </h3>
           <div className="pt-4">
@@ -123,9 +123,9 @@ export const StatsPage: React.FC = () => {
         </div>
 
         {/* Bar Chart Categories */}
-        <div className="lg:col-span-7 bg-white p-6 rounded-3xl border border-slate-200 shadow-xs space-y-4">
-          <h3 className="font-bold text-base text-slate-900 border-b pb-3 flex items-center gap-2">
-            <BarChart3 className="w-5 h-5 text-teal-600" />
+        <div className="lg:col-span-7 bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
+          <h3 className="font-bold text-base text-slate-900 dark:text-white border-b dark:border-slate-800 pb-3 flex items-center gap-2">
+            <BarChart3 className="w-5 h-5 text-teal-600 dark:text-sky-400" />
             <span>Sebaran Pengaduan Berdasarkan Kategori</span>
           </h3>
           <div className="pt-2">
@@ -136,8 +136,8 @@ export const StatsPage: React.FC = () => {
       </div>
 
       {/* Subdistrict Distribution Chart */}
-      <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-xs space-y-4">
-        <h3 className="font-bold text-base text-slate-900 border-b pb-3 flex items-center gap-2">
+      <div className="bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
+        <h3 className="font-bold text-base text-slate-900 dark:text-white border-b dark:border-slate-800 pb-3 flex items-center gap-2">
           <Award className="w-5 h-5 text-amber-500" />
           <span>Sebaran Pengaduan Menurut 8 Kecamatan di Kota Baubau</span>
         </h3>
