@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use App\Enums\UserRole;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -19,7 +20,12 @@ class RoleMiddleware
             ], 401);
         }
 
-        if (!in_array($user->role, $roles)) {
+        // $user->role is UserRole backed enum — compare by value
+        $roleValue = $user->role instanceof UserRole
+            ? $user->role->value
+            : $user->role;
+
+        if (!in_array($roleValue, $roles, true)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Aksi ini hanya dapat dilakukan oleh role dengan izin yang sesuai.',
