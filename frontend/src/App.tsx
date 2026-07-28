@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from './lib/query-client';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -8,19 +8,31 @@ import { ToastProvider } from './components/ui/Toast';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
 
-// Lazy-loaded pages — pages use named exports, map to default
+// Lazy-loaded pages
 const HomePage = lazy(() => import('./pages/HomePage').then(m => ({ default: m.HomePage })));
 const MapPage = lazy(() => import('./pages/MapPage').then(m => ({ default: m.MapPage })));
 const SubmitComplaintPage = lazy(() => import('./pages/SubmitComplaintPage').then(m => ({ default: m.SubmitComplaintPage })));
 const TrackComplaintPage = lazy(() => import('./pages/TrackComplaintPage').then(m => ({ default: m.TrackComplaintPage })));
 const StatsPage = lazy(() => import('./pages/StatsPage').then(m => ({ default: m.StatsPage })));
 const AboutPage = lazy(() => import('./pages/AboutPage').then(m => ({ default: m.AboutPage })));
+const FAQPage = lazy(() => import('./pages/FAQPage').then(m => ({ default: m.FAQPage })));
 const LoginPage = lazy(() => import('./pages/LoginPage').then(m => ({ default: m.LoginPage })));
 const RegisterPage = lazy(() => import('./pages/RegisterPage').then(m => ({ default: m.RegisterPage })));
+const ComplaintDetailPage = lazy(() => import('./pages/ComplaintDetailPage').then(m => ({ default: m.ComplaintDetailPage })));
+
+// Dashboard pages
 const CitizenDashboard = lazy(() => import('./pages/CitizenDashboard').then(m => ({ default: m.CitizenDashboard })));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard').then(m => ({ default: m.AdminDashboard })));
+const OfficerDashboard = lazy(() => import('./pages/OfficerDashboard').then(m => ({ default: m.OfficerDashboard })));
+const KepalaDinasDashboard = lazy(() => import('./pages/KepalaDinasDashboard').then(m => ({ default: m.KepalaDinasDashboard })));
+const ProfilePage = lazy(() => import('./pages/ProfilePage').then(m => ({ default: m.ProfilePage })));
+const NotificationPage = lazy(() => import('./pages/NotificationPage').then(m => ({ default: m.NotificationPage })));
 
-// Loading fallback for Suspense
+// Error pages
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage').then(m => ({ default: m.NotFoundPage })));
+const ForbiddenPage = lazy(() => import('./pages/ForbiddenPage').then(m => ({ default: m.ForbiddenPage })));
+
+// Loading
 const PageLoader: React.FC = () => (
   <div className="min-h-[60vh] flex items-center justify-center">
     <div className="flex flex-col items-center gap-3">
@@ -30,13 +42,33 @@ const PageLoader: React.FC = () => (
   </div>
 );
 
-const PublicLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+// Layouts
+const PublicLayout: React.FC = () => (
   <div className="min-h-screen flex flex-col bg-background font-body transition-colors duration-200">
     <Navbar />
-    <main className="flex-1">{children}</main>
+    <main className="flex-1">
+      <Suspense fallback={<PageLoader />}>
+        <Outlet />
+      </Suspense>
+    </main>
     <Footer />
   </div>
 );
+
+// Route guards
+const GuestRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isAuthenticated, role } = useAuth();
+  if (isAuthenticated) {
+    const redirectMap: Record<string, string> = {
+      citizen: '/dashboard',
+      officer: '/officer',
+      admin: '/admin',
+      head_of_agency: '/kepala-dinas',
+    };
+    return <Navigate to={redirectMap[role ?? 'citizen'] ?? '/dashboard'} replace />;
+  }
+  return <>{children}</>;
+};
 
 const ProtectedRoute: React.FC<{
   children: React.ReactNode;
@@ -45,9 +77,23 @@ const ProtectedRoute: React.FC<{
   const { isAuthenticated, role } = useAuth();
   if (!isAuthenticated) return <Navigate to="/login" replace />;
   if (allowedRoles && role && !allowedRoles.includes(role)) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/403" replace />;
   }
   return <>{children}</>;
+};
+
+// Role-based redirector for the main dashboard route
+const DashboardRouter: React.FC = () => {
+  const { isAuthenticated, role } = useAuth();
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+
+  const routeMap: Record<string, string> = {
+    citizen: '/dashboard',
+    officer: '/officer',
+    admin: '/admin',
+    head_of_agency: '/kepala-dinas',
+  };
+  return <Navigate to={routeMap[role ?? 'citizen'] ?? '/dashboard'} replace />;
 };
 
 export function App() {
@@ -57,42 +103,64 @@ export function App() {
         <AuthProvider>
           <ToastProvider>
             <BrowserRouter>
-              <PublicLayout>
-                <Suspense fallback={<PageLoader />}>
-                  <Routes>
+              <Suspense fallback={<PageLoader />}>
+                <Routes>
+                  {/* Public routes */}
+                  <Route element={<PublicLayout />}>
                     <Route path="/" element={<HomePage />} />
                     <Route path="/map" element={<MapPage />} />
                     <Route path="/submit" element={<SubmitComplaintPage />} />
                     <Route path="/track" element={<TrackComplaintPage />} />
+                    <Route path="/complaint/:ticket_code" element={<ComplaintDetailPage />} />
                     <Route path="/stats" element={<StatsPage />} />
                     <Route path="/about" element={<AboutPage />} />
-                    <Route path="/login" element={<LoginPage />} />
-                    <Route path="/register" element={<RegisterPage />} />
+                    <Route path="/faq" element={<FAQPage />} />
+                    <Route path="/login" element={<GuestRoute><LoginPage /></GuestRoute>} />
+                    <Route path="/register" element={<GuestRoute><RegisterPage /></GuestRoute>} />
+                  </Route>
 
-                    {/* Protected — citizen */}
-                    <Route
-                      path="/dashboard"
-                      element={
-                        <ProtectedRoute allowedRoles={['citizen', 'admin', 'officer']}>
-                          <CitizenDashboard />
-                        </ProtectedRoute>
-                      }
-                    />
+                  {/* Dashboard router */}
+                  <Route path="/dashboard" element={<DashboardRouter />} />
 
-                    {/* Protected — admin/officer */}
-                    <Route
-                      path="/admin"
-                      element={
-                        <ProtectedRoute allowedRoles={['admin', 'officer']}>
-                          <AdminDashboard />
-                        </ProtectedRoute>
-                      }
-                    />
+                  {/* Protected: citizen */}
+                  <Route path="/dashboard/masyarakat" element={
+                    <ProtectedRoute allowedRoles={['citizen']}><CitizenDashboard /></ProtectedRoute>
+                  } />
 
-                    <Route path="*" element={<Navigate to="/" replace />} />
-                  </Routes>
-                </Suspense>
-              </PublicLayout>
+                  {/* Protected: citizen + admin */}
+                  <Route path="/dashboard" element={
+                    <ProtectedRoute allowedRoles={['citizen', 'admin', 'officer']}><CitizenDashboard /></ProtectedRoute>
+                  } />
+
+                  {/* Protected: officer */}
+                  <Route path="/officer" element={
+                    <ProtectedRoute allowedRoles={['officer']}><OfficerDashboard /></ProtectedRoute>
+                  } />
+
+                  {/* Protected: admin */}
+                  <Route path="/admin" element={
+                    <ProtectedRoute allowedRoles={['admin', 'officer']}><AdminDashboard /></ProtectedRoute>
+                  } />
+
+                  {/* Protected: head_of_agency */}
+                  <Route path="/kepala-dinas" element={
+                    <ProtectedRoute allowedRoles={['head_of_agency', 'admin']}><KepalaDinasDashboard /></ProtectedRoute>
+                  } />
+
+                  {/* Protected: profile + notifications */}
+                  <Route path="/profile" element={
+                    <ProtectedRoute allowedRoles={['citizen', 'officer', 'admin', 'head_of_agency']}><ProfilePage /></ProtectedRoute>
+                  } />
+                  <Route path="/notifications" element={
+                    <ProtectedRoute allowedRoles={['citizen', 'officer', 'admin', 'head_of_agency']}><NotificationPage /></ProtectedRoute>
+                  } />
+
+                  {/* Error routes */}
+                  <Route path="/403" element={<ForbiddenPage />} />
+                  <Route path="/404" element={<NotFoundPage />} />
+                  <Route path="*" element={<NotFoundPage />} />
+                </Routes>
+              </Suspense>
             </BrowserRouter>
           </ToastProvider>
         </AuthProvider>

@@ -41,8 +41,9 @@ export const Navbar: React.FC = () => {
     { path: '/stats', label: 'Statistik' },
     { path: '/map', label: 'Peta Interaktif' },
     { path: '/submit', label: 'Buat Laporan' },
-    { path: '/track', label: 'Cek Status' },
-    { path: '/about', label: 'FAQ & Tentang' },
+    { path: '/track', label: 'Lacak Status' },
+    { path: '/faq', label: 'FAQ' },
+    { path: '/about', label: 'Tentang' },
   ];
 
   const handleLogout = async () => {
@@ -53,11 +54,19 @@ export const Navbar: React.FC = () => {
   const userDropdownItems = user
     ? [
         {
-          label: 'Dashboard Saya',
+          label: 'Dashboard',
           icon: <LayoutDashboard className="w-4 h-4" />,
-          onClick: () => navigate(role === 'citizen' ? '/dashboard' : '/admin'),
+          onClick: () => {
+            const routes: Record<string, string> = {
+              citizen: '/dashboard',
+              officer: '/officer',
+              admin: '/admin',
+              head_of_agency: '/kepala-dinas',
+            };
+            navigate(routes[role ?? 'citizen'] ?? '/dashboard');
+          },
         },
-        { label: 'Pengaturan', icon: <Settings className="w-4 h-4" />, onClick: () => {}, divider: true },
+        { label: 'Profil', icon: <Settings className="w-4 h-4" />, onClick: () => navigate('/profile'), divider: true },
         {
           label: 'Keluar',
           icon: <LogOut className="w-4 h-4" />,
@@ -145,10 +154,10 @@ export const Navbar: React.FC = () => {
 
           {/* Notification */}
           {isAuthenticated && (
-            <button className="hidden lg:flex p-2.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors relative">
+            <Link to="/notifications" className="hidden lg:flex p-2.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors relative">
               <Bell className="w-5 h-5" />
               <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-danger rounded-full ring-2 ring-card" />
-            </button>
+            </Link>
           )}
 
           {/* User Menu */}
@@ -217,7 +226,16 @@ export const Navbar: React.FC = () => {
                   variant="outline"
                   fullWidth
                   icon={LayoutDashboard}
-                  onClick={() => { setMobileMenuOpen(false); navigate(role === 'citizen' ? '/dashboard' : '/admin'); }}
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    const routes: Record<string, string> = {
+                      citizen: '/dashboard',
+                      officer: '/officer',
+                      admin: '/admin',
+                      head_of_agency: '/kepala-dinas',
+                    };
+                    navigate(routes[role ?? 'citizen'] ?? '/dashboard');
+                  }}
                 >
                   Dashboard
                 </Button>

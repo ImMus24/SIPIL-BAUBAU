@@ -68,8 +68,8 @@ export const AdminDashboard: React.FC = () => {
   ];
 
   return (
-    <DashboardLayout title="Dashboard Admin" subtitle="Kelola dan pantau seluruh laporan infrastruktur" role="admin">
-      <div className="space-y-6">
+    <DashboardLayout>
+      <div className="max-w-5xl mx-auto">
         {/* KPI Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           <StatCard title="Total Laporan" value={stats.total} icon={FileText} variant="primary" />

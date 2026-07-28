@@ -32,7 +32,10 @@ export const Footer: React.FC = () => {
               <li><Link to="/stats" className="hover:text-accent transition-colors">Statistik Publik</Link></li>
               <li><Link to="/map" className="hover:text-accent transition-colors">Peta Interaktif</Link></li>
               <li><Link to="/submit" className="hover:text-accent transition-colors">Buat Pengaduan</Link></li>
-              <li><Link to="/track" className="hover:text-accent transition-colors">Cek Status Laporan</Link></li>
+              <li><Link to="/track" className="hover:text-accent transition-colors">Lacak Status</Link></li>
+              <li><Link to="/faq" className="hover:text-accent transition-colors">FAQ</Link></li>
+              <li><Link to="/about" className="hover:text-accent transition-colors">Tentang</Link></li>
+              <li><Link to="/login" className="hover:text-accent transition-colors">Portal Login</Link></li>
             </ul>
           </div>
 

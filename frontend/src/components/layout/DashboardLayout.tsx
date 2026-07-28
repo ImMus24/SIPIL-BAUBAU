@@ -1,141 +1,124 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { useTheme } from '../../context/ThemeContext';
-import { Sidebar } from './Sidebar';
 import {
-  LayoutDashboard,
-  FileText,
-  MapPin,
-  BarChart3,
-  Users,
-  Settings,
-  HelpCircle,
+  LayoutDashboard, FileText, Map, BarChart3, User, Bell, LogOut,
+  Menu, Home,
 } from 'lucide-react';
-import { Bell, Sun, Moon, Menu } from 'lucide-react';
-import { Avatar } from '../ui/Avatar';
+import { useState } from 'react';
+import { cn } from '../../lib/utils';
+import { ROLE_LABELS } from '../../config/constants';
 
-interface DashboardLayoutProps {
-  children: React.ReactNode;
-  title: string;
-  subtitle?: string;
-  role: 'citizen' | 'admin' | 'officer';
-}
+type NavItem = { label: string; href: string; icon: React.ReactNode; roles: string[] };
 
-export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children, title, subtitle, role }) => {
+const navItems: NavItem[] = [
+  { label: 'Beranda', href: '/', icon: <Home className="w-4 h-4" />, roles: ['citizen', 'officer', 'admin', 'head_of_agency'] },
+  { label: 'Dashboard', href: '/dashboard', icon: <LayoutDashboard className="w-4 h-4" />, roles: ['citizen'] },
+  { label: 'Dashboard Petugas', href: '/officer', icon: <LayoutDashboard className="w-4 h-4" />, roles: ['officer'] },
+  { label: 'Dashboard Admin', href: '/admin', icon: <LayoutDashboard className="w-4 h-4" />, roles: ['admin'] },
+  { label: 'Dashboard Monitoring', href: '/kepala-dinas', icon: <LayoutDashboard className="w-4 h-4" />, roles: ['head_of_agency'] },
+  { label: 'Buat Pengaduan', href: '/submit', icon: <FileText className="w-4 h-4" />, roles: ['citizen', 'admin'] },
+  { label: 'Peta Pengaduan', href: '/map', icon: <Map className="w-4 h-4" />, roles: ['citizen', 'officer', 'admin', 'head_of_agency'] },
+  { label: 'Statistik', href: '/stats', icon: <BarChart3 className="w-4 h-4" />, roles: ['citizen', 'officer', 'admin', 'head_of_agency'] },
+  { label: 'Profil', href: '/profile', icon: <User className="w-4 h-4" />, roles: ['citizen', 'officer', 'admin', 'head_of_agency'] },
+  { label: 'Notifikasi', href: '/notifications', icon: <Bell className="w-4 h-4" />, roles: ['citizen', 'officer', 'admin', 'head_of_agency'] },
+];
+
+export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user, logout } = useAuth();
-  const { mode, setMode } = useTheme();
+  const location = useLocation();
   const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const filteredItems = navItems.filter(
+    (item) => user?.role && item.roles.includes(user.role),
+  );
 
   const handleLogout = async () => {
     await logout();
-    navigate('/login');
+    navigate('/');
   };
 
-  const citizenSections = [
-    {
-      title: 'Utama',
-      items: [
-        { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
-        { label: 'Buat Laporan', icon: FileText, path: '/submit' },
-        { label: 'Cek Status', icon: MapPin, path: '/track' },
-        { label: 'Statistik', icon: BarChart3, path: '/stats' },
-      ],
-    },
-    {
-      title: 'Bantuan',
-      items: [
-        { label: 'FAQ & Tentang', icon: HelpCircle, path: '/about' },
-        { label: 'Pengaturan', icon: Settings, path: '/settings' },
-      ],
-    },
-  ];
-
-  const adminSections = [
-    {
-      title: 'Utama',
-      items: [
-        { label: 'Dashboard', icon: LayoutDashboard, path: '/admin' },
-        { label: 'Semua Laporan', icon: FileText, path: '/admin/reports', badge: 12 },
-        { label: 'Peta', icon: MapPin, path: '/map' },
-        { label: 'Statistik', icon: BarChart3, path: '/stats' },
-      ],
-    },
-    {
-      title: 'Manajemen',
-      items: [
-        { label: 'Pengguna', icon: Users, path: '/admin/users' },
-        { label: 'Pengaturan', icon: Settings, path: '/admin/settings' },
-      ],
-    },
-  ];
-
-  const sections = role === 'citizen' ? citizenSections : adminSections;
-
   return (
-    <div className="min-h-screen bg-background">
-      {/* Top Bar */}
-      <header className="fixed top-20 left-0 right-0 z-20 h-16 bg-card border-b border-border flex items-center justify-between px-4 sm:px-8 transition-all lg:ml-[260px]">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => {
-              const sidebarToggle = document.querySelector('[data-sidebar-toggle]') as HTMLButtonElement;
-              sidebarToggle?.click();
-            }}
-            className="lg:hidden p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-            aria-label="Buka menu sidebar"
-          >
-            <Menu className="w-5 h-5" />
-          </button>
-          <div>
-            <h1 className="font-heading text-xl font-bold text-foreground">{title}</h1>
-            {subtitle && <p className="text-sm text-muted-foreground">{subtitle}</p>}
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2">
-          {/* Theme quick toggle */}
-          <div className="hidden sm:flex items-center p-1 bg-muted rounded-full border border-border">
-            {(['light', 'dark'] as const).map((m) => (
-              <button
-                key={m}
-                onClick={() => setMode(m)}
-                className={`p-1.5 rounded-full transition-all ${
-                  mode === m ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground'
-                }`}
-              >
-                {m === 'light' ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
-              </button>
-            ))}
-          </div>
-
-          {/* Notification */}
-          <button className="p-2 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors relative">
-            <Bell className="w-5 h-5" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-danger rounded-full ring-2 ring-card" />
-          </button>
-
-          {/* User */}
-          <div className="flex items-center gap-2 pl-2 border-l border-border">
-            <Avatar name={user?.name || ''} size="sm" />
-            <div className="hidden sm:block">
-              <p className="text-sm font-semibold text-foreground">{user?.name}</p>
-              <p className="text-xs text-muted-foreground capitalize">{role === 'citizen' ? 'Warga' : role === 'admin' ? 'Admin' : 'Petugas'}</p>
-            </div>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen flex bg-background">
+      {/* Mobile overlay */}
+      {sidebarOpen && (
+        <div className="fixed inset-0 bg-black/40 z-40 md:hidden" onClick={() => setSidebarOpen(false)} />
+      )}
 
       {/* Sidebar */}
-      <Sidebar sections={sections} onLogout={handleLogout} />
-
-      {/* Main Content */}
-      <main
-        className="pt-36 min-h-screen transition-all duration-300 lg:ml-[260px]">
-        <div className="px-4 sm:px-8 pb-12 max-w-container">
-          {children}
+      <aside className={cn(
+        'fixed md:sticky top-0 left-0 z-50 h-screen w-64 bg-card border-r border-border flex flex-col transition-transform duration-200',
+        sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0',
+      )}>
+        {/* Brand */}
+        <div className="p-5 border-b border-border">
+          <Link to="/" className="flex items-center gap-3" onClick={() => setSidebarOpen(false)}>
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground font-bold text-xs">
+              SB
+            </div>
+            <div>
+              <p className="font-semibold text-sm leading-tight">SIPIL BAUBAU</p>
+              <p className="text-[10px] text-muted-foreground">{user?.role ? ROLE_LABELS[user.role] || user.role : 'Guest'}</p>
+            </div>
+          </Link>
         </div>
-      </main>
+
+        {/* Nav */}
+        <nav className="flex-1 overflow-y-auto p-3 space-y-1">
+          {filteredItems.map((item) => {
+            const isActive = location.pathname === item.href;
+            return (
+              <Link
+                key={item.href}
+                to={item.href}
+                onClick={() => setSidebarOpen(false)}
+                className={cn(
+                  'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all',
+                  isActive
+                    ? 'bg-primary/10 text-primary font-medium'
+                    : 'text-muted-foreground hover:bg-accent hover:text-foreground',
+                )}
+              >
+                {item.icon}
+                {item.label}
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Logout */}
+        <div className="p-3 border-t border-border">
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm text-muted-foreground hover:bg-danger/10 hover:text-danger transition-all"
+          >
+            <LogOut className="w-4 h-4" />
+            Keluar
+          </button>
+        </div>
+      </aside>
+
+      {/* Main */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Top bar */}
+        <header className="sticky top-0 z-30 h-14 bg-background/80 backdrop-blur-sm border-b border-border flex items-center gap-3 px-4">
+          <button className="md:hidden p-2 rounded-lg hover:bg-accent" onClick={() => setSidebarOpen(true)}>
+            <Menu className="w-5 h-5" />
+          </button>
+          <div className="flex-1" />
+          <Link to="/notifications" className="p-2 rounded-lg hover:bg-accent relative">
+            <Bell className="w-4 h-4 text-muted-foreground" />
+          </Link>
+          <Link to="/profile" className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-medium">
+            {user?.name?.[0] ?? '?'}
+          </Link>
+        </header>
+
+        {/* Content */}
+        <main className="flex-1 p-4 sm:p-6 lg:p-8">
+          {children}
+        </main>
+      </div>
     </div>
   );
-};
+}

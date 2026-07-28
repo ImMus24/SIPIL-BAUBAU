@@ -46,8 +46,8 @@ export const CitizenDashboard: React.FC = () => {
   ];
 
   return (
-    <DashboardLayout title="Dashboard Warga" subtitle="Pantau laporan infrastruktur Anda" role="citizen">
-      <div className="space-y-6">
+    <DashboardLayout>
+      <div className="max-w-5xl mx-auto space-y-6">
         {/* KPI Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard title="Total Laporan" value={stats.total} icon={FileText} variant="primary" />
