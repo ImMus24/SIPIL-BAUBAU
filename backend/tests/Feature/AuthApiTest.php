@@ -43,6 +43,7 @@ class AuthApiTest extends TestCase
 
         $response->assertStatus(422)
             ->assertJson([
+                'success' => false,
                 'message' => 'Email atau kata sandi salah.',
             ]);
     }

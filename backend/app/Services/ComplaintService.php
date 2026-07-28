@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Contracts\ComplaintRepositoryInterface;
 use App\DTOs\StoreComplaintDTO;
 use App\DTOs\UpdateComplaintStatusDTO;
+use App\Events\ComplaintCreated;
+use App\Events\ComplaintStatusUpdated;
 use App\Models\Complaint;
 use App\Models\ComplaintStatusLog;
 use App\Models\Attachment;
@@ -85,6 +87,8 @@ class ComplaintService
                 'subdistrict' => $complaint->subdistrict,
             ]);
 
+            ComplaintCreated::dispatch($complaint);
+
             return $complaint->load(['category', 'attachments', 'statusLogs']);
         });
     }
@@ -133,6 +137,8 @@ class ComplaintService
                 'agency_id' => $complaint->agency_id,
                 'notes' => $dto->notes,
             ]);
+
+            ComplaintStatusUpdated::dispatch($complaint, $oldStatus, $dto->status);
 
             return $complaint->fresh(['category', 'agency', 'attachments', 'statusLogs']);
         });
