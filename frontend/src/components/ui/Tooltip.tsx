@@ -17,7 +17,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
   className,
 }) => {
   const [visible, setVisible] = useState(false);
-  const timeoutRef = React.useRef<ReturnType<typeof setTimeout>>();
+  const timeoutRef = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const show = () => {
     clearTimeout(timeoutRef.current);

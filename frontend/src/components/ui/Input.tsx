@@ -53,7 +53,7 @@ export const Input: React.FC<InputProps> = ({
             rightIcon || charCount ? 'pr-10' : 'pr-4',
             error ? 'border-danger focus:ring-danger' : 'border-input',
             props.disabled && 'opacity-50 cursor-not-allowed bg-muted',
-            props.size === 'sm' ? 'py-2 text-sm' : 'py-2.5 text-sm',
+            String(props.size) === 'sm' ? 'py-2 text-sm' : 'py-2.5 text-sm',
             className
           )}
           maxLength={maxLength}

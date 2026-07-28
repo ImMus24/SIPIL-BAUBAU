@@ -1,4 +1,4 @@
-import { api } from './api';
+import api from './api';
 import type { Complaint, ComplaintFilter, StatSummary, Category, Agency } from '../types';
 import { MOCK_COMPLAINTS, MOCK_CATEGORIES, MOCK_AGENCIES } from './mockData';
 
