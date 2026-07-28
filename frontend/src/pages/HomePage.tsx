@@ -44,12 +44,12 @@ export const HomePage: React.FC = () => {
     <div className="space-y-0 pt-20">
       
       {/* 1. Hero Section - Styled in Logo Kota Baubau Colors */}
-      <section className="relative min-h-[780px] lg:min-h-[850px] flex items-center overflow-hidden bg-gradient-to-b from-sky-950 via-sky-900 to-slate-950 text-white">
-        <div className="absolute inset-0 z-0 opacity-20 bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:20px_20px]"></div>
+      <section className="relative min-h-[780px] lg:min-h-[850px] flex items-center overflow-hidden bg-gradient-to-b from-sky-50 via-white to-sky-100 dark:from-sky-950 dark:via-sky-900 dark:to-slate-950 text-slate-900 dark:text-white transition-colors duration-300">
+        <div className="absolute inset-0 z-0 opacity-20 dark:opacity-20 bg-[radial-gradient(#0284c7_1px,transparent_1px)] dark:bg-[radial-gradient(#38bdf8_1px,transparent_1px)] [background-size:20px_20px]"></div>
         <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-r from-sky-950/95 via-sky-900/80 to-slate-950/40 z-10"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-sky-100/95 via-sky-50/80 to-white/50 dark:from-sky-950/95 dark:via-sky-900/80 dark:to-slate-950/40 z-10"></div>
           <div
-            className="w-full h-full bg-cover bg-center"
+            className="w-full h-full bg-cover bg-center opacity-30 dark:opacity-100"
             style={{
               backgroundImage: `url('https://lh3.googleusercontent.com/aida-public/AB6AXuAG6XoC95sZsGkgY-UfJ0DpPBSQfphLAQLCPzjxoe8aMMEa__ZJ7NENUDOSn3dnbH7j44GViixjcPzP47YwWz9h3OedPIaWJndQ-4RuCc3J_og_0wiJVXmwXwDgcL4pWsOMUhwvzG-wafhrV_ocJoaufk3Y2QEjhFwMnwvYuZ1I4c4l-Vy2dLlJZmxPEhpY36cATzab-I4_RQ41H1vxhwPbJx5YxOgvIEDpqYVX6A7MF2G4Ypj9BVJe4uMpUikb34hqJIICO__6bhA')`,
             }}
@@ -59,34 +59,34 @@ export const HomePage: React.FC = () => {
         <div className="relative z-20 px-4 sm:px-8 max-w-[1280px] mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-10 items-center py-16">
           
           <div className="space-y-7">
-            <div className="inline-flex items-center space-x-2 px-5 py-2 rounded-full bg-amber-400/20 border border-amber-400/50 text-amber-300 text-sm font-black uppercase tracking-wider backdrop-blur-md">
-              <ShieldCheck className="w-4 h-4 text-amber-400" />
+            <div className="inline-flex items-center space-x-2 px-5 py-2 rounded-full bg-sky-100 dark:bg-amber-400/20 border border-sky-300 dark:border-amber-400/50 text-sky-900 dark:text-amber-300 text-sm font-black uppercase tracking-wider backdrop-blur-md">
+              <ShieldCheck className="w-4 h-4 text-sky-700 dark:text-amber-400" />
               <span>Pemerintah Kota Baubau • Sulawesi Tenggara</span>
             </div>
             
-            <h1 className="font-headline text-4xl sm:text-5xl lg:text-6xl font-black leading-tight tracking-tight">
+            <h1 className="font-headline text-4xl sm:text-5xl lg:text-6xl font-black leading-tight tracking-tight text-slate-900 dark:text-white">
               Laporkan Kerusakan <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-400 to-sky-300">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-700 via-sky-800 to-sky-950 dark:from-amber-300 dark:via-yellow-400 dark:to-sky-300">
                 Infrastruktur Kota Baubau
               </span>
             </h1>
 
-            <p className="font-body text-base sm:text-lg text-sky-100/90 max-w-xl leading-relaxed">
+            <p className="font-body text-base sm:text-lg text-slate-600 dark:text-sky-100/90 max-w-xl leading-relaxed font-medium">
               Sampaikan keluhan Anda mengenai fasilitas publik di Kota Baubau dengan cepat, transparan, dan dapat dipantau langsung perkembangannya.
             </p>
 
             <div className="flex flex-wrap gap-4 pt-2">
               <Link
                 to="/submit"
-                className="bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-600 text-slate-950 font-black px-8 py-4 rounded-xl text-base shadow-xl shadow-amber-500/20 hover:shadow-amber-500/40 transition-all hover:-translate-y-0.5 active:scale-95 flex items-center space-x-2"
+                className="bg-gradient-to-r from-sky-700 via-sky-800 to-sky-900 dark:from-amber-400 dark:via-yellow-400 dark:to-amber-500 text-white dark:text-slate-950 font-black px-8 py-4 rounded-xl text-base shadow-xl shadow-sky-800/20 dark:shadow-amber-500/20 transition-all hover:-translate-y-0.5 active:scale-95 flex items-center space-x-2"
               >
                 <span>Buat Laporan Sekarang</span>
               </Link>
               <Link
                 to="/track"
-                className="border border-amber-300/40 hover:bg-white/10 text-white px-8 py-4 rounded-xl text-base font-bold transition-all backdrop-blur-md flex items-center gap-2"
+                className="border border-sky-300 dark:border-amber-300/40 bg-white/80 dark:bg-white/10 hover:bg-sky-50 dark:hover:bg-white/20 text-sky-900 dark:text-white px-8 py-4 rounded-xl text-base font-bold transition-all backdrop-blur-md flex items-center gap-2"
               >
-                <span className="material-symbols-outlined text-amber-300">play_circle</span>
+                <span className="material-symbols-outlined text-sky-700 dark:text-amber-300">play_circle</span>
                 <span>Lihat Panduan</span>
               </Link>
             </div>
