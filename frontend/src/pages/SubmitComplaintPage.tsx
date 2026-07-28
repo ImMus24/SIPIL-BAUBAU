@@ -102,15 +102,15 @@ export const SubmitComplaintPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f3f3fe] py-12 px-4 sm:px-6 lg:px-8 font-sans">
+    <div className="min-h-screen bg-[#f3f3fe] py-14 px-4 sm:px-6 lg:px-8 font-sans">
       <div className="max-w-4xl mx-auto space-y-8">
         
         {/* Top Header */}
-        <div className="space-y-2">
+        <div className="space-y-3">
           <h1 className="font-headline text-3xl sm:text-4xl font-extrabold text-[#191b23]">
             Buat Laporan Baru
           </h1>
-          <p className="text-sm text-[#434655] leading-relaxed max-w-2xl">
+          <p className="text-base text-[#434655] leading-relaxed max-w-2xl">
             Sampaikan keluhan atau aspirasi Anda terkait infrastruktur di Kota Baubau. Kami berkomitmen untuk merespons setiap laporan dengan cepat dan tepat.
           </p>
         </div>
@@ -118,7 +118,7 @@ export const SubmitComplaintPage: React.FC = () => {
         {/* 5-Step Progress Indicator Header */}
         <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#e1e2ed] shadow-xs">
           <div className="grid grid-cols-5 gap-2 relative">
-            <div className="absolute top-5 left-[10%] right-[10%] h-0.5 bg-[#e1e2ed] -z-0"></div>
+            <div className="absolute top-6 left-[10%] right-[10%] h-0.5 bg-[#e1e2ed] -z-0"></div>
             
             {[
               { num: 1, label: 'Kategori' },
@@ -132,7 +132,7 @@ export const SubmitComplaintPage: React.FC = () => {
               return (
                 <div key={step.num} className="flex flex-col items-center gap-2 relative z-10">
                   <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all ${
+                    className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-base transition-all ${
                       active
                         ? 'bg-[#004ac6] text-white shadow-md shadow-[#004ac6]/20 ring-4 ring-[#dbe1ff]'
                         : completed
@@ -143,7 +143,7 @@ export const SubmitComplaintPage: React.FC = () => {
                     {step.num}
                   </div>
                   <span
-                    className={`text-xs font-semibold ${
+                    className={`text-sm font-semibold ${
                       active ? 'text-[#004ac6] font-bold' : 'text-slate-500'
                     }`}
                   >
@@ -161,11 +161,11 @@ export const SubmitComplaintPage: React.FC = () => {
           {/* STEP 1: Pilih Kategori Laporan */}
           {currentStep === 1 && (
             <div className="space-y-6">
-              <h3 className="font-headline text-xl font-bold text-[#191b23]">
+              <h3 className="font-headline text-xl sm:text-2xl font-bold text-[#191b23]">
                 Pilih Kategori Laporan
               </h3>
 
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
                 {CATEGORIES_WIZARD.map((cat) => {
                   const selected = categoryId === cat.id;
                   return (
@@ -173,16 +173,16 @@ export const SubmitComplaintPage: React.FC = () => {
                       key={cat.id}
                       type="button"
                       onClick={() => setCategoryId(cat.id)}
-                      className={`p-6 rounded-2xl border text-center transition-all flex flex-col items-center justify-center space-y-3 min-h-[140px] ${
+                      className={`p-6 rounded-2xl border text-center transition-all flex flex-col items-center justify-center space-y-3 min-h-[150px] ${
                         selected
                           ? 'border-[#004ac6] bg-[#dbe1ff]/40 shadow-md ring-2 ring-[#004ac6]/20'
                           : 'border-[#e1e2ed] bg-white hover:border-[#004ac6] hover:bg-slate-50'
                       }`}
                     >
-                      <span className={`material-symbols-outlined text-3xl ${selected ? 'text-[#004ac6]' : 'text-slate-600'}`}>
+                      <span className={`material-symbols-outlined text-4xl ${selected ? 'text-[#004ac6]' : 'text-slate-600'}`}>
                         {cat.icon}
                       </span>
-                      <span className={`text-xs sm:text-sm font-bold ${selected ? 'text-[#004ac6]' : 'text-slate-800'}`}>
+                      <span className={`text-sm font-bold ${selected ? 'text-[#004ac6]' : 'text-slate-800'}`}>
                         {cat.name}
                       </span>
                     </button>
@@ -195,29 +195,29 @@ export const SubmitComplaintPage: React.FC = () => {
           {/* STEP 2: Detail Laporan */}
           {currentStep === 2 && (
             <div className="space-y-6">
-              <h3 className="font-headline text-xl font-bold text-[#191b23]">
+              <h3 className="font-headline text-xl sm:text-2xl font-bold text-[#191b23]">
                 Isi Detail Pengaduan Kerusakan
               </h3>
 
-              <div className="space-y-5 text-sm">
+              <div className="space-y-5">
                 <div>
-                  <label className="block font-bold text-slate-800 mb-2">Judul Laporan Pengaduan *</label>
+                  <label className="block font-bold text-slate-800 mb-2 text-sm">Judul Laporan Pengaduan *</label>
                   <input
                     type="text"
                     required
                     placeholder="Contoh: Jalan Berlubang Parah di Depan Benteng Keraton Wolio"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="w-full text-sm font-medium rounded-xl border border-[#e1e2ed] p-3.5 bg-[#f8fafc] focus:bg-white focus:outline-none focus:border-[#004ac6]"
+                    className="w-full text-base font-medium rounded-xl border border-[#e1e2ed] p-4 bg-[#f8fafc] focus:bg-white focus:outline-none focus:border-[#004ac6] transition-colors"
                   />
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-800 mb-2">Tingkat Urgensi Kerusakan *</label>
+                  <label className="block font-bold text-slate-800 mb-2 text-sm">Tingkat Urgensi Kerusakan *</label>
                   <select
                     value={urgency}
                     onChange={(e) => setUrgency(e.target.value as UrgencyLevel)}
-                    className="w-full text-sm font-semibold rounded-xl border border-[#e1e2ed] p-3.5 bg-[#f8fafc] focus:bg-white focus:outline-none focus:border-[#004ac6]"
+                    className="w-full text-base font-semibold rounded-xl border border-[#e1e2ed] p-4 bg-[#f8fafc] focus:bg-white focus:outline-none focus:border-[#004ac6] transition-colors"
                   >
                     <option value="rendah">Rendah (Kerusakan Ringan)</option>
                     <option value="sedang">Sedang (Mengganggu Kenyamanan Warga)</option>
@@ -227,14 +227,14 @@ export const SubmitComplaintPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-800 mb-2">Deskripsi Lengkap Kerusakan *</label>
+                  <label className="block font-bold text-slate-800 mb-2 text-sm">Deskripsi Lengkap Kerusakan *</label>
                   <textarea
                     required
                     rows={5}
                     placeholder="Ceritakan detail kerusakan, estimasi ukuran lubang/panjang kerusakan, waktu terjadinya, atau dampaknya terhadap warga..."
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className="w-full text-sm font-medium rounded-xl border border-[#e1e2ed] p-3.5 bg-[#f8fafc] focus:bg-white focus:outline-none focus:border-[#004ac6]"
+                    className="w-full text-base font-medium rounded-xl border border-[#e1e2ed] p-4 bg-[#f8fafc] focus:bg-white focus:outline-none focus:border-[#004ac6] transition-colors"
                   ></textarea>
                 </div>
               </div>
@@ -244,24 +244,24 @@ export const SubmitComplaintPage: React.FC = () => {
           {/* STEP 3: Upload Foto Bukti */}
           {currentStep === 3 && (
             <div className="space-y-6">
-              <h3 className="font-headline text-xl font-bold text-[#191b23]">
+              <h3 className="font-headline text-xl sm:text-2xl font-bold text-[#191b23]">
                 Upload Foto Bukti Kerusakan
               </h3>
-              <p className="text-xs text-slate-500">Lampirkan foto jernih dari lokasi untuk mempermudah tim teknis OPD.</p>
+              <p className="text-sm text-slate-500">Lampirkan foto jernih dari lokasi untuk mempermudah tim teknis OPD.</p>
 
-              <div className="border-2 border-dashed border-[#e1e2ed] rounded-3xl p-8 text-center hover:border-[#004ac6] transition-colors bg-[#f8fafc]">
-                <UploadCloud className="w-12 h-12 text-[#004ac6] mx-auto mb-3" />
-                <p className="text-sm font-bold text-slate-800">Pilih file foto dari perangkat Anda</p>
-                <p className="text-xs text-slate-500 mt-1">Format JPG, PNG, atau WEBP (Maksimal 5MB per file)</p>
+              <div className="border-2 border-dashed border-[#e1e2ed] rounded-3xl p-10 text-center hover:border-[#004ac6] transition-colors bg-[#f8fafc]">
+                <UploadCloud className="w-14 h-14 text-[#004ac6] mx-auto mb-4" />
+                <p className="text-base font-bold text-slate-800">Pilih file foto dari perangkat Anda</p>
+                <p className="text-sm text-slate-500 mt-1">Format JPG, PNG, atau WEBP (Maksimal 5MB per file)</p>
                 <input
                   type="file"
                   multiple
                   accept="image/*"
                   onChange={handlePhotoUpload}
-                  className="mt-4 text-xs mx-auto"
+                  className="mt-5 text-sm mx-auto"
                 />
                 {photos.length > 0 && (
-                  <p className="text-xs font-bold text-[#004ac6] mt-3">
+                  <p className="text-sm font-bold text-[#004ac6] mt-3">
                     Terpilih {photos.length} file foto bukti.
                   </p>
                 )}
@@ -272,18 +272,18 @@ export const SubmitComplaintPage: React.FC = () => {
           {/* STEP 4: Pilih Lokasi Peta GIS */}
           {currentStep === 4 && (
             <div className="space-y-6">
-              <h3 className="font-headline text-xl font-bold text-[#191b23]">
+              <h3 className="font-headline text-xl sm:text-2xl font-bold text-[#191b23]">
                 Penentuan Lokasi Presisi GIS
               </h3>
 
-              <div className="space-y-4 text-sm">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                   <div>
-                    <label className="block font-bold text-slate-800 mb-2">Kecamatan di Kota Baubau *</label>
+                    <label className="block font-bold text-slate-800 mb-2 text-sm">Kecamatan di Kota Baubau *</label>
                     <select
                       value={subdistrict}
                       onChange={(e) => setSubdistrict(e.target.value as BaubauSubdistrict)}
-                      className="w-full text-sm font-semibold rounded-xl border border-[#e1e2ed] p-3.5 bg-[#f8fafc] focus:bg-white focus:outline-none focus:border-[#004ac6]"
+                      className="w-full text-base font-semibold rounded-xl border border-[#e1e2ed] p-4 bg-[#f8fafc] focus:bg-white focus:outline-none focus:border-[#004ac6] transition-colors"
                     >
                       {SUBDISTRICTS.map((sub) => (
                         <option key={sub} value={sub}>Kecamatan {sub}</option>
@@ -292,20 +292,20 @@ export const SubmitComplaintPage: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block font-bold text-slate-800 mb-2">Alamat / Patokan Jalan *</label>
+                    <label className="block font-bold text-slate-800 mb-2 text-sm">Alamat / Patokan Jalan *</label>
                     <input
                       type="text"
                       required
                       placeholder="Contoh: Jl. Sultan Murhum No. 45 dekat Gerbang Keraton"
                       value={address}
                       onChange={(e) => setAddress(e.target.value)}
-                      className="w-full text-sm font-medium rounded-xl border border-[#e1e2ed] p-3.5 bg-[#f8fafc] focus:bg-white focus:outline-none focus:border-[#004ac6]"
+                      className="w-full text-base font-medium rounded-xl border border-[#e1e2ed] p-4 bg-[#f8fafc] focus:bg-white focus:outline-none focus:border-[#004ac6] transition-colors"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-800 mb-2">Tandai Lokasi Presisi di Peta GIS (Klik pada peta):</label>
+                  <label className="block font-bold text-slate-800 mb-2 text-sm">Tandai Lokasi Presisi di Peta GIS (Klik pada peta):</label>
                   <BaubauMap
                     pickLocation={true}
                     selectedLat={lat}
@@ -324,20 +324,20 @@ export const SubmitComplaintPage: React.FC = () => {
           {/* STEP 5: Review & Konfirmasi Pelapor */}
           {currentStep === 5 && (
             <div className="space-y-6">
-              <h3 className="font-headline text-xl font-bold text-[#191b23]">
+              <h3 className="font-headline text-xl sm:text-2xl font-bold text-[#191b23]">
                 Review & Konfirmasi Identitas Pelapor
               </h3>
 
-              <div className="bg-[#f8fafc] p-6 rounded-2xl border border-[#e1e2ed] space-y-3 text-xs sm:text-sm text-slate-700">
-                <div className="flex justify-between border-b pb-2">
+              <div className="bg-[#f8fafc] p-6 rounded-2xl border border-[#e1e2ed] space-y-4 text-sm text-slate-700">
+                <div className="flex justify-between border-b pb-3">
                   <span className="font-semibold text-slate-500">Judul Laporan:</span>
-                  <span className="font-bold text-slate-900">{title}</span>
+                  <span className="font-bold text-slate-900 text-right max-w-[60%]">{title}</span>
                 </div>
-                <div className="flex justify-between border-b pb-2">
+                <div className="flex justify-between border-b pb-3">
                   <span className="font-semibold text-slate-500">Kecamatan / Lokasi:</span>
-                  <span className="font-bold text-slate-900">{subdistrict} ({address})</span>
+                  <span className="font-bold text-slate-900 text-right max-w-[60%]">{subdistrict} ({address})</span>
                 </div>
-                <div className="flex justify-between border-b pb-2">
+                <div className="flex justify-between border-b pb-3">
                   <span className="font-semibold text-slate-500">Urgensi:</span>
                   <span className="font-bold text-[#004ac6] capitalize">{urgency}</span>
                 </div>
@@ -347,8 +347,8 @@ export const SubmitComplaintPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="space-y-4 pt-2">
-                <label className="flex items-center space-x-3 text-xs sm:text-sm font-bold text-slate-800 cursor-pointer">
+              <div className="space-y-5 pt-2">
+                <label className="flex items-center space-x-3 text-sm font-bold text-slate-800 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={isAnonymous}
@@ -359,35 +359,35 @@ export const SubmitComplaintPage: React.FC = () => {
                 </label>
 
                 {!isAnonymous && (
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
-                      <label className="block font-bold text-slate-800 mb-1">Nama Lengkap</label>
+                      <label className="block font-bold text-slate-800 mb-2 text-sm">Nama Lengkap</label>
                       <input
                         type="text"
                         placeholder="Nama lengkap Anda"
                         value={reporterName}
                         onChange={(e) => setReporterName(e.target.value)}
-                        className="w-full p-3.5 bg-[#f8fafc] border border-[#e1e2ed] rounded-xl text-sm"
+                        className="w-full p-3.5 bg-[#f8fafc] border border-[#e1e2ed] rounded-xl text-base transition-colors focus:outline-none focus:border-[#004ac6]"
                       />
                     </div>
                     <div>
-                      <label className="block font-bold text-slate-800 mb-1">No. WhatsApp / HP</label>
+                      <label className="block font-bold text-slate-800 mb-2 text-sm">No. WhatsApp / HP</label>
                       <input
                         type="tel"
                         placeholder="0812XXXXXXXX"
                         value={reporterPhone}
                         onChange={(e) => setReporterPhone(e.target.value)}
-                        className="w-full p-3.5 bg-[#f8fafc] border border-[#e1e2ed] rounded-xl text-sm"
+                        className="w-full p-3.5 bg-[#f8fafc] border border-[#e1e2ed] rounded-xl text-base transition-colors focus:outline-none focus:border-[#004ac6]"
                       />
                     </div>
                     <div>
-                      <label className="block font-bold text-slate-800 mb-1">Email (Opsional)</label>
+                      <label className="block font-bold text-slate-800 mb-2 text-sm">Email (Opsional)</label>
                       <input
                         type="email"
                         placeholder="email@domain.com"
                         value={reporterEmail}
                         onChange={(e) => setReporterEmail(e.target.value)}
-                        className="w-full p-3.5 bg-[#f8fafc] border border-[#e1e2ed] rounded-xl text-sm"
+                        className="w-full p-3.5 bg-[#f8fafc] border border-[#e1e2ed] rounded-xl text-base transition-colors focus:outline-none focus:border-[#004ac6]"
                       />
                     </div>
                   </div>
@@ -402,7 +402,7 @@ export const SubmitComplaintPage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setCurrentStep(currentStep - 1)}
-                className="px-6 py-3 border border-[#e1e2ed] text-slate-700 font-bold text-sm rounded-full hover:bg-slate-50 transition-colors flex items-center space-x-2"
+                className="px-7 py-3.5 border border-[#e1e2ed] text-slate-700 font-bold text-sm rounded-full hover:bg-slate-50 transition-colors flex items-center space-x-2"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Kembali</span>
@@ -421,20 +421,20 @@ export const SubmitComplaintPage: React.FC = () => {
               <button
                 type="button"
                 onClick={handleNextStep}
-                className="px-8 py-3.5 bg-[#004ac6] hover:bg-[#2563eb] text-white text-sm font-bold rounded-full shadow-lg shadow-[#004ac6]/20 transition-all flex items-center space-x-2"
+                className="px-9 py-4 bg-[#004ac6] hover:bg-[#2563eb] text-white text-base font-bold rounded-full shadow-lg shadow-[#004ac6]/20 transition-all flex items-center space-x-2"
               >
                 <span>Lanjut</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-5 h-5" />
               </button>
             ) : (
               <button
                 type="button"
                 onClick={handleSubmit}
                 disabled={loading}
-                className="px-8 py-3.5 bg-[#004ac6] hover:bg-[#2563eb] text-white text-sm font-bold rounded-full shadow-lg shadow-[#004ac6]/20 transition-all flex items-center space-x-2"
+                className="px-9 py-4 bg-[#004ac6] hover:bg-[#2563eb] text-white text-base font-bold rounded-full shadow-lg shadow-[#004ac6]/20 transition-all flex items-center space-x-2"
               >
                 <span>{loading ? 'Mengirim...' : 'Kirim Pengaduan'}</span>
-                <CheckCircle2 className="w-4 h-4 text-amber-300" />
+                <CheckCircle2 className="w-5 h-5 text-amber-300" />
               </button>
             )}
           </div>
@@ -452,17 +452,17 @@ export const SubmitComplaintPage: React.FC = () => {
             title="Laporan Pengaduan Berhasil Terdaftar!"
             maxWidth="md"
           >
-            <div className="text-center space-y-4 py-4">
+            <div className="text-center space-y-5 py-4">
               <div className="w-16 h-16 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto shadow-inner">
                 <CheckCircle2 className="w-10 h-10" />
               </div>
 
               <div>
-                <p className="text-xs text-slate-500">Kode Tiket Pelacakan Resmi Anda:</p>
-                <div className="inline-block my-2 px-5 py-2.5 bg-slate-900 text-amber-400 font-mono font-black text-2xl rounded-2xl shadow-md border border-slate-800">
+                <p className="text-sm text-slate-500">Kode Tiket Pelacakan Resmi Anda:</p>
+                <div className="inline-block my-3 px-6 py-3 bg-slate-900 text-amber-400 font-mono font-black text-2xl rounded-2xl shadow-md border border-slate-800">
                   {createdResult.ticket_code}
                 </div>
-                <p className="text-xs text-slate-600 leading-relaxed">
+                <p className="text-sm text-slate-600 leading-relaxed">
                   Simpan kode tiket ini untuk mengecek progres penanganan oleh Dinas terkait di Kota Baubau.
                 </p>
               </div>
@@ -472,7 +472,7 @@ export const SubmitComplaintPage: React.FC = () => {
                   setCreatedResult(null);
                   navigate(`/track?ticket=${createdResult.ticket_code}`);
                 }}
-                className="w-full py-3.5 bg-[#004ac6] text-white font-bold text-sm rounded-xl shadow-md hover:bg-[#2563eb] transition-colors"
+                className="w-full py-4 bg-[#004ac6] text-white font-bold text-base rounded-xl shadow-md hover:bg-[#2563eb] transition-colors"
               >
                 Lihat Progres Laporan Saya
               </button>

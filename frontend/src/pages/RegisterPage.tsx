@@ -57,24 +57,24 @@ export const RegisterPage: React.FC = () => {
             <span className="font-headline font-black text-2xl tracking-tight">SIPIL BAUBAU</span>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-5">
             <h1 className="font-headline text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight tracking-tight">
               Layanan Pengaduan Infrastruktur Modern.
             </h1>
-            <p className="text-sm sm:text-base text-white/90 leading-relaxed font-medium">
+            <p className="text-base text-white/90 leading-relaxed font-medium">
               Wujudkan Kota Baubau yang lebih baik melalui partisipasi aktif Anda dalam melaporkan kendala infrastruktur di sekitar kita.
             </p>
           </div>
 
           {/* Interactive GIS Preview Card */}
-          <div className="bg-white/15 backdrop-blur-md border border-white/30 rounded-3xl p-4 space-y-3 shadow-2xl">
+          <div className="bg-white/15 backdrop-blur-md border border-white/30 rounded-3xl p-5 space-y-3 shadow-2xl">
             <div className="flex items-center space-x-3">
-              <div className="p-2 bg-[#39b8fd] text-[#001e2f] rounded-xl">
+              <div className="p-2.5 bg-[#39b8fd] text-[#001e2f] rounded-xl">
                 <MapPin className="w-5 h-5" />
               </div>
               <div>
-                <h4 className="text-xs font-bold">Peta Infrastruktur</h4>
-                <p className="text-[11px] text-white/80">Terpantau secara Real-time</p>
+                <h4 className="text-sm font-bold">Peta Infrastruktur</h4>
+                <p className="text-xs text-white/80">Terpantau secara Real-time</p>
               </div>
             </div>
             <img
@@ -85,7 +85,7 @@ export const RegisterPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="relative z-10 pt-8 text-[11px] text-white/70">
+        <div className="relative z-10 pt-8 text-xs text-white/70">
           © {new Date().getFullYear()} Pemerintah Kota Baubau. Transformasi Digital Menuju Smart City.
         </div>
 
@@ -99,45 +99,45 @@ export const RegisterPage: React.FC = () => {
           
           <div className="space-y-2">
             <h2 className="font-headline text-3xl font-extrabold text-slate-900">Buat Akun Baru</h2>
-            <p className="text-sm text-slate-500 font-medium">
+            <p className="text-sm text-slate-500 font-medium leading-relaxed">
               Silakan lengkapi data diri Anda untuk memulai.
             </p>
           </div>
 
           {errorMsg && (
-            <div className="p-4 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold rounded-2xl">
+            <div className="p-4 bg-rose-50 border border-rose-200 text-rose-700 text-sm font-bold rounded-2xl">
               {errorMsg}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5 text-sm">
+          <form onSubmit={handleSubmit} className="space-y-5">
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block font-bold text-slate-800 mb-1.5 text-xs">Nama Lengkap *</label>
+                <label className="block font-bold text-slate-800 mb-2 text-sm">Nama Lengkap *</label>
                 <div className="relative">
-                  <User className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+                  <User className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     required
                     placeholder="Masukkan nama"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full pl-11 pr-4 py-3.5 bg-[#f8fafc] border border-[#e1e2ed] rounded-2xl text-sm font-medium focus:bg-white focus:outline-none focus:border-[#004ac6]"
+                    className="w-full pl-12 pr-4 py-3.5 bg-[#f8fafc] border border-[#e1e2ed] rounded-2xl text-base font-medium focus:bg-white focus:outline-none focus:border-[#004ac6] transition-colors"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block font-bold text-slate-800 mb-1.5 text-xs">NIK (KTP)</label>
+                <label className="block font-bold text-slate-800 mb-2 text-sm">NIK (KTP)</label>
                 <div className="relative">
-                  <CreditCard className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+                  <CreditCard className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     placeholder="16 digit NIK"
                     value={nik}
                     onChange={(e) => setNik(e.target.value)}
-                    className="w-full pl-11 pr-4 py-3.5 bg-[#f8fafc] border border-[#e1e2ed] rounded-2xl text-sm font-medium focus:bg-white focus:outline-none focus:border-[#004ac6]"
+                    className="w-full pl-12 pr-4 py-3.5 bg-[#f8fafc] border border-[#e1e2ed] rounded-2xl text-base font-medium focus:bg-white focus:outline-none focus:border-[#004ac6] transition-colors"
                   />
                 </div>
               </div>
@@ -145,83 +145,83 @@ export const RegisterPage: React.FC = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block font-bold text-slate-800 mb-1.5 text-xs">No HP *</label>
+                <label className="block font-bold text-slate-800 mb-2 text-sm">No HP *</label>
                 <div className="relative">
-                  <Phone className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+                  <Phone className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
                   <input
                     type="tel"
                     placeholder="08xx..."
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="w-full pl-11 pr-4 py-3.5 bg-[#f8fafc] border border-[#e1e2ed] rounded-2xl text-sm font-medium focus:bg-white focus:outline-none focus:border-[#004ac6]"
+                    className="w-full pl-12 pr-4 py-3.5 bg-[#f8fafc] border border-[#e1e2ed] rounded-2xl text-base font-medium focus:bg-white focus:outline-none focus:border-[#004ac6] transition-colors"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block font-bold text-slate-800 mb-1.5 text-xs">Email *</label>
+                <label className="block font-bold text-slate-800 mb-2 text-sm">Email *</label>
                 <div className="relative">
-                  <Mail className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+                  <Mail className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
                   <input
                     type="email"
                     required
                     placeholder="contoh@mail.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-11 pr-4 py-3.5 bg-[#f8fafc] border border-[#e1e2ed] rounded-2xl text-sm font-medium focus:bg-white focus:outline-none focus:border-[#004ac6]"
+                    className="w-full pl-12 pr-4 py-3.5 bg-[#f8fafc] border border-[#e1e2ed] rounded-2xl text-base font-medium focus:bg-white focus:outline-none focus:border-[#004ac6] transition-colors"
                   />
                 </div>
               </div>
             </div>
 
             <div>
-              <label className="block font-bold text-slate-800 mb-1.5 text-xs">Alamat</label>
+              <label className="block font-bold text-slate-800 mb-2 text-sm">Alamat</label>
               <div className="relative">
-                <MapPin className="w-4 h-4 text-slate-400 absolute left-4 top-4" />
+                <MapPin className="w-5 h-5 text-slate-400 absolute left-4 top-4" />
                 <textarea
                   rows={2}
                   placeholder="Alamat lengkap sesuai KTP"
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3.5 bg-[#f8fafc] border border-[#e1e2ed] rounded-2xl text-sm font-medium focus:bg-white focus:outline-none focus:border-[#004ac6]"
+                  className="w-full pl-12 pr-4 py-3.5 bg-[#f8fafc] border border-[#e1e2ed] rounded-2xl text-base font-medium focus:bg-white focus:outline-none focus:border-[#004ac6] transition-colors"
                 ></textarea>
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block font-bold text-slate-800 mb-1.5 text-xs">Password *</label>
+                <label className="block font-bold text-slate-800 mb-2 text-sm">Password *</label>
                 <div className="relative">
-                  <Lock className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+                  <Lock className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
                   <input
                     type="password"
                     required
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-11 pr-4 py-3.5 bg-[#f8fafc] border border-[#e1e2ed] rounded-2xl text-sm font-medium focus:bg-white focus:outline-none focus:border-[#004ac6]"
+                    className="w-full pl-12 pr-4 py-3.5 bg-[#f8fafc] border border-[#e1e2ed] rounded-2xl text-base font-medium focus:bg-white focus:outline-none focus:border-[#004ac6] transition-colors"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block font-bold text-slate-800 mb-1.5 text-xs">Konfirmasi Password *</label>
+                <label className="block font-bold text-slate-800 mb-2 text-sm">Konfirmasi Password *</label>
                 <div className="relative">
-                  <Lock className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+                  <Lock className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
                   <input
                     type="password"
                     required
                     placeholder="••••••••"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full pl-11 pr-4 py-3.5 bg-[#f8fafc] border border-[#e1e2ed] rounded-2xl text-sm font-medium focus:bg-white focus:outline-none focus:border-[#004ac6]"
+                    className="w-full pl-12 pr-4 py-3.5 bg-[#f8fafc] border border-[#e1e2ed] rounded-2xl text-base font-medium focus:bg-white focus:outline-none focus:border-[#004ac6] transition-colors"
                   />
                 </div>
               </div>
             </div>
 
             <div className="pt-1">
-              <label className="flex items-center space-x-3 text-xs text-slate-600 font-semibold cursor-pointer">
+              <label className="flex items-center space-x-3 text-sm text-slate-600 font-semibold cursor-pointer">
                 <input
                   type="checkbox"
                   checked={agreeTerms}
@@ -237,14 +237,14 @@ export const RegisterPage: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 bg-[#004ac6] hover:bg-[#2563eb] text-white text-sm font-extrabold rounded-full shadow-lg shadow-[#004ac6]/20 transition-all flex items-center justify-center space-x-2 active:scale-95"
+              className="w-full py-4 bg-[#004ac6] hover:bg-[#2563eb] text-white text-base font-extrabold rounded-full shadow-lg shadow-[#004ac6]/20 transition-all flex items-center justify-center space-x-2 active:scale-95"
             >
               <span>{loading ? 'Mendaftarkan Akun...' : 'Daftar Sekarang'}</span>
-              <ArrowRight className="w-4 h-4" />
+              <ArrowRight className="w-5 h-5" />
             </button>
           </form>
 
-          <div className="text-center text-xs text-slate-600 pt-4 border-t border-[#e1e2ed]">
+          <div className="text-center text-sm text-slate-600 pt-5 border-t border-[#e1e2ed]">
             Sudah punya akun?{' '}
             <Link to="/login" className="font-bold text-[#004ac6] hover:underline">
               Masuk di sini

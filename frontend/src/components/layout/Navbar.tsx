@@ -54,27 +54,27 @@ export const Navbar: React.FC = () => {
           <div>
             <div className="flex items-center space-x-2">
               <span className="font-headline font-black text-lg text-slate-900 tracking-tight">SIPIL BAUBAU</span>
-              <span className="bg-amber-400 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-xs">
+              <span className="bg-amber-400 text-slate-950 text-[11px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-xs">
                 KOTA BAUBAU
               </span>
             </div>
-            <p className="text-[11px] font-medium text-sky-800 hidden sm:block">
+            <p className="text-xs font-medium text-sky-800 hidden sm:block">
               Sistem Pengaduan Infrastruktur Berbasis Web
             </p>
           </div>
         </Link>
 
         {/* Desktop Navigation Links */}
-        <div className="hidden md:flex gap-7 items-center">
+        <div className="hidden lg:flex gap-6 items-center">
           {navLinks.map((link) => {
             const active = isActive(link.path);
             return (
               <Link
                 key={link.path}
                 to={link.path}
-                className={`text-sm font-semibold transition-all duration-200 ${
+                className={`text-sm font-semibold transition-all duration-200 py-1 ${
                   active
-                    ? 'text-sky-800 font-bold border-b-2 border-amber-400 pb-1'
+                    ? 'text-sky-800 font-bold border-b-2 border-amber-400'
                     : 'text-slate-600 hover:text-sky-700 hover:scale-105'
                 }`}
               >
@@ -85,12 +85,12 @@ export const Navbar: React.FC = () => {
         </div>
 
         {/* User Auth Action Button */}
-        <div className="hidden md:flex items-center space-x-3">
+        <div className="hidden lg:flex items-center space-x-3">
           {isAuthenticated && user ? (
             <div className="flex items-center space-x-3">
               <Link
                 to={role === 'citizen' ? '/dashboard' : '/admin'}
-                className="inline-flex items-center space-x-2 px-5 py-2.5 bg-slate-950 hover:bg-slate-900 text-white rounded-full text-xs font-bold shadow-md transition-all active:scale-95 border border-amber-400/40"
+                className="inline-flex items-center space-x-2 px-5 py-2.5 bg-slate-950 hover:bg-slate-900 text-white rounded-full text-sm font-bold shadow-md transition-all active:scale-95 border border-amber-400/40"
               >
                 <LayoutDashboard className="w-4 h-4 text-amber-400" />
                 <span>{role === 'admin' ? 'Portal Admin' : role === 'officer' ? 'Portal OPD' : 'Dashboard Saya'}</span>
@@ -101,13 +101,13 @@ export const Navbar: React.FC = () => {
                 title="Keluar"
                 className="p-2.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-full transition-colors"
               >
-                <LogOut className="w-4.5 h-4.5" />
+                <LogOut className="w-5 h-5" />
               </button>
             </div>
           ) : (
             <Link
               to="/login"
-              className="bg-gradient-to-r from-sky-700 via-sky-800 to-sky-900 hover:from-sky-800 hover:to-sky-950 text-white px-6 py-2.5 rounded-full text-xs font-extrabold shadow-lg shadow-sky-800/20 transition-all active:scale-95 ring-1 ring-amber-400/60"
+              className="bg-gradient-to-r from-sky-700 via-sky-800 to-sky-900 hover:from-sky-800 hover:to-sky-950 text-white px-7 py-3 rounded-full text-sm font-extrabold shadow-lg shadow-sky-800/20 transition-all active:scale-95 ring-1 ring-amber-400/60"
             >
               Masuk Portal
             </Link>
@@ -115,7 +115,7 @@ export const Navbar: React.FC = () => {
         </div>
 
         {/* Mobile Menu Button */}
-        <div className="md:hidden flex items-center">
+        <div className="lg:hidden flex items-center">
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="p-2.5 text-slate-700 hover:bg-slate-100 rounded-xl transition-colors"
@@ -128,13 +128,13 @@ export const Navbar: React.FC = () => {
 
       {/* Mobile Dropdown Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-white border-b border-slate-200 px-6 py-4 space-y-3 shadow-xl">
+        <div className="lg:hidden bg-white border-b border-slate-200 px-6 py-5 space-y-3 shadow-xl">
           {navLinks.map((link) => (
             <Link
               key={link.path}
               to={link.path}
               onClick={() => setMobileMenuOpen(false)}
-              className={`block text-sm font-semibold py-2 ${
+              className={`block text-base font-semibold py-2.5 ${
                 isActive(link.path) ? 'text-sky-800 font-extrabold' : 'text-slate-700'
               }`}
             >
@@ -148,7 +148,7 @@ export const Navbar: React.FC = () => {
                   setMobileMenuOpen(false);
                   handleLogout();
                 }}
-                className="w-full py-2.5 text-center bg-rose-50 text-rose-700 rounded-xl text-xs font-bold"
+                className="w-full py-3 text-center bg-rose-50 text-rose-700 rounded-xl text-sm font-bold"
               >
                 Keluar Akun
               </button>
@@ -156,7 +156,7 @@ export const Navbar: React.FC = () => {
               <Link
                 to="/login"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block w-full py-3 text-center bg-sky-800 text-white rounded-full text-xs font-extrabold shadow-md"
+                className="block w-full py-3.5 text-center bg-sky-800 text-white rounded-full text-sm font-extrabold shadow-md"
               >
                 Masuk Portal
               </Link>

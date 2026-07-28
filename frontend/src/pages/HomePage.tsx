@@ -58,33 +58,33 @@ export const HomePage: React.FC = () => {
 
         <div className="relative z-20 px-4 sm:px-8 max-w-[1280px] mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-10 items-center py-16">
           
-          <div className="space-y-6">
-            <div className="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-amber-400/20 border border-amber-400/50 text-amber-300 text-xs font-black uppercase tracking-wider backdrop-blur-md">
+          <div className="space-y-7">
+            <div className="inline-flex items-center space-x-2 px-5 py-2 rounded-full bg-amber-400/20 border border-amber-400/50 text-amber-300 text-sm font-black uppercase tracking-wider backdrop-blur-md">
               <ShieldCheck className="w-4 h-4 text-amber-400" />
               <span>Pemerintah Kota Baubau • Sulawesi Tenggara</span>
             </div>
             
-            <h1 className="font-headline text-3xl sm:text-5xl lg:text-6xl font-black leading-tight tracking-tight">
+            <h1 className="font-headline text-4xl sm:text-5xl lg:text-6xl font-black leading-tight tracking-tight">
               Laporkan Kerusakan <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-400 to-sky-300">
                 Infrastruktur Kota Baubau
               </span>
             </h1>
 
-            <p className="font-body text-base sm:text-lg text-sky-100/90 max-w-xl leading-relaxed font-normal">
+            <p className="font-body text-base sm:text-lg text-sky-100/90 max-w-xl leading-relaxed">
               Sampaikan keluhan Anda mengenai fasilitas publik di Kota Baubau dengan cepat, transparan, dan dapat dipantau langsung perkembangannya.
             </p>
 
             <div className="flex flex-wrap gap-4 pt-2">
               <Link
                 to="/submit"
-                className="bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-600 text-slate-950 font-black px-8 py-4 rounded-xl text-sm shadow-xl shadow-amber-500/20 hover:shadow-amber-500/40 transition-all hover:-translate-y-0.5 active:scale-95 flex items-center space-x-2"
+                className="bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-600 text-slate-950 font-black px-8 py-4 rounded-xl text-base shadow-xl shadow-amber-500/20 hover:shadow-amber-500/40 transition-all hover:-translate-y-0.5 active:scale-95 flex items-center space-x-2"
               >
                 <span>Buat Laporan Sekarang</span>
               </Link>
               <Link
                 to="/track"
-                className="border border-amber-300/40 hover:bg-white/10 text-white px-8 py-4 rounded-xl text-sm font-bold transition-all backdrop-blur-md flex items-center gap-2"
+                className="border border-amber-300/40 hover:bg-white/10 text-white px-8 py-4 rounded-xl text-base font-bold transition-all backdrop-blur-md flex items-center gap-2"
               >
                 <span className="material-symbols-outlined text-amber-300">play_circle</span>
                 <span>Lihat Panduan</span>
@@ -107,33 +107,33 @@ export const HomePage: React.FC = () => {
                   </div>
 
                   <div className="p-4 space-y-3.5">
-                    <div className="p-3 bg-white rounded-xl shadow-xs border border-sky-100 flex gap-3 items-center">
+                    <div className="p-3.5 bg-white rounded-xl shadow-xs border border-sky-100 flex gap-3 items-center">
                       <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-700 shrink-0 border border-amber-300">
                         <span className="material-symbols-outlined">lightbulb</span>
                       </div>
                       <div>
-                        <p className="text-xs font-bold text-slate-900">Lampu Padam</p>
-                        <p className="text-[11px] text-slate-500">Kawasan Pantai Kamali</p>
+                        <p className="text-sm font-bold text-slate-900">Lampu Padam</p>
+                        <p className="text-xs text-slate-500">Kawasan Pantai Kamali</p>
                       </div>
                     </div>
 
-                    <div className="p-3 bg-white rounded-xl shadow-xs border border-sky-100 flex gap-3 items-center">
+                    <div className="p-3.5 bg-white rounded-xl shadow-xs border border-sky-100 flex gap-3 items-center">
                       <div className="w-10 h-10 rounded-full bg-sky-100 flex items-center justify-center text-sky-700 shrink-0 border border-sky-300">
                         <span className="material-symbols-outlined">warning</span>
                       </div>
                       <div>
-                        <p className="text-xs font-bold text-slate-900">Jalan Berlubang</p>
-                        <p className="text-[11px] text-slate-500">Jl. Sudirman No. 45 (Wolio)</p>
+                        <p className="text-sm font-bold text-slate-900">Jalan Berlubang</p>
+                        <p className="text-xs text-slate-500">Jl. Sudirman No. 45 (Wolio)</p>
                       </div>
                     </div>
 
-                    <div className="p-3 bg-white rounded-xl shadow-xs border border-sky-100 flex gap-3 items-center">
+                    <div className="p-3.5 bg-white rounded-xl shadow-xs border border-sky-100 flex gap-3 items-center">
                       <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 shrink-0 border border-emerald-300">
                         <span className="material-symbols-outlined">verified</span>
                       </div>
                       <div>
-                        <p className="text-xs font-bold text-slate-900">Drainase Selesai</p>
-                        <p className="text-[11px] text-slate-500">Kecamatan Murhum</p>
+                        <p className="text-sm font-bold text-slate-900">Drainase Selesai</p>
+                        <p className="text-xs text-slate-500">Kecamatan Murhum</p>
                       </div>
                     </div>
                   </div>
@@ -151,7 +151,7 @@ export const HomePage: React.FC = () => {
       </section>
 
       {/* 2. Statistics Section */}
-      <section className="py-16 bg-slate-100/70 border-b border-sky-100">
+      <section className="py-20 bg-slate-100/70 border-b border-sky-100">
         <div className="px-4 sm:px-8 max-w-[1280px] mx-auto">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             
@@ -159,32 +159,32 @@ export const HomePage: React.FC = () => {
               <div className="w-16 h-16 bg-sky-100 rounded-2xl flex items-center justify-center text-sky-700 mb-4 group-hover:scale-110 transition-transform">
                 <span className="material-symbols-outlined text-[32px]">description</span>
               </div>
-              <h4 className="text-slate-600 text-xs font-bold mb-1 uppercase tracking-wider">Total Pengaduan</h4>
-              <div className="font-headline text-[36px] font-black text-sky-800">{stats.total}</div>
+              <h4 className="text-slate-600 text-sm font-bold mb-1 uppercase tracking-wider">Total Pengaduan</h4>
+              <div className="font-headline text-[40px] font-black text-sky-800">{stats.total}</div>
             </div>
 
             <div className="bg-white p-8 rounded-2xl shadow-xs border border-slate-200 flex flex-col items-center text-center group hover:border-amber-500 transition-all">
               <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center text-amber-700 mb-4 group-hover:scale-110 transition-transform">
                 <span className="material-symbols-outlined text-[32px]">sync</span>
               </div>
-              <h4 className="text-slate-600 text-xs font-bold mb-1 uppercase tracking-wider">Sedang Diproses</h4>
-              <div className="font-headline text-[36px] font-black text-amber-600">{stats.diproses}</div>
+              <h4 className="text-slate-600 text-sm font-bold mb-1 uppercase tracking-wider">Sedang Diproses</h4>
+              <div className="font-headline text-[40px] font-black text-amber-600">{stats.diproses}</div>
             </div>
 
             <div className="bg-white p-8 rounded-2xl shadow-xs border border-slate-200 flex flex-col items-center text-center group hover:border-emerald-600 transition-all">
               <div className="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center text-emerald-700 mb-4 group-hover:scale-110 transition-transform">
                 <span className="material-symbols-outlined text-[32px]">verified</span>
               </div>
-              <h4 className="text-slate-600 text-xs font-bold mb-1 uppercase tracking-wider">Selesai Ditangani</h4>
-              <div className="font-headline text-[36px] font-black text-emerald-600">{stats.selesai}</div>
+              <h4 className="text-slate-600 text-sm font-bold mb-1 uppercase tracking-wider">Selesai Ditangani</h4>
+              <div className="font-headline text-[40px] font-black text-emerald-600">{stats.selesai}</div>
             </div>
 
             <div className="bg-white p-8 rounded-2xl shadow-xs border border-slate-200 flex flex-col items-center text-center group hover:border-sky-800 transition-all">
               <div className="w-16 h-16 bg-sky-900 text-amber-300 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                 <span className="material-symbols-outlined text-[32px]">engineering</span>
               </div>
-              <h4 className="text-slate-600 text-xs font-bold mb-1 uppercase tracking-wider">Petugas OPD Aktif</h4>
-              <div className="font-headline text-[36px] font-black text-slate-900">86</div>
+              <h4 className="text-slate-600 text-sm font-bold mb-1 uppercase tracking-wider">Petugas OPD Aktif</h4>
+              <div className="font-headline text-[40px] font-black text-slate-900">86</div>
             </div>
 
           </div>
@@ -192,12 +192,12 @@ export const HomePage: React.FC = () => {
       </section>
 
       {/* 3. Category Section */}
-      <section className="py-16">
+      <section className="py-20">
         <div className="px-4 sm:px-8 max-w-[1280px] mx-auto">
           
-          <div className="text-center mb-12 space-y-2">
-            <h2 className="font-headline text-3xl font-extrabold text-slate-900">Kategori Pengaduan Infrastruktur</h2>
-            <p className="text-sm text-slate-600 max-w-2xl mx-auto">
+          <div className="text-center mb-14 space-y-3">
+            <h2 className="font-headline text-3xl sm:text-4xl font-extrabold text-slate-900">Kategori Pengaduan Infrastruktur</h2>
+            <p className="text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
               Pilih kategori infrastruktur yang ingin Anda laporkan untuk mempercepat proses penugasan tim teknis lapangan.
             </p>
           </div>
@@ -207,12 +207,12 @@ export const HomePage: React.FC = () => {
               <button
                 key={idx}
                 onClick={() => navigate(`/submit?category=${cat.catId}`)}
-                className="bg-white p-6 rounded-2xl border border-slate-200 hover:border-sky-600 hover:shadow-xl hover:shadow-sky-600/10 transition-all text-center group"
+                className="bg-white p-8 rounded-2xl border border-slate-200 hover:border-sky-600 hover:shadow-xl hover:shadow-sky-600/10 transition-all text-center group"
               >
-                <div className="w-12 h-12 bg-sky-50 mx-auto rounded-xl flex items-center justify-center text-sky-800 group-hover:bg-sky-700 group-hover:text-white transition-colors mb-4">
-                  <span className="material-symbols-outlined">{cat.icon}</span>
+                <div className="w-14 h-14 bg-sky-50 mx-auto rounded-xl flex items-center justify-center text-sky-800 group-hover:bg-sky-700 group-hover:text-white transition-colors mb-4">
+                  <span className="material-symbols-outlined text-[28px]">{cat.icon}</span>
                 </div>
-                <span className="font-bold text-xs text-slate-900 group-hover:text-sky-800 transition-colors">
+                <span className="font-bold text-sm text-slate-900 group-hover:text-sky-800 transition-colors">
                   {cat.name}
                 </span>
               </button>
@@ -223,35 +223,35 @@ export const HomePage: React.FC = () => {
       </section>
 
       {/* 4. Interactive Map Section */}
-      <section className="py-16 bg-white overflow-hidden border-t border-b border-slate-200">
+      <section className="py-20 bg-white overflow-hidden border-t border-b border-slate-200">
         <div className="px-4 sm:px-8 max-w-[1280px] mx-auto">
-          <div className="flex flex-col lg:flex-row gap-10 items-start">
+          <div className="flex flex-col lg:flex-row gap-12 items-start">
             
             <div className="lg:w-1/3 space-y-6">
-              <h2 className="font-headline text-3xl font-extrabold text-slate-900">Pantau Kondisi Kota Real-Time</h2>
-              <p className="text-sm text-slate-600 leading-relaxed">
+              <h2 className="font-headline text-3xl sm:text-4xl font-extrabold text-slate-900">Pantau Kondisi Kota Real-Time</h2>
+              <p className="text-base text-slate-600 leading-relaxed">
                 Peta interaktif menunjukkan titik-titik kerusakan yang sedang dilaporkan oleh warga Kota Baubau. Kami menjaga transparansi setiap laporan.
               </p>
 
               <div className="space-y-3 pt-2">
                 <div className="flex items-center gap-3">
-                  <div className="w-3.5 h-3.5 rounded-full bg-amber-500"></div>
-                  <span className="text-xs font-bold text-slate-800">Menunggu Verifikasi</span>
+                  <div className="w-4 h-4 rounded-full bg-amber-500"></div>
+                  <span className="text-sm font-bold text-slate-800">Menunggu Verifikasi</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-3.5 h-3.5 rounded-full bg-sky-600"></div>
-                  <span className="text-xs font-bold text-slate-800">Dalam Pengerjaan OPD</span>
+                  <div className="w-4 h-4 rounded-full bg-sky-600"></div>
+                  <span className="text-sm font-bold text-slate-800">Dalam Pengerjaan OPD</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-3.5 h-3.5 rounded-full bg-emerald-600"></div>
-                  <span className="text-xs font-bold text-slate-800">Selesai Diperbaiki</span>
+                  <div className="w-4 h-4 rounded-full bg-emerald-600"></div>
+                  <span className="text-sm font-bold text-slate-800">Selesai Diperbaiki</span>
                 </div>
               </div>
 
               <div className="pt-4">
-                <div className="p-4 bg-sky-50 rounded-xl border border-sky-200 flex gap-3 items-start">
+                <div className="p-5 bg-sky-50 rounded-xl border border-sky-200 flex gap-3 items-start">
                   <span className="material-symbols-outlined text-sky-700 shrink-0">info</span>
-                  <p className="text-xs text-sky-900 font-medium leading-relaxed">
+                  <p className="text-sm text-sky-900 font-medium leading-relaxed">
                     Peta diperbarui secara otomatis berdasarkan data sistem pengaduan terbaru di 8 Kecamatan se-Kota Baubau.
                   </p>
                 </div>
@@ -267,11 +267,11 @@ export const HomePage: React.FC = () => {
       </section>
 
       {/* 5. Timeline Section */}
-      <section className="py-16 bg-slate-100/80">
+      <section className="py-20 bg-slate-100/80">
         <div className="px-4 sm:px-8 max-w-[1280px] mx-auto">
-          <div className="text-center mb-16 space-y-2">
-            <h2 className="font-headline text-3xl font-extrabold text-slate-900">Cara Kerja SIPIL BAUBAU</h2>
-            <p className="text-sm text-slate-600 max-w-xl mx-auto">
+          <div className="text-center mb-16 space-y-3">
+            <h2 className="font-headline text-3xl sm:text-4xl font-extrabold text-slate-900">Cara Kerja SIPIL BAUBAU</h2>
+            <p className="text-base text-slate-600 max-w-xl mx-auto leading-relaxed">
               Alur pelaporan yang mudah dan sistematis untuk memastikan aspirasi Anda didengar.
             </p>
           </div>
@@ -279,42 +279,42 @@ export const HomePage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 relative">
             <div className="hidden md:block absolute top-12 left-0 w-full h-0.5 bg-sky-300 z-0"></div>
             
-            <div className="relative z-10 space-y-3 text-center md:text-left">
+            <div className="relative z-10 space-y-4 text-center md:text-left">
               <div className="w-16 h-16 rounded-full bg-sky-800 text-amber-300 flex items-center justify-center font-headline text-2xl font-black shadow-lg shadow-sky-800/20 mx-auto md:mx-0 ring-2 ring-amber-400">
                 1
               </div>
-              <h4 className="font-headline font-bold text-base text-slate-900">Pilih Lokasi</h4>
-              <p className="text-xs text-slate-600 leading-relaxed">
+              <h4 className="font-headline font-bold text-lg text-slate-900">Pilih Lokasi</h4>
+              <p className="text-sm text-slate-600 leading-relaxed">
                 Tandai titik kerusakan secara akurat menggunakan sistem GPS atau peta interaktif.
               </p>
             </div>
 
-            <div className="relative z-10 space-y-3 text-center md:text-left">
+            <div className="relative z-10 space-y-4 text-center md:text-left">
               <div className="w-16 h-16 rounded-full bg-white text-sky-800 flex items-center justify-center font-headline text-2xl font-black shadow-sm border border-slate-300 mx-auto md:mx-0">
                 2
               </div>
-              <h4 className="font-headline font-bold text-base text-slate-900">Upload Foto</h4>
-              <p className="text-xs text-slate-600 leading-relaxed">
+              <h4 className="font-headline font-bold text-lg text-slate-900">Upload Foto</h4>
+              <p className="text-sm text-slate-600 leading-relaxed">
                 Lampirkan bukti foto kerusakan dari berbagai sisi untuk memudahkan verifikasi tim.
               </p>
             </div>
 
-            <div className="relative z-10 space-y-3 text-center md:text-left">
+            <div className="relative z-10 space-y-4 text-center md:text-left">
               <div className="w-16 h-16 rounded-full bg-white text-sky-800 flex items-center justify-center font-headline text-2xl font-black shadow-sm border border-slate-300 mx-auto md:mx-0">
                 3
               </div>
-              <h4 className="font-headline font-bold text-base text-slate-900">Isi Pengaduan</h4>
-              <p className="text-xs text-slate-600 leading-relaxed">
+              <h4 className="font-headline font-bold text-lg text-slate-900">Isi Pengaduan</h4>
+              <p className="text-sm text-slate-600 leading-relaxed">
                 Berikan deskripsi detail mengenai jenis kerusakan dan dampak yang dirasakan warga.
               </p>
             </div>
 
-            <div className="relative z-10 space-y-3 text-center md:text-left">
+            <div className="relative z-10 space-y-4 text-center md:text-left">
               <div className="w-16 h-16 rounded-full bg-white text-sky-800 flex items-center justify-center font-headline text-2xl font-black shadow-sm border border-slate-300 mx-auto md:mx-0">
                 4
               </div>
-              <h4 className="font-headline font-bold text-base text-slate-900">Pantau Progress</h4>
-              <p className="text-xs text-slate-600 leading-relaxed">
+              <h4 className="font-headline font-bold text-lg text-slate-900">Pantau Progress</h4>
+              <p className="text-sm text-slate-600 leading-relaxed">
                 Terima notifikasi real-time saat status laporan Anda berubah hingga selesai diperbaiki.
               </p>
             </div>
@@ -323,24 +323,24 @@ export const HomePage: React.FC = () => {
       </section>
 
       {/* 6. Testimonials Section */}
-      <section className="py-16">
+      <section className="py-20">
         <div className="px-4 sm:px-8 max-w-[1280px] mx-auto">
-          <div className="text-center mb-12 space-y-2">
-            <h2 className="font-headline text-3xl font-extrabold text-slate-900">Suara Warga Baubau</h2>
-            <p className="text-sm text-slate-600">
+          <div className="text-center mb-14 space-y-3">
+            <h2 className="font-headline text-3xl sm:text-4xl font-extrabold text-slate-900">Suara Warga Baubau</h2>
+            <p className="text-base text-slate-600">
               Kepuasan masyarakat adalah prioritas kami dalam membangun infrastruktur kota yang lebih baik.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             
-            <div className="glass-card p-8 rounded-3xl space-y-4 hover:-translate-y-2 transition-all">
+            <div className="glass-card p-8 rounded-3xl space-y-5 hover:-translate-y-2 transition-all">
               <div className="flex gap-1 text-amber-400">
                 {[...Array(5)].map((_, i) => (
-                  <span key={i} className="material-symbols-outlined fill-current text-sm">star</span>
+                  <span key={i} className="material-symbols-outlined fill-current text-base">star</span>
                 ))}
               </div>
-              <p className="text-xs italic text-slate-600 leading-relaxed">
+              <p className="text-sm italic text-slate-600 leading-relaxed">
                 "Sangat terbantu dengan aplikasi ini. Laporan lampu jalan mati di depan rumah direspon hanya dalam waktu 24 jam!"
               </p>
               <div className="flex items-center gap-4 pt-2">
@@ -350,19 +350,19 @@ export const HomePage: React.FC = () => {
                   alt="Herman Susilo"
                 />
                 <div>
-                  <h6 className="font-bold text-xs text-slate-900">Herman Susilo</h6>
-                  <p className="text-[11px] text-slate-500">Warga Kelurahan Batulo</p>
+                  <h6 className="font-bold text-sm text-slate-900">Herman Susilo</h6>
+                  <p className="text-xs text-slate-500">Warga Kelurahan Batulo</p>
                 </div>
               </div>
             </div>
 
-            <div className="glass-card p-8 rounded-3xl border-sky-300 space-y-4 hover:-translate-y-2 transition-all shadow-xl shadow-sky-600/5">
+            <div className="glass-card p-8 rounded-3xl border-sky-300 space-y-5 hover:-translate-y-2 transition-all shadow-xl shadow-sky-600/5">
               <div className="flex gap-1 text-amber-400">
                 {[...Array(5)].map((_, i) => (
-                  <span key={i} className="material-symbols-outlined fill-current text-sm">star</span>
+                  <span key={i} className="material-symbols-outlined fill-current text-base">star</span>
                 ))}
               </div>
-              <p className="text-xs italic text-slate-600 leading-relaxed">
+              <p className="text-sm italic text-slate-600 leading-relaxed">
                 "Transparansi pengerjaannya bagus sekali. Saya bisa melihat foto tim teknis saat memperbaiki drainase yang mampet."
               </p>
               <div className="flex items-center gap-4 pt-2">
@@ -372,19 +372,19 @@ export const HomePage: React.FC = () => {
                   alt="Siti Rahmawati"
                 />
                 <div>
-                  <h6 className="font-bold text-xs text-slate-900">Siti Rahmawati</h6>
-                  <p className="text-[11px] text-slate-500">Warga Kelurahan Wameo</p>
+                  <h6 className="font-bold text-sm text-slate-900">Siti Rahmawati</h6>
+                  <p className="text-xs text-slate-500">Warga Kelurahan Wameo</p>
                 </div>
               </div>
             </div>
 
-            <div className="glass-card p-8 rounded-3xl space-y-4 hover:-translate-y-2 transition-all">
+            <div className="glass-card p-8 rounded-3xl space-y-5 hover:-translate-y-2 transition-all">
               <div className="flex gap-1 text-amber-400">
                 {[...Array(5)].map((_, i) => (
-                  <span key={i} className="material-symbols-outlined fill-current text-sm">star</span>
+                  <span key={i} className="material-symbols-outlined fill-current text-base">star</span>
                 ))}
               </div>
-              <p className="text-xs italic text-slate-600 leading-relaxed">
+              <p className="text-sm italic text-slate-600 leading-relaxed">
                 "Aplikasi yang sangat modern untuk pemerintah kota. Semoga semua fasilitas publik di Baubau semakin terawat."
               </p>
               <div className="flex items-center gap-4 pt-2">
@@ -394,8 +394,8 @@ export const HomePage: React.FC = () => {
                   alt="Drs. M. Nasir"
                 />
                 <div>
-                  <h6 className="font-bold text-xs text-slate-900">Drs. M. Nasir</h6>
-                  <p className="text-[11px] text-slate-500">Tokoh Masyarakat</p>
+                  <h6 className="font-bold text-sm text-slate-900">Drs. M. Nasir</h6>
+                  <p className="text-xs text-slate-500">Tokoh Masyarakat</p>
                 </div>
               </div>
             </div>
@@ -405,7 +405,7 @@ export const HomePage: React.FC = () => {
       </section>
 
       {/* 7. CTA Section */}
-      <section className="py-16">
+      <section className="py-20">
         <div className="px-4 sm:px-8 max-w-[1280px] mx-auto">
           <div className="bg-gradient-to-r from-sky-900 via-sky-800 to-sky-950 rounded-[3rem] p-10 sm:p-16 text-center text-white relative overflow-hidden shadow-2xl border border-amber-400/30">
             <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
@@ -415,13 +415,13 @@ export const HomePage: React.FC = () => {
               <h2 className="font-headline text-3xl sm:text-4xl font-extrabold leading-tight">
                 Bangun Kota Baubau Lebih Baik Bersama Kami
               </h2>
-              <p className="text-sm sm:text-base text-sky-100/90 leading-relaxed">
+              <p className="text-base sm:text-lg text-sky-100/90 leading-relaxed">
                 Laporkan sekarang dan jadilah bagian dari perubahan positif untuk kenyamanan seluruh warga kota.
               </p>
               <div className="pt-4">
                 <Link
                   to="/submit"
-                  className="inline-block bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-600 text-slate-950 font-black px-10 py-5 rounded-2xl text-sm hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-amber-500/20"
+                  className="inline-block bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-600 text-slate-950 font-black px-10 py-5 rounded-2xl text-base hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-amber-500/20"
                 >
                   Mulai Laporan Pertama Anda
                 </Link>

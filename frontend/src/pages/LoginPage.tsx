@@ -45,18 +45,18 @@ export const LoginPage: React.FC = () => {
     <div className="min-h-screen bg-[#f3f3fe] flex items-center justify-center p-4 sm:p-6 lg:p-8 font-sans">
       
       {/* Login Card Modal Container */}
-      <div className="max-w-5xl w-full bg-white rounded-3xl border border-[#e1e2ed] shadow-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[640px]">
+      <div className="max-w-5xl w-full bg-white rounded-3xl border border-[#e1e2ed] shadow-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[680px]">
         
         {/* Left Blue Banner Panel */}
         <div className="lg:col-span-6 bg-[#004ac6] text-white p-8 sm:p-12 flex flex-col justify-between relative overflow-hidden">
-          <div className="space-y-4 relative z-10">
+          <div className="space-y-5 relative z-10">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-amber-300 ring-1 ring-white/40">
+              <div className="w-11 h-11 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-amber-300 ring-1 ring-white/40">
                 <ShieldCheck className="w-6 h-6" />
               </div>
               <h2 className="font-headline font-black text-2xl tracking-tight">SIPIL BAUBAU</h2>
             </div>
-            <p className="text-sm text-white/90 leading-relaxed max-w-md font-medium">
+            <p className="text-base text-white/90 leading-relaxed max-w-md font-medium">
               Sistem Pengaduan Infrastruktur Kota Terpadu untuk Baubau yang lebih baik dan transparan.
             </p>
           </div>
@@ -71,13 +71,13 @@ export const LoginPage: React.FC = () => {
           </div>
 
           {/* Bottom Security Highlights */}
-          <div className="space-y-2 relative z-10 text-xs text-white/90 font-medium">
-            <div className="flex items-center space-x-2">
-              <CheckCircle2 className="w-4 h-4 text-amber-300" />
+          <div className="space-y-3 relative z-10 text-sm text-white/90 font-medium">
+            <div className="flex items-center space-x-2.5">
+              <CheckCircle2 className="w-5 h-5 text-amber-300" />
               <span>Keamanan Data Terjamin</span>
             </div>
-            <div className="flex items-center space-x-2">
-              <CheckCircle2 className="w-4 h-4 text-amber-300" />
+            <div className="flex items-center space-x-2.5">
+              <CheckCircle2 className="w-5 h-5 text-amber-300" />
               <span>Respon Cepat Tanggap OPD Baubau</span>
             </div>
           </div>
@@ -90,64 +90,64 @@ export const LoginPage: React.FC = () => {
         <div className="lg:col-span-6 p-8 sm:p-12 flex flex-col justify-between space-y-6">
           
           <div className="space-y-6">
-            <div className="space-y-1">
+            <div className="space-y-2">
               <h2 className="font-headline text-3xl font-extrabold text-slate-900">Selamat Datang</h2>
-              <p className="text-xs sm:text-sm text-slate-500 font-medium">
+              <p className="text-sm text-slate-500 font-medium leading-relaxed">
                 Silakan masuk untuk melanjutkan akses ke portal pengaduan infrastruktur.
               </p>
             </div>
 
             {errorMsg && (
-              <div className="p-3.5 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-bold rounded-xl">
+              <div className="p-4 bg-rose-50 border border-rose-200 text-rose-700 text-sm font-bold rounded-xl">
                 {errorMsg}
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-4 text-sm">
+            <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label className="block font-bold text-slate-800 mb-1.5 text-xs">Alamat Email</label>
+                <label className="block font-bold text-slate-800 mb-2 text-sm">Alamat Email</label>
                 <div className="relative">
-                  <Mail className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+                  <Mail className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
                   <input
                     type="email"
                     required
                     placeholder="nama@email.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-11 pr-4 py-3 bg-[#f8fafc] border border-[#e1e2ed] rounded-xl text-sm font-medium focus:bg-white focus:outline-none focus:border-[#004ac6]"
+                    className="w-full pl-12 pr-4 py-3.5 bg-[#f8fafc] border border-[#e1e2ed] rounded-xl text-base font-medium focus:bg-white focus:outline-none focus:border-[#004ac6] transition-colors"
                   />
                 </div>
               </div>
 
               <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="block font-bold text-slate-800 text-xs">Kata Sandi</label>
-                  <a href="#lupa" onClick={(e) => { e.preventDefault(); alert('Silakan hubungi admin di pengaduan@baubaukota.go.id'); }} className="text-xs font-bold text-[#004ac6] hover:underline">
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block font-bold text-slate-800 text-sm">Kata Sandi</label>
+                  <a href="#lupa" onClick={(e) => { e.preventDefault(); alert('Silakan hubungi admin di pengaduan@baubaukota.go.id'); }} className="text-sm font-bold text-[#004ac6] hover:underline">
                     Lupa Sandi?
                   </a>
                 </div>
                 <div className="relative">
-                  <Lock className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+                  <Lock className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     required
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-11 pr-11 py-3 bg-[#f8fafc] border border-[#e1e2ed] rounded-xl text-sm font-medium focus:bg-white focus:outline-none focus:border-[#004ac6]"
+                    className="w-full pl-12 pr-12 py-3.5 bg-[#f8fafc] border border-[#e1e2ed] rounded-xl text-base font-medium focus:bg-white focus:outline-none focus:border-[#004ac6] transition-colors"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                   >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
               </div>
 
               <div className="flex items-center justify-between pt-1">
-                <label className="flex items-center space-x-2 text-xs font-semibold text-slate-600 cursor-pointer">
+                <label className="flex items-center space-x-2.5 text-sm font-semibold text-slate-600 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={rememberMe}
@@ -161,35 +161,35 @@ export const LoginPage: React.FC = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 bg-[#004ac6] hover:bg-[#2563eb] text-white text-sm font-bold rounded-full shadow-lg shadow-[#004ac6]/20 transition-all flex items-center justify-center space-x-2 active:scale-95"
+                className="w-full py-4 bg-[#004ac6] hover:bg-[#2563eb] text-white text-base font-bold rounded-full shadow-lg shadow-[#004ac6]/20 transition-all flex items-center justify-center space-x-2 active:scale-95"
               >
                 <span>{loading ? 'Proses Masuk...' : 'Masuk'}</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-5 h-5" />
               </button>
             </form>
 
             {/* Quick Demo Credentials Assistant */}
-            <div className="pt-2 border-t border-[#e1e2ed] space-y-2 text-xs">
-              <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Demo Akun Cepat:</p>
+            <div className="pt-3 border-t border-[#e1e2ed] space-y-3">
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Demo Akun Cepat:</p>
               <div className="flex flex-wrap gap-2">
                 <button
                   type="button"
                   onClick={() => fillQuickDemo('admin@baubaukota.go.id')}
-                  className="px-3 py-1.5 bg-[#dbe1ff] text-[#004ac6] font-bold rounded-lg hover:bg-[#004ac6] hover:text-white transition-colors"
+                  className="px-4 py-2 bg-[#dbe1ff] text-[#004ac6] text-sm font-bold rounded-lg hover:bg-[#004ac6] hover:text-white transition-colors"
                 >
                   Admin Master
                 </button>
                 <button
                   type="button"
                   onClick={() => fillQuickDemo('officer.pupr@baubaukota.go.id')}
-                  className="px-3 py-1.5 bg-[#c9e6ff] text-[#006591] font-bold rounded-lg hover:bg-[#006591] hover:text-white transition-colors"
+                  className="px-4 py-2 bg-[#c9e6ff] text-[#006591] text-sm font-bold rounded-lg hover:bg-[#006591] hover:text-white transition-colors"
                 >
                   Petugas PUPR
                 </button>
                 <button
                   type="button"
                   onClick={() => fillQuickDemo('warga@gmail.com')}
-                  className="px-3 py-1.5 bg-slate-100 text-slate-700 font-bold rounded-lg hover:bg-slate-800 hover:text-white transition-colors"
+                  className="px-4 py-2 bg-slate-100 text-slate-700 text-sm font-bold rounded-lg hover:bg-slate-800 hover:text-white transition-colors"
                 >
                   Warga
                 </button>
@@ -198,7 +198,7 @@ export const LoginPage: React.FC = () => {
 
           </div>
 
-          <div className="text-center text-xs text-slate-600 border-t border-[#e1e2ed] pt-4">
+          <div className="text-center text-sm text-slate-600 border-t border-[#e1e2ed] pt-5">
             Belum punya akun?{' '}
             <Link to="/register" className="font-bold text-[#004ac6] hover:underline">
               Daftar Sekarang
