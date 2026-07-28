@@ -1,87 +1,65 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ShieldCheck, MapPin, Phone, Mail, Globe, ExternalLink } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="bg-slate-950 text-slate-300 border-t border-sky-900/40">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
-          
-          {/* Brand Col */}
-          <div className="space-y-4">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-600 to-sky-800 flex items-center justify-center text-white font-black text-lg shadow-lg ring-1 ring-amber-400">
-                <ShieldCheck className="w-6 h-6 text-amber-300" />
-              </div>
-              <div>
-                <h3 className="font-extrabold text-white text-base tracking-tight">SIPIL BAUBAU</h3>
-                <p className="text-[11px] text-amber-400 font-bold uppercase tracking-wider">Pemerintah Kota Baubau</p>
-              </div>
-            </div>
-            <p className="text-xs text-slate-400 leading-relaxed">
-              Sistem Pengaduan Infrastruktur Berbasis Web dengan Pemetaan Lokasi GIS dan Monitoring Penanganan Laporan Real-time di Kota Baubau, Sulawesi Tenggara.
-            </p>
-          </div>
-
-          {/* Quick Links */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-amber-400">Navigasi Utama</h4>
-            <ul className="space-y-2 text-xs">
-              <li><Link to="/" className="hover:text-amber-300 transition-colors">Beranda</Link></li>
-              <li><Link to="/map" className="hover:text-amber-300 transition-colors">Peta GIS Pengaduan</Link></li>
-              <li><Link to="/submit" className="hover:text-amber-300 transition-colors">Buat Laporan Infrastruktur</Link></li>
-              <li><Link to="/track" className="hover:text-amber-300 transition-colors">Cek Status Laporan</Link></li>
-              <li><Link to="/stats" className="hover:text-amber-300 transition-colors">Statistik & Analisis OPD</Link></li>
-            </ul>
-          </div>
-
-          {/* Subdistricts list */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-amber-400">Cakupan Wilayah Kecamatan</h4>
-            <div className="grid grid-cols-2 gap-2 text-xs text-slate-400">
-              <span className="hover:text-white">• Wolio</span>
-              <span className="hover:text-white">• Betoambari</span>
-              <span className="hover:text-white">• Murhum</span>
-              <span className="hover:text-white">• Kokalukuna</span>
-              <span className="hover:text-white">• Lea-Lea</span>
-              <span className="hover:text-white">• Sorawolio</span>
-              <span className="hover:text-white">• Bungi</span>
-              <span className="hover:text-white">• Batupoaro</span>
-            </div>
-          </div>
-
-          {/* Contact & Government Office */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-amber-400">Kontak Resmi Pemkot</h4>
-            <div className="space-y-2.5 text-xs text-slate-400">
-              <div className="flex items-start space-x-2.5">
-                <MapPin className="w-4 h-4 text-sky-400 shrink-0 mt-0.5" />
-                <span>Kawasan Palagimata, Jl. Palagimata, Kota Baubau, Sulawesi Tenggara 93724</span>
-              </div>
-              <div className="flex items-center space-x-2.5">
-                <Phone className="w-4 h-4 text-sky-400 shrink-0" />
-                <span>Call Center: (0402) 2821100</span>
-              </div>
-              <div className="flex items-center space-x-2.5">
-                <Mail className="w-4 h-4 text-sky-400 shrink-0" />
-                <span>pengaduan@baubaukota.go.id</span>
-              </div>
-              <div className="flex items-center space-x-2.5">
-                <Globe className="w-4 h-4 text-sky-400 shrink-0" />
-                <a href="https://baubaukota.go.id" target="_blank" rel="noreferrer" className="hover:text-amber-300 flex items-center gap-1">
-                  baubaukota.go.id <ExternalLink className="w-3 h-3" />
-                </a>
-              </div>
-            </div>
-          </div>
-
+    <footer className="bg-[#e1e2ed] border-t border-[#c3c6d7] w-full py-8 text-[#434655]">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 px-4 sm:px-8 max-w-[1280px] mx-auto">
+        
+        {/* Brand Col */}
+        <div className="space-y-3">
+          <div className="font-headline text-lg font-bold text-[#191b23]">SIPIL BAUBAU</div>
+          <p className="text-xs text-[#434655] leading-relaxed pr-4">
+            Sistem Pengaduan Infrastruktur Kota Terintegrasi. Inovasi digital Pemerintah Kota Baubau untuk pelayanan publik yang prima.
+          </p>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-slate-900 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500">
-          <p>© {new Date().getFullYear()} Pemerintah Kota Baubau. Hak Cipta Dilindungi Undang-Undang.</p>
-          <p className="mt-2 sm:mt-0 font-mono text-[11px] text-amber-400/80">SIPIL BAUBAU v1.0.0 • GovTech Baubau</p>
+        {/* Quick Links */}
+        <div className="space-y-3">
+          <h6 className="font-semibold text-xs text-[#004ac6] uppercase tracking-wider">Tautan Cepat</h6>
+          <ul className="space-y-1.5 text-xs">
+            <li><Link className="hover:text-[#191b23] transition-colors" to="/">Beranda</Link></li>
+            <li><Link className="hover:text-[#191b23] transition-colors" to="/stats">Statistik Publik</Link></li>
+            <li><Link className="hover:text-[#191b23] transition-colors" to="/map">Peta Interaktif</Link></li>
+            <li><Link className="hover:text-[#191b23] transition-colors" to="/submit">Daftar Pengaduan</Link></li>
+          </ul>
         </div>
+
+        {/* Support */}
+        <div className="space-y-3">
+          <h6 className="font-semibold text-xs text-[#004ac6] uppercase tracking-wider">Dukungan</h6>
+          <ul className="space-y-1.5 text-xs">
+            <li><Link className="hover:text-[#191b23] transition-colors" to="/about">Tentang Kami</Link></li>
+            <li><Link className="hover:text-[#191b23] transition-colors" to="/track">Panduan Penggunaan</Link></li>
+            <li><Link className="hover:text-[#191b23] transition-colors" to="/about">Kebijakan Privasi</Link></li>
+            <li><Link className="hover:text-[#191b23] transition-colors" to="/about">Kontak</Link></li>
+          </ul>
+        </div>
+
+        {/* Contact Us */}
+        <div className="space-y-3">
+          <h6 className="font-semibold text-xs text-[#004ac6] uppercase tracking-wider">Hubungi Kami</h6>
+          <p className="text-xs text-[#434655]">
+            Gedung Pusat Pemerintahan Kota Baubau<br />
+            Sulawesi Tenggara, Indonesia
+          </p>
+          <div className="flex gap-3 pt-1">
+            <a href="https://baubaukota.go.id" target="_blank" rel="noreferrer" className="w-8 h-8 rounded-full bg-white border border-[#c3c6d7] flex items-center justify-center hover:bg-[#004ac6] hover:text-white transition-all">
+              <span className="material-symbols-outlined text-sm">public</span>
+            </a>
+            <a href="mailto:pengaduan@baubaukota.go.id" className="w-8 h-8 rounded-full bg-white border border-[#c3c6d7] flex items-center justify-center hover:bg-[#004ac6] hover:text-white transition-all">
+              <span className="material-symbols-outlined text-sm">mail</span>
+            </a>
+            <a href="tel:04022821100" className="w-8 h-8 rounded-full bg-white border border-[#c3c6d7] flex items-center justify-center hover:bg-[#004ac6] hover:text-white transition-all">
+              <span className="material-symbols-outlined text-sm">call</span>
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+      <div className="mt-8 pt-4 border-t border-[#c3c6d7]/40 text-center text-xs text-[#434655]">
+        © {new Date().getFullYear()} Kota Baubau. Sistem Pengaduan Infrastruktur Kota.
       </div>
     </footer>
   );
