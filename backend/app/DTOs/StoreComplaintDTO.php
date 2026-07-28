@@ -38,4 +38,9 @@ readonly class StoreComplaintDTO
             attachments: $attachments,
         );
     }
+
+    public function toCoordinates(): \App\ValueObjects\Coordinate
+    {
+        return \App\ValueObjects\Coordinate::from($this->latitude, $this->longitude);
+    }
 }

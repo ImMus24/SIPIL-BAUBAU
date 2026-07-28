@@ -2,9 +2,10 @@
 
 namespace App\Services;
 
+use App\Actions\RegisterUserAction;
+use App\Actions\LogoutUserAction;
 use App\Contracts\UserRepositoryInterface;
 use App\DTOs\RegisterUserDTO;
-
 use App\Models\AuditLog;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
@@ -13,26 +14,16 @@ use Illuminate\Validation\ValidationException;
 class AuthService
 {
     public function __construct(
-        protected UserRepositoryInterface $userRepository
+        protected UserRepositoryInterface $userRepository,
+        protected RegisterUserAction $registerUserAction,
+        protected LogoutUserAction $logoutUserAction,
     ) {}
 
     public function register(RegisterUserDTO $dto): array
     {
-        $user = $this->userRepository->create([
-            'name' => $dto->name,
-            'email' => $dto->email,
-            'password' => Hash::make($dto->password),
-            'role' => $dto->role,
-            'phone' => $dto->phone,
-        ]);
+        $user = $this->registerUserAction->execute($dto);
 
         $token = $user->createToken('sipil_baubau_token')->plainTextToken;
-
-        AuditLog::log('USER_REGISTERED', "Pengguna {$user->name} ({$user->email}) berhasil mendaftar.", null, [
-            'id' => $user->id,
-            'email' => $user->email,
-            'role' => $user->role,
-        ], $user);
 
         return [
             'user' => $user,
@@ -59,7 +50,7 @@ class AuthService
 
         AuditLog::log('USER_LOGGED_IN', "Pengguna {$user->name} berhasil login.", null, [
             'user_id' => $user->id,
-            'role' => $user->role,
+            'role' => $user->role->value,
         ], $user);
 
         return [
@@ -70,9 +61,6 @@ class AuthService
 
     public function logout(?User $user): void
     {
-        if ($user) {
-            AuditLog::log('USER_LOGGED_OUT', "Pengguna {$user->name} logout dari sistem.", null, null, $user);
-            $user->tokens()->delete();
-        }
+        $this->logoutUserAction->execute($user);
     }
 }

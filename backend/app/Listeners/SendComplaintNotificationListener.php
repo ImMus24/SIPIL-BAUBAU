@@ -4,20 +4,27 @@ namespace App\Listeners;
 
 use App\Events\ComplaintCreated;
 use App\Events\ComplaintStatusUpdated;
+use App\Jobs\SendComplaintNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Support\Facades\Log;
 
 class SendComplaintNotificationListener implements ShouldQueue
 {
-    use InteractsWithQueue;
+    public $queue = 'notifications';
 
     public function handle(object $event): void
     {
         if ($event instanceof ComplaintCreated) {
-            Log::info("Async Notification: New complaint created [{$event->complaint->ticket_code}]");
+            SendComplaintNotification::dispatch(
+                $event->complaint,
+                'created'
+            )->onQueue('notifications');
         } elseif ($event instanceof ComplaintStatusUpdated) {
-            Log::info("Async Notification: Status updated for complaint [{$event->complaint->ticket_code}] from {$event->oldStatus} to {$event->newStatus}");
+            SendComplaintNotification::dispatch(
+                $event->complaint,
+                'status_updated',
+                $event->oldStatus,
+                $event->newStatus,
+            )->onQueue('notifications');
         }
     }
 }

@@ -95,4 +95,22 @@ class ComplaintRepository implements ComplaintRepositoryInterface
             'completion_rate' => $completionRate,
         ];
     }
+
+    public function findDuplicate(string $identifier, string $address, int $categoryId): ?Complaint
+    {
+        return Complaint::query()
+            ->where(function ($q) use ($identifier) {
+                $q->where('reporter_email', $identifier)
+                  ->orWhere('reporter_phone', $identifier);
+            })
+            ->where('address', $address)
+            ->where('category_id', $categoryId)
+            ->where('created_at', '>=', now()->subHours(24))
+            ->first();
+    }
+
+    public function delete(Complaint $complaint): bool
+    {
+        return $complaint->delete();
+    }
 }

@@ -21,4 +21,8 @@ interface ComplaintRepositoryInterface
     public function update(Complaint $complaint, array $data): bool;
 
     public function getSummaryStats(): array;
+
+    public function findDuplicate(string $identifier, string $address, int $categoryId): ?Complaint;
+
+    public function delete(Complaint $complaint): bool;
 }
