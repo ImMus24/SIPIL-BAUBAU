@@ -26,7 +26,7 @@ import {
 
 type TabId = 'semua' | 'menunggu' | 'diproses' | 'selesai';
 
-const OfficerDashboard: React.FC = () => {
+export const OfficerDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [data, setData] = useState<OfficerDashboardData | null>(null);
