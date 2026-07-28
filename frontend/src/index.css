@@ -3,7 +3,7 @@
 
 @layer base {
   body {
-    @apply bg-[#faf8ff] text-[#191b23] font-sans antialiased selection:bg-[#dbe1ff] selection:text-[#00174b];
+    @apply bg-slate-50 text-slate-900 font-sans antialiased selection:bg-sky-600 selection:text-amber-300;
   }
 }
 
@@ -12,9 +12,9 @@
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(226, 232, 240, 0.6);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(2, 132, 199, 0.15);
 }
 
 @keyframes float {
@@ -58,14 +58,14 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #f3f3fe;
+  background: #f1f5f9;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #004ac6;
+  background: #0284c7;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #003ea8;
+  background: #0369a1;
 }
