@@ -272,6 +272,13 @@ export interface AdminDashboardData {
   complaint_analytics: ComplaintAnalytics;
 }
 
+export interface WelcomeData {
+  name: string;
+  date: string;
+  time: string;
+  greeting: string;
+}
+
 export interface OfficerDashboardData {
   stats_agency: AgencyStats;
   todays_tasks: TodaysTasks;
@@ -281,6 +288,11 @@ export interface OfficerDashboardData {
   priority_complaints: Complaint[];
   performance_chart: PerformanceDay[];
   assignment_history: AssignmentHistoryItem[];
+  timeline: TimelineItem[];
+  officer_performance_score: number;
+  completed_this_month: number;
+  today_complaints: Complaint[];
+  welcome: WelcomeData;
 }
 
 export interface HeadOfAgencyDashboardData {

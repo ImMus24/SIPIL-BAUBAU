@@ -1,28 +1,33 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
-import { StatCard } from '../../components/ui/StatCard';
-import { Card } from '../../components/ui/Card';
-import { StatusBadge, UrgencyBadge } from '../../components/ui/Badge';
-import { Button } from '../../components/ui/Button';
 import { Breadcrumb } from '../../components/ui/Breadcrumb';
-import { StatusUpdateModal } from '../../components/ui/StatusUpdateModal';
+import { Card } from '../../components/ui/Card';
+import { Button } from '../../components/ui/Button';
 import { Skeleton } from '../../components/dashboard/LoadingSkeleton';
 import { ErrorState } from '../../components/dashboard/ErrorState';
-import { QuickActionCard } from '../../components/dashboard/QuickActionCard';
-import { AreaChart } from '../../components/charts/AreaChart';
+import { StatusBadge } from '../../components/ui/Badge';
+import { OfficerWelcomeHeader } from '../../components/officer/OfficerWelcomeHeader';
+import { OfficerKPIGrid } from '../../components/officer/OfficerKPIGrid';
+import { OfficerQuickActions } from '../../components/officer/OfficerQuickActions';
+import { OfficerTaskCard } from '../../components/officer/OfficerTaskCard';
+import { OfficerTaskMap } from '../../components/officer/OfficerTaskMap';
+import { OfficerProgressModal } from '../../components/officer/OfficerProgressModal';
+import { OfficerTaskTimeline } from '../../components/officer/OfficerTaskTimeline';
+import { OfficerPerformanceChart } from '../../components/officer/OfficerPerformanceChart';
+import { OfficerActivityFeed } from '../../components/officer/OfficerActivityFeed';
 import { dashboardService } from '../../services/dashboardService';
 import { useAuth } from '../../context/AuthContext';
-import type { Complaint, OfficerDashboardData, PerformanceDay, AssignmentHistoryItem } from '../../types';
+import type {
+  Complaint, OfficerDashboardData, PerformanceDay,
+} from '../../types';
 import {
-  ClipboardList, Clock, CheckCircle2, AlertTriangle,
-  Activity, Calendar, MapPin, ArrowUpCircle, Timer,
-  Camera, ChevronRight, ListChecks, TrendingUp, Award,
+  ClipboardList, ChevronRight, Clock, ArrowUpRight, ArrowUpCircle,
 } from 'lucide-react';
 
-type TabId = 'semua' | 'menunggu' | 'diproses' | 'selesai' | 'ditolak';
+type TabId = 'semua' | 'menunggu' | 'diproses' | 'selesai';
 
-export const OfficerDashboard: React.FC = () => {
+const OfficerDashboard: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [data, setData] = useState<OfficerDashboardData | null>(null);
@@ -32,9 +37,11 @@ export const OfficerDashboard: React.FC = () => {
   const [selectedComplaint, setSelectedComplaint] = useState<Complaint | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [searchFilter, setSearchFilter] = useState('');
 
   const fetchData = useCallback(async () => {
-    setLoading(true); setError(null);
+    setLoading(true);
+    setError(null);
     try {
       const res = await dashboardService.getOfficerDashboard();
       setData(res as OfficerDashboardData);
@@ -48,17 +55,42 @@ export const OfficerDashboard: React.FC = () => {
 
   useEffect(() => { fetchData(); }, [fetchData, refreshKey]);
 
-  if (error) return (
-    <DashboardLayout>
-      <div className="max-w-6xl mx-auto">
-        <Breadcrumb items={[{ label: 'Dashboard Petugas', href: '/officer' }]} />
-        <ErrorState title="Gagal Memuat Dashboard" message={error} onRetry={fetchData} variant="fullscreen" />
-      </div>
-    </DashboardLayout>
-  );
+  // Auto-refresh every 30s
+  useEffect(() => {
+    const interval = setInterval(fetchData, 30000);
+    return () => clearInterval(interval);
+  }, [fetchData]);
 
-  const handleStatusUpdated = () => setRefreshKey((k) => k + 1);
+  const handleStatusUpdated = () => setRefreshKey(k => k + 1);
   const openStatusModal = (c: Complaint) => { setSelectedComplaint(c); setModalOpen(true); };
+
+  const openGoogleMaps = (task: Complaint) => {
+    if (task.latitude && task.longitude) {
+      window.open(`https://www.google.com/maps/dir/?api=1&destination=${task.latitude},${task.longitude}`, '_blank');
+    } else {
+      window.open(`https://www.google.com/maps/search/${encodeURIComponent(task.address + ', ' + task.subdistrict)}`, '_blank');
+    }
+  };
+
+  const viewComplaintDetail = (task: Complaint) => {
+    openStatusModal(task);
+  };
+
+  const completeTask = (task: Complaint) => {
+    setSelectedComplaint(task);
+    setModalOpen(true);
+  };
+
+  if (error) {
+    return (
+      <DashboardLayout>
+        <div className="max-w-6xl mx-auto">
+          <Breadcrumb items={[{ label: 'Dashboard Petugas', href: '/officer' }]} />
+          <ErrorState title="Gagal Memuat Dashboard" message={error} onRetry={fetchData} variant="fullscreen" />
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   const statsAgency = data?.stats_agency ?? { menunggu: 0, diproses: 0, selesai: 0, ditolak: 0 };
   const todaysTasks = data?.todays_tasks ?? { new_today: 0, in_progress: 0, completed_today: 0 };
@@ -66,203 +98,200 @@ export const OfficerDashboard: React.FC = () => {
   const priority: Complaint[] = data?.priority_complaints ?? [];
   const avgTime = data?.avg_resolution_time ?? 0;
   const performanceChart: PerformanceDay[] = data?.performance_chart ?? [];
-  const assignmentHistory: AssignmentHistoryItem[] = data?.assignment_history ?? [];
+  const timeline = data?.timeline ?? [];
+  const performanceScore = data?.officer_performance_score ?? 0;
+  const completedThisMonth = data?.completed_this_month ?? 0;
+  const welcome = data?.welcome ?? { name: user?.name || 'Petugas', date: '', time: '', greeting: 'Selamat Datang' };
+  const unreadNotif = 0;
 
-  const filtered = activeTab === 'semua' ? tasks : tasks.filter((c) => c.status === activeTab);
-  const totalHandled = statsAgency.selesai + statsAgency.diproses + statsAgency.ditolak;
+  // Filter tasks
+  const filtered = tasks.filter(t => {
+    const matchesTab = activeTab === 'semua' || t.status === activeTab;
+    if (!searchFilter) return matchesTab;
+    const q = searchFilter.toLowerCase();
+    return matchesTab && (
+      t.ticket_code?.toLowerCase().includes(q) ||
+      t.title?.toLowerCase().includes(q) ||
+      t.reporter_name?.toLowerCase().includes(q) ||
+      t.subdistrict?.toLowerCase().includes(q) ||
+      t.address?.toLowerCase().includes(q)
+    );
+  });
+
+  const hasUnfinishedTasks = tasks.some(t => t.status !== 'selesai' && t.status !== 'ditolak');
+  const firstUnfinished = tasks.find(t => t.status !== 'selesai' && t.status !== 'ditolak');
+  const firstWithPhoto = tasks.find(t => t.status !== 'selesai');
 
   const tabs = [
-    { id: 'semua' as TabId, label: 'Semua', badge: tasks.length },
-    { id: 'menunggu' as TabId, label: 'Menunggu', badge: statsAgency.menunggu },
-    { id: 'diproses' as TabId, label: 'Diproses', badge: statsAgency.diproses },
-    { id: 'selesai' as TabId, label: 'Selesai', badge: statsAgency.selesai },
+    { id: 'semua' as TabId, label: 'Semua', count: tasks.length },
+    { id: 'menunggu' as TabId, label: 'Menunggu', count: statsAgency.menunggu },
+    { id: 'diproses' as TabId, label: 'Diproses', count: statsAgency.diproses },
+    { id: 'selesai' as TabId, label: 'Selesai', count: statsAgency.selesai },
   ];
 
   return (
     <DashboardLayout>
-      <div className="max-w-6xl mx-auto space-y-6 animate-fade-in">
+      <div className="max-w-7xl mx-auto space-y-6 animate-fade-in">
+        {/* Breadcrumb */}
         <Breadcrumb items={[{ label: 'Dashboard Petugas', href: '/officer' }]} />
 
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="font-heading text-2xl font-black text-foreground">Dashboard Petugas</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Selamat datang, {user?.name?.split(' ')[0]} — Pantau dan kelola tugas penanganan laporan
-            </p>
+        {/* Welcome Header */}
+        <OfficerWelcomeHeader
+          welcome={welcome}
+          unreadNotifications={unreadNotif}
+          onSearch={setSearchFilter}
+        />
+
+        {/* KPI Grid */}
+        <OfficerKPIGrid
+          statsAgency={statsAgency}
+          todaysTasks={todaysTasks}
+          avgResolutionTime={avgTime}
+          performanceScore={performanceScore}
+          completedThisMonth={completedThisMonth}
+          loading={loading}
+        />
+
+        {/* Quick Actions */}
+        <OfficerQuickActions
+          hasUnfinishedTasks={hasUnfinishedTasks}
+          onStartToday={() => { if (firstUnfinished) openStatusModal(firstUnfinished); }}
+          onViewMap={() => navigate('/map')}
+          onViewComplaints={() => navigate('/complaints')}
+          onUploadDoc={() => { if (firstWithPhoto) openStatusModal(firstWithPhoto); }}
+          onViewHistory={() => {}}
+        />
+
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left: Performance Chart + Timeline */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Performance Chart */}
+            <OfficerPerformanceChart
+              performanceChart={performanceChart}
+              performanceScore={performanceScore}
+              completedThisMonth={completedThisMonth}
+              loading={loading}
+            />
+
+            {/* Task Map */}
+            <OfficerTaskMap
+              assignedTasks={tasks.map(t => ({
+                id: t.id,
+                ticket_code: t.ticket_code,
+                title: t.title,
+                latitude: t.latitude,
+                longitude: t.longitude,
+                status: t.status,
+                subdistrict: t.subdistrict,
+                urgency: t.urgency,
+                created_at: t.created_at,
+              }))}
+              loading={loading}
+              onNavigateToLocation={(point) => {
+                window.open(`https://www.google.com/maps/dir/?api=1&destination=${point.latitude},${point.longitude}`, '_blank');
+              }}
+            />
           </div>
-          <div className="flex items-center gap-2 bg-card border border-border rounded-xl px-4 py-2">
-            <Calendar className="w-4 h-4 text-primary" />
-            <span className="text-sm font-semibold text-foreground">
-              {new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
-            </span>
+
+          {/* Right: Timeline + Activity */}
+          <div className="space-y-6">
+            <OfficerTaskTimeline timeline={timeline} loading={loading} />
+            <OfficerActivityFeed activities={tasks} loading={loading} />
           </div>
         </div>
 
-        {loading ? <Skeleton.KPIGrid count={5} /> : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            <StatCard title="Ditugaskan Hari Ini" value={todaysTasks.new_today} icon={ClipboardList} variant="primary" />
-            <StatCard title="Sedang Diproses" value={statsAgency.diproses} icon={Clock} variant="info" />
-            <StatCard title="Selesai" value={statsAgency.selesai} icon={CheckCircle2} variant="success" />
-            <StatCard title="Rata-rata Waktu" value={`${avgTime} jam`} icon={Timer} variant="default" />
-            <StatCard title="Total Ditangani" value={totalHandled} icon={TrendingUp} variant="primary" />
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <Card className="lg:col-span-2">
-            <div className="flex items-center gap-2 mb-4">
-              <Activity className="w-5 h-5 text-primary" />
-              <h3 className="font-heading font-bold text-foreground">Progress Hari Ini</h3>
-            </div>
-            {loading ? <Skeleton variant="rectangular" height={80} /> : (
-              <div className="flex items-center justify-around h-24">
-                <div className="flex flex-col items-center">
-                  <p className="text-3xl font-black text-primary">{todaysTasks.new_today}</p>
-                  <p className="text-xs text-muted-foreground mt-1 font-semibold">Tugas Baru</p>
-                </div>
-                <div className="w-px h-16 bg-border" />
-                <div className="flex flex-col items-center">
-                  <p className="text-3xl font-black text-info">{todaysTasks.in_progress}</p>
-                  <p className="text-xs text-muted-foreground mt-1 font-semibold">Sedang Diproses</p>
-                </div>
-                <div className="w-px h-16 bg-border" />
-                <div className="flex flex-col items-center">
-                  <p className="text-3xl font-black text-success">{todaysTasks.completed_today}</p>
-                  <p className="text-xs text-muted-foreground mt-1 font-semibold">Selesai Hari Ini</p>
-                </div>
-              </div>
-            )}
-          </Card>
-
-          <Card>
-            <div className="flex items-center gap-2 mb-4">
-              <ListChecks className="w-5 h-5 text-primary" />
-              <h3 className="font-heading font-bold text-foreground">Ringkasan Tugas</h3>
-            </div>
-            {loading ? <Skeleton variant="text" count={3} /> : (
-              <div className="space-y-3">
-                {[
-                  { label: 'Total Tugas', value: tasks.length, color: 'text-foreground' },
-                  { label: 'Prioritas Tinggi', value: priority.length, color: 'text-danger' },
-                  { label: 'Rata-rata Waktu', value: `${avgTime} jam`, color: 'text-info' },
-                  { label: 'Ditangani Hari Ini', value: todaysTasks.new_today + todaysTasks.completed_today, color: 'text-success' },
-                ].map((s) => (
-                  <div key={s.label} className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">{s.label}</span>
-                    <span className={`text-sm font-bold ${s.color}`}>{s.value}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </Card>
-        </div>
-
+        {/* Priority Queue */}
         {!loading && priority.length > 0 && (
           <Card variant="bordered" className="border-danger/20 bg-danger/5">
             <div className="flex items-center gap-2 mb-4">
-              <AlertTriangle className="w-5 h-5 text-danger" />
+              <div className="w-2 h-2 rounded-full bg-danger animate-pulse" />
               <h3 className="font-heading font-bold text-danger">Prioritas Tinggi</h3>
               <span className="ml-auto text-xs bg-danger/10 text-danger px-2 py-0.5 rounded-full font-bold">{priority.length} laporan</span>
             </div>
             <div className="space-y-2">
-              {priority.slice(0, 4).map((c) => (
+              {priority.slice(0, 5).map((c) => (
                 <div key={c.id} className="flex items-center justify-between p-3 bg-card rounded-xl border border-border">
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-semibold text-foreground truncate">{c.title}</p>
                     <p className="text-xs text-muted-foreground">{c.ticket_code} · {c.subdistrict}</p>
                   </div>
-                  <div className="flex items-center gap-2"><UrgencyBadge urgency={c.urgency} /><Button variant="ghost" size="sm" icon={ArrowUpCircle} onClick={() => openStatusModal(c)}>Proses</Button></div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <Button variant="outline" size="sm" icon={ArrowUpCircle} onClick={() => openStatusModal(c)}>Proses</Button>
+                    <Button variant="ghost" size="sm" icon={Navigation} onClick={() => openGoogleMaps(c)} />
+                  </div>
                 </div>
               ))}
             </div>
           </Card>
         )}
 
-        {!loading && performanceChart.length > 0 && (
-          <Card>
-            <div className="flex items-center gap-2 mb-4"><Award className="w-5 h-5 text-primary" /><h3 className="font-heading font-bold text-foreground">Performa 7 Hari Terakhir</h3></div>
-            <AreaChart series={[{ name: 'Selesai', data: performanceChart.map((d) => d.completed) }, { name: 'Baru', data: performanceChart.map((d) => d.new) }]} categories={performanceChart.map((d) => d.label)} height={250} colors={['#22c55e', '#3b82f6']} />
-          </Card>
-        )}
-
-        {!loading && (
-          <div>
-            <h2 className="font-heading font-bold text-foreground mb-3 text-sm uppercase tracking-wider text-muted-foreground">Aksi Cepat</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <QuickActionCard label="Buka Google Maps" description="Navigasi ke lokasi" icon={MapPin} color="bg-success/10 text-success" onClick={() => window.open('https://maps.google.com', '_blank')} />
-              <QuickActionCard label="Update Progress" description="Perbarui status" icon={ArrowUpCircle} color="bg-primary/10 text-primary" onClick={() => { const t = tasks.find(c => c.status !== 'selesai' && c.status !== 'ditolak'); if (t) openStatusModal(t); }} />
-              <QuickActionCard label="Upload Foto" description="Dokumentasi" icon={Camera} color="bg-info/10 text-info" onClick={() => { const t = tasks.find(c => c.status !== 'selesai'); if (t) openStatusModal(t); }} />
-              <QuickActionCard label="Peta Tugas" description="Lihat sebaran tugas" icon={MapPin} color="bg-warning/10 text-warning" onClick={() => navigate('/map')} />
-            </div>
-          </div>
-        )}
-
+        {/* Task List */}
         <Card>
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
-            <h2 className="font-heading text-lg font-bold text-foreground">Daftar Tugas</h2>
+            <div className="flex items-center gap-2">
+              <ClipboardList className="w-5 h-5 text-primary" />
+              <h2 className="font-heading text-lg font-bold text-foreground">Daftar Tugas</h2>
+              <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">{filtered.length} item</span>
+            </div>
             <div className="flex flex-wrap gap-1">
               {tabs.map((tab) => (
-                <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${activeTab === tab.id ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground hover:bg-accent'}`}>
-                  {tab.label}{tab.badge > 0 && <span className="ml-1 text-[10px] opacity-60">({tab.badge})</span>}
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                    activeTab === tab.id
+                      ? 'bg-primary/10 text-primary'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                  }`}
+                >
+                  {tab.label}
+                  {tab.count > 0 && <span className="ml-1 text-[10px] opacity-60">({tab.count})</span>}
                 </button>
               ))}
             </div>
           </div>
-          {loading ? <Skeleton.Table rows={5} cols={4} /> : filtered.length === 0 ? (
-            <div className="py-8 text-center"><ClipboardList className="w-8 h-8 text-muted-foreground/40 mx-auto mb-2" /><p className="text-sm text-muted-foreground">Belum ada tugas.</p></div>
+
+          {loading ? (
+            <div className="space-y-3">
+              {[1, 2, 3].map(i => <Skeleton key={i} variant="rectangular" height={80} />)}
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="py-12 text-center">
+              <ClipboardList className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
+              <p className="text-sm text-muted-foreground font-medium">
+                {searchFilter ? 'Tidak ada tugas yang cocok dengan pencarian' : 'Belum ada tugas'}
+              </p>
+              <p className="text-xs text-muted-foreground/60 mt-1">
+                {searchFilter ? 'Coba gunakan kata kunci lain' : 'Tunggu admin menugaskan laporan ke OPD Anda'}
+              </p>
+            </div>
           ) : (
-            <div className="divide-y divide-border">
+            <div className="space-y-3">
               {filtered.map((task) => (
-                <div key={task.id} className="flex items-center justify-between p-3 hover:bg-muted/50 rounded-xl transition-colors group">
-                  <div className="flex items-start gap-3 min-w-0 flex-1">
-                    <div className="shrink-0 w-10 h-10 rounded-xl bg-muted flex items-center justify-center"><ClipboardList className="w-5 h-5 text-muted-foreground" /></div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-semibold text-foreground truncate">{task.title}</p>
-                      <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                        <span className="text-[11px] text-muted-foreground font-mono">{task.ticket_code}</span>
-                        <span className="text-[11px] text-muted-foreground">·</span>
-                        <span className="text-[11px] text-muted-foreground">{task.subdistrict}</span>
-                        <span className="text-[11px] text-muted-foreground">·</span>
-                        <span className="text-[11px] text-muted-foreground">{task.reporter_name}</span>
-                        {task.urgency && <><span className="text-[11px] text-muted-foreground">·</span><UrgencyBadge urgency={task.urgency} /></>}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <StatusBadge status={task.status} size="sm" />
-                    {task.status !== 'selesai' && task.status !== 'ditolak' ? (
-                      <Button variant="accent" size="sm" icon={ArrowUpCircle} onClick={(e) => { e.stopPropagation(); openStatusModal(task); }}>Update</Button>
-                    ) : null}
-                    <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </div>
-                </div>
+                <OfficerTaskCard
+                  key={task.id}
+                  task={task}
+                  onViewDetail={viewComplaintDetail}
+                  onNavigate={openGoogleMaps}
+                  onUpdate={viewComplaintDetail}
+                  onComplete={completeTask}
+                />
               ))}
             </div>
           )}
         </Card>
-
-        {!loading && assignmentHistory.length > 0 && (
-          <Card>
-            <div className="flex items-center gap-2 mb-4"><Clock className="w-5 h-5 text-primary" /><h3 className="font-heading font-bold text-foreground">Riwayat Penugasan</h3></div>
-            <div className="space-y-2">
-              {assignmentHistory.slice(0, 8).map((item) => (
-                <div key={item.id} className="flex items-center justify-between p-3 rounded-xl hover:bg-muted/50 transition-colors">
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold text-foreground truncate">{item.title}</p>
-                    <p className="text-xs text-muted-foreground">{item.ticket_code} · {item.category_name}</p>
-                  </div>
-                  <div className="flex items-center gap-3 shrink-0">
-                    <StatusBadge status={item.status} size="sm" />
-                    <span className="text-xs text-muted-foreground">{new Date(item.created_at).toLocaleDateString('id-ID')}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Card>
-        )}
       </div>
-      {selectedComplaint && <StatusUpdateModal open={modalOpen} onClose={() => setModalOpen(false)} complaint={selectedComplaint} onSuccess={handleStatusUpdated} />}
+
+      {/* Progress Modal */}
+      {selectedComplaint && (
+        <OfficerProgressModal
+          open={modalOpen}
+          onClose={() => setModalOpen(false)}
+          complaint={selectedComplaint}
+          onSuccess={handleStatusUpdated}
+        />
+      )}
     </DashboardLayout>
   );
 };

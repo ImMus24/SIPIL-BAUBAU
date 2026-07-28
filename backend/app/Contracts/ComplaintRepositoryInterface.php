@@ -49,5 +49,9 @@ interface ComplaintRepositoryInterface
 
     public function update(Complaint $complaint, array $data): bool;
 
+    public function getTimelineByAgency(int $agencyId, int $limit = 15): array;
+
+    public function getCompletedCountThisMonth(int $agencyId): int;
+
     public function delete(Complaint $complaint): bool;
 }

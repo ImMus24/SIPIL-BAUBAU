@@ -109,23 +109,42 @@ class DashboardService
     {
         if (!$agencyId) {
             return [
-                'stats_agency' => ['menunggu' => 0, 'diproses' => 0, 'selesai' => 0, 'ditolak' => 0],
-                'todays_tasks' => ['new_today' => 0, 'in_progress' => 0, 'completed_today' => 0],
-                'assigned_tasks' => collect([]),
-                'recent_activity' => collect([]),
-                'avg_resolution_time' => 0,
-                'priority_complaints' => [],
-                'performance_chart' => [],
-                'assignment_history' => [],
+                'stats_agency'           => ['menunggu' => 0, 'diproses' => 0, 'selesai' => 0, 'ditolak' => 0],
+                'todays_tasks'           => ['new_today' => 0, 'in_progress' => 0, 'completed_today' => 0],
+                'assigned_tasks'         => collect([]),
+                'recent_activity'        => collect([]),
+                'avg_resolution_time'    => 0,
+                'priority_complaints'    => [],
+                'performance_chart'      => [],
+                'assignment_history'     => [],
+                'timeline'               => [],
+                'officer_performance_score' => 0,
+                'completed_this_month'   => 0,
+                'today_complaints'       => [],
+                'welcome'                => [
+                    'name'  => '',
+                    'date'  => now()->isoFormat('dddd, D MMMM YYYY'),
+                    'time'  => now()->format('H:i'),
+                    'greeting' => self::getGreeting(),
+                ],
             ];
         }
 
-        $stats = $this->complaintRepository->getByAgencyGroupedByStatus($agencyId);
+        $stats       = $this->complaintRepository->getByAgencyGroupedByStatus($agencyId);
         $todaysTasks = $this->complaintRepository->getTodaysCountByAgency($agencyId);
-        $assignedTasks = $this->complaintRepository->getByAgencyId($agencyId);
-        $recentActivity = $this->complaintRepository->getByAgencyId($agencyId, ['status' => 'diproses']);
-        $avgTime = $this->complaintRepository->getAvgResolutionTimeByAgency($agencyId);
-        $priority = $this->complaintRepository->getByAgencyId($agencyId, ['status' => 'menunggu']);
+        $assigned    = $this->complaintRepository->getByAgencyId($agencyId);
+        $inProg      = $this->complaintRepository->getByAgencyId($agencyId, ['status' => 'diproses']);
+        $avgTime     = $this->complaintRepository->getAvgResolutionTimeByAgency($agencyId);
+        $priority    = $this->complaintRepository->getByAgencyId($agencyId, ['status' => 'menunggu']);
+        $timeline    = $this->complaintRepository->getTimelineByAgency($agencyId);
+        $monthCmpl   = $this->complaintRepository->getCompletedCountThisMonth($agencyId);
+
+        // Today's complaints — created or completed today
+        $today = today()->toDateString();
+        $todayComplaints = $assigned->filter(fn($c) =>
+            $c->created_at->toDateString() === $today
+            || ($c->completed_at && $c->completed_at->toDateString() === $today)
+        )->values();
 
         // Performance chart (last 7 days)
         $performanceChart = [];
@@ -156,26 +175,60 @@ class DashboardService
             ->limit(10)
             ->get()
             ->map(fn($c) => [
-                'id' => $c->id,
-                'ticket_code' => $c->ticket_code,
-                'title' => $c->title,
-                'status' => $c->status,
-                'category_name' => $c->category?->name,
+                'id'           => $c->id,
+                'ticket_code'  => $c->ticket_code,
+                'title'        => $c->title,
+                'status'       => $c->status,
+                'category_name'=> $c->category?->name,
                 'completed_at' => $c->completed_at,
-                'created_at' => $c->created_at,
+                'created_at'   => $c->created_at,
             ])
             ->toArray();
 
+        // Dynamic performance score (0-100)
+        $total     = array_sum($stats);
+        $completed = $stats['selesai'];
+        $score     = 0;
+        if ($total > 0) {
+            $rateWeight  = 0.6;
+            $timeWeight  = 0.4;
+            $completionRate = $completed / $total;
+            $timeFactor  = $avgTime > 0 ? max(0, 1 - ($avgTime / 168)) : 0; // 168h = 1 week
+            $score = round(($completionRate * $rateWeight + $timeFactor * $timeWeight) * 100);
+        }
+
+        // User name for welcome
+        $userName = User::find($userId)?->name ?? 'Petugas';
+
         return [
-            'stats_agency' => $stats,
-            'todays_tasks' => $todaysTasks,
-            'assigned_tasks' => $assignedTasks,
-            'recent_activity' => $recentActivity,
-            'avg_resolution_time' => $avgTime,
-            'priority_complaints' => $priority,
-            'performance_chart' => $performanceChart,
-            'assignment_history' => $assignmentHistory,
+            'stats_agency'              => $stats,
+            'todays_tasks'              => $todaysTasks,
+            'assigned_tasks'            => $assigned,
+            'recent_activity'           => $inProg,
+            'avg_resolution_time'       => $avgTime,
+            'priority_complaints'       => $priority,
+            'performance_chart'         => $performanceChart,
+            'assignment_history'        => $assignmentHistory,
+            'timeline'                  => $timeline,
+            'officer_performance_score' => $score,
+            'completed_this_month'      => $monthCmpl,
+            'today_complaints'          => $todayComplaints,
+            'welcome'                   => [
+                'name'     => $userName,
+                'date'     => now()->isoFormat('dddd, D MMMM YYYY'),
+                'time'     => now()->format('H:i'),
+                'greeting' => self::getGreeting(),
+            ],
         ];
+    }
+
+    protected static function getGreeting(): string
+    {
+        $h = (int) now()->format('H');
+        if ($h < 10)  return 'Selamat Pagi';
+        if ($h < 15)  return 'Selamat Siang';
+        if ($h < 18)  return 'Selamat Sore';
+        return 'Selamat Malam';
     }
 
     public function getHeadOfAgencyDashboard(): array

@@ -38,13 +38,19 @@ export const complaintService = {
     status: string,
     notes: string,
     agency_id?: number,
-    photo_proof?: File
+    photo_proof?: File,
+    photos?: Record<string, File>, // { before: File, during: File, after: File }
   ): Promise<Complaint> {
     const formData = new FormData();
     formData.append('status', status);
     formData.append('notes', notes);
     if (agency_id) formData.append('agency_id', String(agency_id));
     if (photo_proof) formData.append('photo_proof', photo_proof);
+    if (photos) {
+      Object.entries(photos).forEach(([key, file]) => {
+        formData.append(`photos[${key}]`, file);
+      });
+    }
 
     const response = await api.post(`/complaints/${id}/status`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },

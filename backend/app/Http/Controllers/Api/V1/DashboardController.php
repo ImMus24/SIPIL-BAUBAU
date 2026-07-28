@@ -51,14 +51,19 @@ class DashboardController extends Controller
         $dashboard = $this->dashboardService->getOfficerDashboard($user->id, $user->agency_id);
 
         return $this->success([
-            'stats_agency'        => $dashboard['stats_agency'],
-            'todays_tasks'        => $dashboard['todays_tasks'],
-            'assigned_tasks'      => ComplaintResource::collection($dashboard['assigned_tasks']),
-            'recent_activity'     => ComplaintResource::collection($dashboard['recent_activity']),
-            'avg_resolution_time' => $dashboard['avg_resolution_time'],
-            'priority_complaints' => ComplaintResource::collection($dashboard['priority_complaints']),
-            'performance_chart'   => $dashboard['performance_chart'],
-            'assignment_history'  => $dashboard['assignment_history'],
+            'stats_agency'              => $dashboard['stats_agency'],
+            'todays_tasks'              => $dashboard['todays_tasks'],
+            'assigned_tasks'            => ComplaintResource::collection($dashboard['assigned_tasks']),
+            'recent_activity'           => ComplaintResource::collection($dashboard['recent_activity']),
+            'avg_resolution_time'       => $dashboard['avg_resolution_time'],
+            'priority_complaints'       => ComplaintResource::collection($dashboard['priority_complaints']),
+            'performance_chart'         => $dashboard['performance_chart'],
+            'assignment_history'        => $dashboard['assignment_history'],
+            'timeline'                  => $dashboard['timeline'],
+            'officer_performance_score' => $dashboard['officer_performance_score'],
+            'completed_this_month'      => $dashboard['completed_this_month'],
+            'today_complaints'          => ComplaintResource::collection($dashboard['today_complaints']),
+            'welcome'                   => $dashboard['welcome'],
         ], 'Data dashboard petugas berhasil dimuat.');
     }
 

@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Contracts\ComplaintRepositoryInterface;
 use App\Models\Complaint;
+use App\Models\ComplaintStatusLog;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
@@ -28,6 +29,25 @@ class ComplaintRepository implements ComplaintRepositoryInterface
     public function delete(Complaint $complaint): bool
     {
         return $complaint->delete();
+    }
+
+    public function getTimelineByAgency(int $agencyId, int $limit = 15): array
+    {
+        return ComplaintStatusLog::with(['complaint:id,ticket_code,title'])
+            ->whereHas('complaint', fn($q) => $q->where('agency_id', $agencyId))
+            ->latest()
+            ->limit($limit)
+            ->get()
+            ->toArray();
+    }
+
+    public function getCompletedCountThisMonth(int $agencyId): int
+    {
+        return Complaint::where('agency_id', $agencyId)
+            ->where('status', 'selesai')
+            ->whereMonth('completed_at', now()->month)
+            ->whereYear('completed_at', now()->year)
+            ->count();
     }
 
     // ──────────────────────────────────────────────────────────────
