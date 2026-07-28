@@ -2,7 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
-import { ShieldCheck, LogOut, Menu, X, LayoutDashboard, Sun, Moon, Monitor } from 'lucide-react';
+import {
+  ShieldCheck,
+  LogOut,
+  Menu,
+  X,
+  LayoutDashboard,
+  Sun,
+  Moon,
+  Monitor,
+  Bell,
+  Search,
+  Settings,
+} from 'lucide-react';
+import { Avatar } from '../ui/Avatar';
+import { Dropdown } from '../ui/Dropdown';
+import { Button } from '../ui/Button';
 
 export const Navbar: React.FC = () => {
   const { user, isAuthenticated, role, logout } = useAuth();
@@ -11,15 +26,10 @@ export const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 20) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -40,200 +50,186 @@ export const Navbar: React.FC = () => {
     navigate('/login');
   };
 
+  const userDropdownItems = user
+    ? [
+        {
+          label: 'Dashboard Saya',
+          icon: <LayoutDashboard className="w-4 h-4" />,
+          onClick: () => navigate(role === 'citizen' ? '/dashboard' : '/admin'),
+        },
+        { label: 'Pengaturan', icon: <Settings className="w-4 h-4" />, onClick: () => {}, divider: true },
+        {
+          label: 'Keluar',
+          icon: <LogOut className="w-4 h-4" />,
+          onClick: handleLogout,
+          variant: 'danger' as const,
+        },
+      ]
+    : [];
+
   return (
     <nav
-      className={`fixed top-0 w-full z-50 transition-all duration-300 ease-in-out border-b border-sky-100 dark:border-slate-800 ${
+      className={`fixed top-0 w-full z-50 transition-all duration-300 ${
         scrolled
-          ? 'bg-white/95 dark:bg-slate-900/95 shadow-md backdrop-blur-xl'
-          : 'bg-white/85 dark:bg-slate-900/85 backdrop-blur-xl'
+          ? 'bg-white/90 dark:bg-slate-900/90 shadow-lg backdrop-blur-xl border-b border-border'
+          : 'bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-transparent'
       }`}
     >
-      <div className="flex justify-between items-center px-4 sm:px-8 max-w-[1280px] mx-auto h-20">
-        
-        {/* Brand Shield Logo matching Logo Kota Baubau */}
-        <Link to="/" className="flex items-center space-x-3 group">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-sky-600 via-sky-700 to-sky-900 flex items-center justify-center text-white font-black text-xl shadow-md ring-2 ring-amber-400/90 group-hover:scale-105 transition-transform">
-            <ShieldCheck className="w-7 h-7 text-amber-300" />
+      <div className="flex items-center justify-between px-4 sm:px-8 max-w-container mx-auto h-20">
+        {/* Brand */}
+        <Link to="/" className="flex items-center gap-3 group">
+          <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center text-primary-foreground shadow-md ring-2 ring-accent/80 group-hover:scale-105 transition-transform">
+            <ShieldCheck className="w-6 h-6 text-accent" />
           </div>
-          <div>
-            <div className="flex items-center space-x-2">
-              <span className="font-headline font-black text-lg text-slate-900 dark:text-white tracking-tight">SIPIL BAUBAU</span>
-              <span className="bg-amber-400 text-slate-950 text-[11px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-xs">
+          <div className="hidden sm:block">
+            <div className="flex items-center gap-2">
+              <span className="font-heading font-black text-lg text-foreground tracking-tight">SIPIL BAUBAU</span>
+              <span className="bg-accent text-accent-foreground text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">
                 KOTA BAUBAU
               </span>
             </div>
-            <p className="text-xs font-medium text-sky-800 dark:text-sky-400 hidden sm:block">
+            <p className="text-xs font-medium text-muted-foreground hidden sm:block">
               Sistem Pengaduan Infrastruktur Berbasis Web
             </p>
           </div>
         </Link>
 
-        {/* Desktop Navigation Links */}
-        <div className="hidden lg:flex gap-6 items-center">
-          {navLinks.map((link) => {
-            const active = isActive(link.path);
-            return (
-              <Link
-                key={link.path}
-                to={link.path}
-                className={`text-sm font-semibold transition-all duration-200 py-1 ${
-                  active
-                    ? 'text-sky-800 dark:text-sky-400 font-bold border-b-2 border-amber-400'
-                    : 'text-slate-600 dark:text-slate-300 hover:text-sky-700 dark:hover:text-sky-400 hover:scale-105'
-                }`}
-              >
-                {link.label}
-              </Link>
-            );
-          })}
+        {/* Desktop Nav */}
+        <div className="hidden lg:flex items-center gap-6">
+          {navLinks.map((link) => (
+            <Link
+              key={link.path}
+              to={link.path}
+              className={`relative text-sm font-semibold py-1 transition-colors duration-150 ${
+                isActive(link.path)
+                  ? 'text-primary font-bold'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {link.label}
+              {isActive(link.path) && (
+                <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-accent rounded-full" />
+              )}
+            </Link>
+          ))}
         </div>
 
-        {/* Explicit Theme Mode Segmented Controller (Terang / Gelap / System) */}
-        <div className="hidden lg:flex items-center space-x-3">
-          <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-full border border-slate-200 dark:border-slate-700 text-xs font-bold shadow-xs">
-            <button
-              onClick={() => setMode('light')}
-              className={`flex items-center space-x-1 px-3 py-1.5 rounded-full transition-all ${
-                mode === 'light'
-                  ? 'bg-white text-sky-900 shadow-sm font-extrabold border border-sky-200'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-              }`}
-              title="Aktifkan Mode Terang (Light)"
-            >
-              <Sun className={`w-3.5 h-3.5 ${mode === 'light' ? 'text-amber-500' : ''}`} />
-              <span>Terang</span>
-            </button>
-            
-            <button
-              onClick={() => setMode('dark')}
-              className={`flex items-center space-x-1 px-3 py-1.5 rounded-full transition-all ${
-                mode === 'dark'
-                  ? 'bg-slate-900 text-sky-300 shadow-sm font-extrabold border border-sky-700'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-              }`}
-              title="Aktifkan Mode Gelap (Dark)"
-            >
-              <Moon className={`w-3.5 h-3.5 ${mode === 'dark' ? 'text-sky-400' : ''}`} />
-              <span>Gelap</span>
-            </button>
+        {/* Right Actions */}
+        <div className="flex items-center gap-2">
+          {/* Search */}
+          <button
+            onClick={() => setSearchOpen(!searchOpen)}
+            className="hidden lg:flex p-2.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            title="Cari"
+          >
+            <Search className="w-5 h-5" />
+          </button>
 
-            <button
-              onClick={() => setMode('system')}
-              className={`flex items-center space-x-1 px-3 py-1.5 rounded-full transition-all ${
-                mode === 'system'
-                  ? 'bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-sm font-extrabold border border-emerald-300 dark:border-emerald-700'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-              }`}
-              title="Gunakan Mode Sistem OS"
-            >
-              <Monitor className={`w-3.5 h-3.5 ${mode === 'system' ? 'text-emerald-500' : ''}`} />
-              <span>OS</span>
-            </button>
+          {/* Theme Toggle */}
+          <div className="hidden lg:flex items-center p-1 bg-muted rounded-full border border-border">
+            {(['light', 'dark', 'system'] as const).map((m) => (
+              <button
+                key={m}
+                onClick={() => setMode(m)}
+                className={`p-1.5 rounded-full transition-all ${
+                  mode === m
+                    ? 'bg-card text-foreground shadow-sm'
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+                title={m === 'light' ? 'Terang' : m === 'dark' ? 'Gelap' : 'Sistem'}
+              >
+                {m === 'light' ? <Sun className="w-4 h-4" /> : m === 'dark' ? <Moon className="w-4 h-4" /> : <Monitor className="w-4 h-4" />}
+              </button>
+            ))}
           </div>
 
-          {isAuthenticated && user ? (
-            <div className="flex items-center space-x-3">
-              <Link
-                to={role === 'citizen' ? '/dashboard' : '/admin'}
-                className="inline-flex items-center space-x-2 px-5 py-2.5 bg-slate-950 dark:bg-sky-700 hover:bg-slate-900 dark:hover:bg-sky-600 text-white rounded-full text-sm font-bold shadow-md transition-all active:scale-95 border border-amber-400/40"
-              >
-                <LayoutDashboard className="w-4 h-4 text-amber-400" />
-                <span>{role === 'admin' ? 'Portal Admin' : role === 'officer' ? 'Portal OPD' : 'Dashboard Saya'}</span>
-              </Link>
+          {/* Notification */}
+          {isAuthenticated && (
+            <button className="hidden lg:flex p-2.5 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors relative">
+              <Bell className="w-5 h-5" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-danger rounded-full ring-2 ring-card" />
+            </button>
+          )}
 
-              <button
-                onClick={handleLogout}
-                title="Keluar"
-                className="p-2.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950 rounded-full transition-colors"
-              >
-                <LogOut className="w-5 h-5" />
-              </button>
+          {/* User Menu */}
+          {isAuthenticated && user ? (
+            <div className="hidden lg:flex items-center gap-2 pl-2 border-l border-border">
+              <Dropdown
+                trigger={
+                  <div className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-muted transition-colors cursor-pointer">
+                    <Avatar name={user.name} size="sm" />
+                    <span className="text-sm font-semibold text-foreground max-w-[120px] truncate">
+                      {user.name}
+                    </span>
+                  </div>
+                }
+                items={userDropdownItems}
+                align="right"
+              />
             </div>
           ) : (
             <Link
               to="/login"
-              className="bg-gradient-to-r from-sky-700 via-sky-800 to-sky-900 hover:from-sky-800 hover:to-sky-950 text-white px-7 py-3 rounded-full text-sm font-extrabold shadow-lg shadow-sky-800/20 transition-all active:scale-95 ring-1 ring-amber-400/60"
+              className="hidden lg:inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground rounded-xl text-sm font-semibold hover:bg-primary-hover transition-all shadow-sm active:scale-[0.98]"
             >
               Masuk Portal
             </Link>
           )}
-        </div>
 
-        {/* Mobile Menu Button + Explicit Theme Toggle */}
-        <div className="lg:hidden flex items-center space-x-2">
-          <button
-            onClick={() => setMode(mode === 'dark' ? 'light' : 'dark')}
-            className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 transition-colors"
-            title={mode === 'dark' ? 'Ubah ke Mode Terang' : 'Ubah ke Mode Gelap'}
-          >
-            {mode === 'dark' ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5 text-sky-600" />}
-          </button>
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2.5 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
-          >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+          {/* Mobile Hamburger */}
+          <div className="lg:hidden flex items-center gap-1">
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2.5 rounded-xl text-foreground hover:bg-muted transition-colors"
+            >
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
         </div>
-
       </div>
 
-      {/* Mobile Dropdown Menu */}
+      {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 px-6 py-5 space-y-4 shadow-xl">
+        <div className="lg:hidden bg-card border-b border-border px-6 py-5 space-y-3 shadow-xl animate-fade-in">
           {navLinks.map((link) => (
             <Link
               key={link.path}
               to={link.path}
               onClick={() => setMobileMenuOpen(false)}
               className={`block text-base font-semibold py-2.5 ${
-                isActive(link.path) ? 'text-sky-800 dark:text-sky-400 font-extrabold' : 'text-slate-700 dark:text-slate-300'
+                isActive(link.path) ? 'text-primary font-bold' : 'text-muted-foreground'
               }`}
             >
               {link.label}
             </Link>
           ))}
-          
-          <div className="pt-3 border-t border-slate-100 dark:border-slate-700 space-y-3">
-            <div className="flex items-center justify-between text-xs font-bold text-slate-600 dark:text-slate-400">
-              <span>Pilih Tema:</span>
-              <div className="flex items-center space-x-1 p-0.5 bg-slate-100 dark:bg-slate-800 rounded-lg">
-                <button
-                  onClick={() => setMode('light')}
-                  className={`px-2.5 py-1 rounded-md ${mode === 'light' ? 'bg-white text-sky-900 font-bold shadow-xs' : 'text-slate-500'}`}
-                >
-                  Terang
-                </button>
-                <button
-                  onClick={() => setMode('dark')}
-                  className={`px-2.5 py-1 rounded-md ${mode === 'dark' ? 'bg-slate-900 text-sky-300 font-bold shadow-xs' : 'text-slate-500'}`}
-                >
-                  Gelap
-                </button>
-                <button
-                  onClick={() => setMode('system')}
-                  className={`px-2.5 py-1 rounded-md ${mode === 'system' ? 'bg-white dark:bg-slate-900 text-emerald-500 font-bold shadow-xs' : 'text-slate-500'}`}
-                >
-                  OS
-                </button>
-              </div>
-            </div>
-
+          <div className="pt-3 border-t border-border space-y-3">
             {isAuthenticated ? (
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  handleLogout();
-                }}
-                className="w-full py-3 text-center bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-400 rounded-xl text-sm font-bold"
-              >
-                Keluar Akun
-              </button>
+              <>
+                <div className="flex items-center gap-3 py-2">
+                  <Avatar name={user?.name || ''} size="md" />
+                  <div>
+                    <p className="font-semibold text-foreground">{user?.name}</p>
+                    <p className="text-xs text-muted-foreground">{user?.email}</p>
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  fullWidth
+                  icon={LayoutDashboard}
+                  onClick={() => { setMobileMenuOpen(false); navigate(role === 'citizen' ? '/dashboard' : '/admin'); }}
+                >
+                  Dashboard
+                </Button>
+                <Button variant="danger" fullWidth icon={LogOut} onClick={handleLogout}>
+                  Keluar Akun
+                </Button>
+              </>
             ) : (
               <Link
                 to="/login"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block w-full py-3.5 text-center bg-sky-800 text-white rounded-full text-sm font-extrabold shadow-md"
+                className="block w-full py-3 text-center bg-primary text-primary-foreground rounded-xl text-sm font-bold shadow-sm"
               >
                 Masuk Portal
               </Link>

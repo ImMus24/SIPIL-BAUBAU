@@ -1,78 +1,95 @@
-import React, { useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback } from 'react';
 import { CheckCircle2, AlertCircle, Info, AlertTriangle, X } from 'lucide-react';
+import { clsx } from 'clsx';
 
-export type ToastType = 'success' | 'error' | 'warning' | 'info';
+type ToastType = 'success' | 'error' | 'warning' | 'info';
 
-export interface ToastProps {
-  id?: string;
+interface ToastItem {
+  id: string;
   type: ToastType;
   title: string;
   message?: string;
-  isOpen: boolean;
-  onClose: () => void;
-  duration?: number;
 }
 
-export const Toast: React.FC<ToastProps> = ({
-  type,
-  title,
-  message,
-  isOpen,
-  onClose,
-  duration = 4000,
-}) => {
-  useEffect(() => {
-    if (isOpen && duration > 0) {
-      const timer = setTimeout(() => {
-        onClose();
-      }, duration);
-      return () => clearTimeout(timer);
-    }
-  }, [isOpen, duration, onClose]);
+interface ToastContextType {
+  toast: (type: ToastType, title: string, message?: string) => void;
+  success: (title: string, message?: string) => void;
+  error: (title: string, message?: string) => void;
+  warning: (title: string, message?: string) => void;
+  info: (title: string, message?: string) => void;
+}
 
-  if (!isOpen) return null;
+const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
-  const typeConfig = {
-    success: {
-      icon: CheckCircle2,
-      color: 'bg-emerald-50 dark:bg-emerald-950/90 text-emerald-900 dark:text-emerald-100 border-emerald-300 dark:border-emerald-700',
-      iconColor: 'text-emerald-600 dark:text-emerald-400',
-    },
-    error: {
-      icon: AlertCircle,
-      color: 'bg-rose-50 dark:bg-rose-950/90 text-rose-900 dark:text-rose-100 border-rose-300 dark:border-rose-700',
-      iconColor: 'text-rose-600 dark:text-rose-400',
-    },
-    warning: {
-      icon: AlertTriangle,
-      color: 'bg-amber-50 dark:bg-amber-950/90 text-amber-900 dark:text-amber-100 border-amber-300 dark:border-amber-700',
-      iconColor: 'text-amber-600 dark:text-amber-400',
-    },
-    info: {
-      icon: Info,
-      color: 'bg-sky-50 dark:bg-sky-950/90 text-sky-900 dark:text-sky-100 border-sky-300 dark:border-sky-700',
-      iconColor: 'text-sky-600 dark:text-sky-400',
-    },
+export const useToast = () => {
+  const ctx = useContext(ToastContext);
+  if (!ctx) throw new Error('useToast must be used within ToastProvider');
+  return ctx;
+};
+
+const typeConfig = {
+  success: { icon: CheckCircle2, bg: 'bg-success-bg border-success-border', color: 'text-success' },
+  error: { icon: AlertCircle, bg: 'bg-danger-bg border-danger-border', color: 'text-danger' },
+  warning: { icon: AlertTriangle, bg: 'bg-warning-bg border-warning-border', color: 'text-warning' },
+  info: { icon: Info, bg: 'bg-info-bg border-info-border', color: 'text-info' },
+};
+
+export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [toasts, setToasts] = useState<ToastItem[]>([]);
+
+  const addToast = useCallback((type: ToastType, title: string, message?: string) => {
+    const id = Math.random().toString(36).slice(2);
+    setToasts((prev) => [...prev, { id, type, title, message }]);
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 4000);
+  }, []);
+
+  const removeToast = useCallback((id: string) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  }, []);
+
+  const context: ToastContextType = {
+    toast: addToast,
+    success: (t, m) => addToast('success', t, m),
+    error: (t, m) => addToast('error', t, m),
+    warning: (t, m) => addToast('warning', t, m),
+    info: (t, m) => addToast('info', t, m),
   };
 
-  const current = typeConfig[type];
-  const IconComponent = current.icon;
-
   return (
-    <div className="fixed bottom-6 right-6 z-50 max-w-md w-full animate-bounce-short">
-      <div className={`flex items-start p-4 rounded-2xl border shadow-xl backdrop-blur-md transition-all ${current.color}`}>
-        <IconComponent className={`w-6 h-6 mr-3 shrink-0 mt-0.5 ${current.iconColor}`} />
-        <div className="flex-1 pr-2">
-          <h4 className="font-extrabold text-sm tracking-tight">{title}</h4>
-          {message && <p className="text-xs opacity-90 mt-0.5 leading-relaxed">{message}</p>}
-        </div>
-        <button
-          onClick={onClose}
-          className="p-1 rounded-lg opacity-70 hover:opacity-100 hover:bg-black/5 dark:hover:bg-white/10 transition-opacity"
-        >
-          <X className="w-4 h-4" />
-        </button>
+    <ToastContext.Provider value={context}>
+      {children}
+      {/* Toast Container */}
+      <div className="fixed bottom-6 right-6 z-[100] flex flex-col gap-2 max-w-sm w-full pointer-events-none">
+        {toasts.map((toast) => {
+          const config = typeConfig[toast.type];
+          const Icon = config.icon;
+          return (
+            <div
+              key={toast.id}
+              className={clsx(
+                'pointer-events-auto flex items-start p-4 rounded-xl border shadow-xl backdrop-blur-md animate-slide-in-right',
+                config.bg
+              )}
+            >
+              <Icon className={clsx('w-5 h-5 mr-3 shrink-0 mt-0.5', config.color)} />
+              <div className="flex-1 min-w-0">
+                <h4 className={clsx('font-bold text-sm', config.color)}>{toast.title}</h4>
+                {toast.message && (
+                  <p className="text-xs text-foreground/70 mt-0.5">{toast.message}</p>
+                )}
+              </div>
+              <button
+                onClick={() => removeToast(toast.id)}
+                className="p-1 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition-colors ml-2 shrink-0"
+              >
+                <X className="w-3.5 h-3.5 text-muted-foreground" />
+              </button>
+            </div>
+          );
+        })}
       </div>
-    </div>
+    </ToastContext.Provider>
   );
 };

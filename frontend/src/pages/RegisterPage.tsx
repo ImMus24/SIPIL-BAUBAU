@@ -1,259 +1,208 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { User, CreditCard, Phone, Mail, MapPin, Lock, ShieldCheck, ArrowRight } from 'lucide-react';
+import { Button } from '../components/ui/Button';
+import { Input } from '../components/ui/Input';
+import { Stepper } from '../components/ui/Stepper';
+import { ShieldCheck, User, Phone, Mail, Lock, ArrowRight, ArrowLeft } from 'lucide-react';
+
+const steps = [
+  { id: 'personal', label: 'Data Pribadi', description: 'Nama & kontak' },
+  { id: 'account', label: 'Akun', description: 'Email & password' },
+  { id: 'confirm', label: 'Konfirmasi', description: 'Verifikasi data' },
+];
 
 export const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
   const { register } = useAuth();
-  const [name, setName] = useState('');
-  const [nik, setNik] = useState('');
-  const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
-  const [address, setAddress] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [agreeTerms, setAgreeTerms] = useState(false);
+  const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name || !email || !password) {
-      setErrorMsg('Harap lengkapi nama, email, dan kata sandi.');
-      return;
-    }
-    if (password !== confirmPassword) {
-      setErrorMsg('Konfirmasi kata sandi tidak cocok.');
-      return;
-    }
-    if (!agreeTerms) {
-      setErrorMsg('Anda harus menyetujui Syarat & Ketentuan.');
-      return;
-    }
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [agreeTerms, setAgreeTerms] = useState(false);
 
+  const handleNext = () => {
+    setErrorMsg('');
+    if (step === 0) {
+      if (!name.trim()) { setErrorMsg('Nama lengkap wajib diisi.'); return; }
+    }
+    if (step === 1) {
+      if (!email.trim()) { setErrorMsg('Email wajib diisi.'); return; }
+      if (password.length < 8) { setErrorMsg('Kata sandi minimal 8 karakter.'); return; }
+      if (password !== confirmPassword) { setErrorMsg('Konfirmasi kata sandi tidak cocok.'); return; }
+      if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password)) {
+        setErrorMsg('Kata sandi harus mengandung huruf besar, huruf kecil, dan angka.');
+        return;
+      }
+    }
+    setStep((s) => Math.min(s + 1, 2));
+  };
+
+  const handleSubmit = async () => {
+    if (!agreeTerms) { setErrorMsg('Anda harus menyetujui Syarat & Ketentuan.'); return; }
     setLoading(true);
     setErrorMsg('');
     try {
       await register(name, email, password, phone);
       navigate('/dashboard');
-    } catch {
-      setErrorMsg('Pendaftaran gagal. Email mungkin sudah terdaftar.');
-    } finally {
-      setLoading(false);
-    }
+    } catch (err: any) {
+      setErrorMsg(err?.response?.data?.message || err?.response?.data?.errors?.email?.[0] || err?.response?.data?.errors?.password?.[0] || 'Pendaftaran gagal. Silakan periksa kembali data Anda.');
+    } finally { setLoading(false); }
   };
 
   return (
-    <div className="min-h-screen bg-[#faf8ff] dark:bg-slate-950 flex flex-col lg:flex-row font-sans transition-colors duration-300">
-      
-      {/* Left Blue Hero Panel */}
-      <div className="lg:w-5/12 bg-[#004ac6] dark:bg-sky-950 text-white p-8 sm:p-14 flex flex-col justify-between relative overflow-hidden">
-        <div className="space-y-8 relative z-10">
-          <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-amber-300 ring-2 ring-white/40 shadow-lg">
-              <ShieldCheck className="w-7 h-7" />
-            </div>
-            <span className="font-headline font-black text-2xl tracking-tight">SIPIL BAUBAU</span>
-          </div>
-
-          <div className="space-y-5">
-            <h1 className="font-headline text-3xl sm:text-4xl lg:text-5xl font-extrabold leading-tight tracking-tight">
-              Layanan Pengaduan Infrastruktur Modern.
-            </h1>
-            <p className="text-base text-white/90 leading-relaxed font-medium">
-              Wujudkan Kota Baubau yang lebih baik melalui partisipasi aktif Anda dalam melaporkan kendala infrastruktur di sekitar kita.
-            </p>
-          </div>
-
-          {/* Interactive GIS Preview Card */}
-          <div className="bg-white/15 backdrop-blur-md border border-white/30 rounded-3xl p-5 space-y-3 shadow-2xl">
-            <div className="flex items-center space-x-3">
-              <div className="p-2.5 bg-[#39b8fd] text-[#001e2f] rounded-xl">
-                <MapPin className="w-5 h-5" />
+    <div className="min-h-screen bg-background flex items-center justify-center p-4 sm:p-6 pt-24">
+      <div className="max-w-4xl w-full bg-card rounded-3xl border border-border shadow-2xl overflow-hidden animate-fade-in-up">
+        <div className="grid grid-cols-1 lg:grid-cols-12">
+          {/* Left */}
+          <div className="lg:col-span-5 bg-gradient-to-br from-primary to-primary-hover text-primary-foreground p-8 sm:p-10 flex flex-col justify-between relative overflow-hidden">
+            <div className="space-y-6 relative z-10">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center ring-1 ring-white/40">
+                  <ShieldCheck className="w-6 h-6 text-accent" />
+                </div>
+                <h2 className="font-heading font-black text-xl">SIPIL BAUBAU</h2>
               </div>
               <div>
-                <h4 className="text-sm font-bold">Peta Infrastruktur</h4>
-                <p className="text-xs text-white/80">Terpantau secara Real-time</p>
+                <h1 className="font-heading text-2xl sm:text-3xl font-black leading-tight">Buat Akun Baru</h1>
+                <p className="text-sm text-white/80 mt-2">Bergabunglah dengan ribuan warga Baubau yang peduli dengan infrastruktur kota.</p>
               </div>
             </div>
-            <img
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBdxE0a20tjwg-ifwJPg5ZZ5GUHhjHc1pDc6gmdbNoohWTw9dqNeOn2Ybi5H6BmX400iCy0vBp9PObYkM60ijwvje4Asxg3LPKZHVLv-0xa6qVOZ02UUUPyBUb71yHkyEI9WQU4LbAbjbj6tMHfdifKiDFZnF76zPmHsM7uqSGK1UivXgZ0fTq8EsvQ7Ff7sWhC2bo3C9fepMPNsY7MPgU02owQXstE8WeBvpNTPENxvlP9yFXYZUclL27etAl30xL9ljzH_QBUuZU"
-              alt="Baubau Map GIS Preview"
-              className="w-full h-36 object-cover rounded-xl border border-white/20"
-            />
-          </div>
-        </div>
 
-        <div className="relative z-10 pt-8 text-xs text-white/70">
-          © {new Date().getFullYear()} Pemerintah Kota Baubau. Transformasi Digital Menuju Smart City.
-        </div>
-
-        {/* Background glow circle */}
-        <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-[#39b8fd]/20 blur-3xl rounded-full"></div>
-      </div>
-
-      {/* Right Register Form Panel */}
-      <div className="lg:w-7/12 p-8 sm:p-14 flex items-center justify-center dark:bg-slate-900">
-        <div className="max-w-xl w-full space-y-8">
-          
-          <div className="space-y-2">
-            <h2 className="font-headline text-3xl font-extrabold text-slate-900 dark:text-white">Buat Akun Baru</h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
-              Silakan lengkapi data diri Anda untuk memulai.
-            </p>
-          </div>
-
-          {errorMsg && (
-            <div className="p-4 bg-rose-50 dark:bg-rose-950/80 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-sm font-bold rounded-2xl">
-              {errorMsg}
+            <div className="relative z-10">
+              <Stepper steps={steps} currentStep={step} orientation="vertical" />
             </div>
-          )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block font-bold text-slate-800 dark:text-slate-200 mb-2 text-sm">Nama Lengkap *</label>
-                <div className="relative">
-                  <User className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="text"
+            <div className="absolute -bottom-20 -right-20 w-60 h-60 bg-secondary/20 blur-3xl rounded-full" />
+          </div>
+
+          {/* Right */}
+          <div className="lg:col-span-7 p-8 sm:p-10 flex items-center">
+            <div className="max-w-md mx-auto w-full space-y-6">
+              {errorMsg && (
+                <div className="p-4 bg-danger-bg border border-danger-border text-danger text-sm font-bold rounded-xl">
+                  {errorMsg}
+                </div>
+              )}
+
+              {/* Step 0: Personal Data */}
+              {step === 0 && (
+                <div className="space-y-4 animate-fade-in">
+                  <Input
+                    label="Nama Lengkap"
                     required
-                    placeholder="Masukkan nama"
+                    placeholder="Masukkan nama sesuai KTP"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3.5 bg-[#f8fafc] dark:bg-slate-800 border border-[#e1e2ed] dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl text-base font-medium focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:border-[#004ac6] dark:focus:border-sky-500 transition-colors"
+                    icon={<User className="w-4 h-4" />}
                   />
-                </div>
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-800 dark:text-slate-200 mb-2 text-sm">NIK (KTP)</label>
-                <div className="relative">
-                  <CreditCard className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="text"
-                    placeholder="16 digit NIK"
-                    value={nik}
-                    onChange={(e) => setNik(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3.5 bg-[#f8fafc] dark:bg-slate-800 border border-[#e1e2ed] dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl text-base font-medium focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:border-[#004ac6] dark:focus:border-sky-500 transition-colors"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block font-bold text-slate-800 dark:text-slate-200 mb-2 text-sm">No HP *</label>
-                <div className="relative">
-                  <Phone className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
-                  <input
+                  <Input
+                    label="Nomor HP"
                     type="tel"
-                    placeholder="08xx..."
+                    placeholder="08xx xxxx xxxx"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3.5 bg-[#f8fafc] dark:bg-slate-800 border border-[#e1e2ed] dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl text-base font-medium focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:border-[#004ac6] dark:focus:border-sky-500 transition-colors"
+                    icon={<Phone className="w-4 h-4" />}
                   />
+                  <Button fullWidth icon={ArrowRight} iconPosition="right" onClick={handleNext}>
+                    Selanjutnya
+                  </Button>
                 </div>
-              </div>
+              )}
 
-              <div>
-                <label className="block font-bold text-slate-800 dark:text-slate-200 mb-2 text-sm">Email *</label>
-                <div className="relative">
-                  <Mail className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
-                  <input
+              {/* Step 1: Account */}
+              {step === 1 && (
+                <div className="space-y-4 animate-fade-in">
+                  <Input
+                    label="Alamat Email"
                     type="email"
                     required
-                    placeholder="contoh@mail.com"
+                    placeholder="contoh@email.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3.5 bg-[#f8fafc] dark:bg-slate-800 border border-[#e1e2ed] dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl text-base font-medium focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:border-[#004ac6] dark:focus:border-sky-500 transition-colors"
+                    icon={<Mail className="w-4 h-4" />}
                   />
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <label className="block font-bold text-slate-800 dark:text-slate-200 mb-2 text-sm">Alamat</label>
-              <div className="relative">
-                <MapPin className="w-5 h-5 text-slate-400 absolute left-4 top-4" />
-                <textarea
-                  rows={2}
-                  placeholder="Alamat lengkap sesuai KTP"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  className="w-full pl-12 pr-4 py-3.5 bg-[#f8fafc] dark:bg-slate-800 border border-[#e1e2ed] dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl text-base font-medium focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:border-[#004ac6] dark:focus:border-sky-500 transition-colors"
-                ></textarea>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block font-bold text-slate-800 dark:text-slate-200 mb-2 text-sm">Password *</label>
-                <div className="relative">
-                  <Lock className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
-                  <input
+                  <Input
+                    label="Kata Sandi"
                     type="password"
                     required
-                    placeholder="••••••••"
+                    placeholder="Min. 8 karakter (Huruf Besar, Kecil, Angka)"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3.5 bg-[#f8fafc] dark:bg-slate-800 border border-[#e1e2ed] dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl text-base font-medium focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:border-[#004ac6] dark:focus:border-sky-500 transition-colors"
+                    icon={<Lock className="w-4 h-4" />}
                   />
-                </div>
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-800 dark:text-slate-200 mb-2 text-sm">Konfirmasi Password *</label>
-                <div className="relative">
-                  <Lock className="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
-                  <input
+                  <Input
+                    label="Konfirmasi Kata Sandi"
                     type="password"
                     required
-                    placeholder="••••••••"
+                    placeholder="Ulangi kata sandi"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3.5 bg-[#f8fafc] dark:bg-slate-800 border border-[#e1e2ed] dark:border-slate-700 text-slate-900 dark:text-white rounded-2xl text-base font-medium focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:border-[#004ac6] dark:focus:border-sky-500 transition-colors"
+                    icon={<Lock className="w-4 h-4" />}
+                    error={confirmPassword && password !== confirmPassword ? 'Kata sandi tidak cocok' : undefined}
                   />
+                  <div className="flex gap-3">
+                    <Button variant="outline" icon={ArrowLeft} onClick={() => setStep(0)}>
+                      Kembali
+                    </Button>
+                    <Button fullWidth icon={ArrowRight} iconPosition="right" onClick={handleNext}>
+                      Selanjutnya
+                    </Button>
+                  </div>
                 </div>
-              </div>
+              )}
+
+              {/* Step 2: Confirm */}
+              {step === 2 && (
+                <div className="space-y-4 animate-fade-in">
+                  <div className="bg-muted rounded-2xl p-5 space-y-3">
+                    <h3 className="font-heading font-bold text-foreground">Ringkasan Data</h3>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between"><span className="text-muted-foreground">Nama</span><span className="font-semibold text-foreground">{name}</span></div>
+                      <div className="flex justify-between"><span className="text-muted-foreground">HP</span><span className="font-semibold text-foreground">{phone || '-'}</span></div>
+                      <div className="flex justify-between"><span className="text-muted-foreground">Email</span><span className="font-semibold text-foreground">{email}</span></div>
+                    </div>
+                  </div>
+
+                  <label className="flex items-start gap-3 text-sm text-muted-foreground cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={agreeTerms}
+                      onChange={(e) => setAgreeTerms(e.target.checked)}
+                      className="mt-0.5 rounded border-border text-primary focus:ring-ring"
+                    />
+                    <span>
+                      Saya menyetujui <a href="#" className="text-primary font-bold underline">Syarat & Ketentuan</a> serta{' '}
+                      <a href="#" className="text-primary font-bold underline">Kebijakan Privasi</a> SIPIL BAUBAU.
+                    </span>
+                  </label>
+
+                  <div className="flex gap-3">
+                    <Button variant="outline" icon={ArrowLeft} onClick={() => setStep(1)}>
+                      Kembali
+                    </Button>
+                    <Button fullWidth loading={loading} icon={ArrowRight} iconPosition="right" onClick={handleSubmit}>
+                      Daftar Sekarang
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              <p className="text-center text-sm text-muted-foreground pt-2">
+                Sudah punya akun?{' '}
+                <Link to="/login" className="font-bold text-primary hover:underline">
+                  Masuk di sini
+                </Link>
+              </p>
             </div>
-
-            <div className="pt-1">
-              <label className="flex items-center space-x-3 text-sm text-slate-600 dark:text-slate-300 font-semibold cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={agreeTerms}
-                  onChange={(e) => setAgreeTerms(e.target.checked)}
-                  className="w-4 h-4 text-[#004ac6] dark:text-sky-500 rounded"
-                />
-                <span>
-                  Saya menyetujui <a href="#terms" onClick={(e) => e.preventDefault()} className="text-[#004ac6] dark:text-sky-400 font-bold underline">Syarat & Ketentuan</a> serta <a href="#privacy" onClick={(e) => e.preventDefault()} className="text-[#004ac6] dark:text-sky-400 font-bold underline">Kebijakan Privasi</a> SIPIL BAUBAU.
-                </span>
-              </label>
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-4 bg-[#004ac6] hover:bg-[#2563eb] dark:bg-sky-600 dark:hover:bg-sky-500 text-white text-base font-extrabold rounded-full shadow-lg shadow-[#004ac6]/20 transition-all flex items-center justify-center space-x-2 active:scale-95"
-            >
-              <span>{loading ? 'Mendaftarkan Akun...' : 'Daftar Sekarang'}</span>
-              <ArrowRight className="w-5 h-5" />
-            </button>
-          </form>
-
-          <div className="text-center text-sm text-slate-600 dark:text-slate-400 pt-5 border-t border-[#e1e2ed] dark:border-slate-800">
-            Sudah punya akun?{' '}
-            <Link to="/login" className="font-bold text-[#004ac6] dark:text-sky-400 hover:underline">
-              Masuk di sini
-            </Link>
           </div>
-
         </div>
       </div>
-
     </div>
   );
 };

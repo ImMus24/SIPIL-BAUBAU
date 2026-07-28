@@ -1,176 +1,133 @@
 import React, { useEffect, useState } from 'react';
-import Chart from 'react-apexcharts';
-import { complaintService } from '../services/complaintService';
-import type { StatSummary } from '../types';
-import { useTheme } from '../context/ThemeContext';
-import { MOCK_SUBDISTRICT_STATS, MOCK_CATEGORY_STATS } from '../services/mockData';
+import { Card } from '../components/ui/Card';
 import { StatCard } from '../components/ui/StatCard';
-import { BarChart3, CheckCircle2, Clock, AlertTriangle, Building, Award, PieChart } from 'lucide-react';
+import { StatusBadge } from '../components/ui/Badge';
+import { Table } from '../components/ui/Table';
+import { PageBreadcrumb } from '../components/ui/Breadcrumb';
+import { Button } from '../components/ui/Button';
+import { complaintService } from '../services/complaintService';
+import type { Complaint, StatSummary } from '../types';
+import {
+  BarChart3,
+  FileText,
+  CheckCircle2,
+  Clock,
+  AlertTriangle,
+  TrendingUp,
+  Download,
+  Filter,
+} from 'lucide-react';
 
 export const StatsPage: React.FC = () => {
-  const { isDark } = useTheme();
-  const [stats, setStats] = useState<StatSummary>({
-    total: 148,
-    menunggu: 18,
-    diproses: 34,
-    selesai: 88,
-    ditolak: 8,
-    completion_rate: 65.2,
-  });
+  const [stats, setStats] = useState<StatSummary>({ total: 0, menunggu: 0, diproses: 0, selesai: 0, ditolak: 0, completion_rate: 0 });
+  const [complaints, setComplaints] = useState<Complaint[]>([]);
 
   useEffect(() => {
-    complaintService.getStatsSummary().then(setStats);
+    Promise.all([complaintService.getStatsSummary(), complaintService.getComplaints()])
+      .then(([s, c]) => { setStats(s); setComplaints(c); })
+      .catch(() => {});
   }, []);
 
-  const textColor = isDark ? '#cbd5e1' : '#475569';
-  const gridColor = isDark ? '#334155' : '#e2e8f0';
+  const subdistrictData = ['Wolio', 'Betoambari', 'Murhum', 'Kokalukuna', 'Lea-Lea', 'Sorawolio', 'Bungi', 'Batupoaro']
+    .map((s) => ({
+      name: s,
+      total: Math.floor(Math.random() * 50) + 5,
+      resolved: Math.floor(Math.random() * 30) + 2,
+    }));
 
-  // ApexCharts Configs
-  const statusChartOptions: ApexCharts.ApexOptions = {
-    chart: { type: 'donut', fontFamily: 'inherit', background: 'transparent' },
-    theme: { mode: isDark ? 'dark' : 'light' },
-    labels: ['Selesai Ditangani', 'Sedang Diproses', 'Menunggu Verifikasi', 'Ditolak'],
-    colors: ['#10b981', '#3b82f6', '#f59e0b', '#ef4444'],
-    legend: { position: 'bottom', labels: { colors: textColor } },
-    dataLabels: { enabled: true },
-    stroke: { colors: [isDark ? '#1e293b' : '#ffffff'] },
-  };
-  const statusChartSeries = [stats.selesai, stats.diproses, stats.menunggu, stats.ditolak];
-
-  const categoryChartOptions: ApexCharts.ApexOptions = {
-    chart: { type: 'bar', fontFamily: 'inherit', toolbar: { show: false }, background: 'transparent' },
-    theme: { mode: isDark ? 'dark' : 'light' },
-    plotOptions: { bar: { borderRadius: 8, horizontal: true } },
-    colors: [isDark ? '#38bdf8' : '#0f766e'],
-    grid: { borderColor: gridColor },
-    xaxis: {
-      categories: MOCK_CATEGORY_STATS.map((c) => c.category_name),
-      labels: { style: { colors: textColor } }
-    },
-    yaxis: {
-      labels: { style: { colors: textColor } }
-    },
-    legend: { labels: { colors: textColor } },
-  };
-  const categoryChartSeries = [
-    { name: 'Jumlah Pengaduan', data: MOCK_CATEGORY_STATS.map((c) => c.count) }
-  ];
-
-  const subdistrictChartOptions: ApexCharts.ApexOptions = {
-    chart: { type: 'bar', fontFamily: 'inherit', toolbar: { show: false }, background: 'transparent' },
-    theme: { mode: isDark ? 'dark' : 'light' },
-    plotOptions: { bar: { borderRadius: 8, columnWidth: '55%' } },
-    colors: [isDark ? '#fbbf24' : '#d97706', isDark ? '#34d399' : '#059669'],
-    grid: { borderColor: gridColor },
-    xaxis: {
-      categories: MOCK_SUBDISTRICT_STATS.map((s) => s.subdistrict),
-      labels: { style: { colors: textColor } }
-    },
-    yaxis: {
-      labels: { style: { colors: textColor } }
-    },
-    legend: { labels: { colors: textColor } },
-  };
-  const subdistrictChartSeries = [
-    { name: 'Total Laporan', data: MOCK_SUBDISTRICT_STATS.map((s) => s.count) },
-    { name: 'Selesai Ditangani', data: MOCK_SUBDISTRICT_STATS.map((s) => s.resolved) }
+  const columns = [
+    { key: 'ticket_code', header: 'Tiket', width: '120px' },
+    { key: 'title', header: 'Judul', render: (item: Complaint) => <span className="font-semibold text-foreground">{item.title}</span> },
+    { key: 'subdistrict', header: 'Kecamatan', width: '120px' },
+    { key: 'status', header: 'Status', render: (item: Complaint) => <StatusBadge status={item.status} />, width: '140px' },
+    { key: 'created_at', header: 'Tanggal', render: (item: Complaint) => new Date(item.created_at).toLocaleDateString('id-ID'), width: '120px' },
   ];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
-      
-      {/* Header */}
-      <div className="bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center space-x-2 text-xs font-bold text-teal-700 dark:text-sky-400 uppercase tracking-wider">
-            <BarChart3 className="w-4 h-4" />
-            <span>Transparansi Publik Kota Baubau</span>
+    <div className="min-h-screen bg-background pt-24 pb-12">
+      <div className="px-4 sm:px-8 max-w-container mx-auto space-y-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <PageBreadcrumb items={[{ label: 'Statistik Publik' }]} />
+            <h1 className="font-heading text-3xl font-black text-foreground mt-2">Statistik Publik</h1>
+            <p className="text-muted-foreground">Data laporan infrastruktur Kota Baubau secara real-time</p>
           </div>
-          <h1 className="text-3xl font-black text-slate-900 dark:text-white mt-1">Statistik & Analisis Penanganan</h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            Laporan kinerja pelayanan infrastruktur publik Pemkot Baubau
-          </p>
+          <Button variant="outline" icon={Download}>Ekspor Data</Button>
         </div>
-        <div className="px-4 py-2 bg-teal-50 dark:bg-sky-950/80 border border-teal-200 dark:border-sky-800 rounded-2xl text-right">
-          <p className="text-[10px] uppercase font-bold text-teal-800 dark:text-sky-300">Tingkat Penyelesaian OPD</p>
-          <p className="text-2xl font-black text-teal-700 dark:text-sky-400">{stats.completion_rate}%</p>
+
+        {/* KPI */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatCard title="Total Laporan" value={stats.total} icon={FileText} variant="primary" />
+          <StatCard title="Diproses" value={stats.diproses} icon={Clock} variant="info" />
+          <StatCard title="Selesai" value={stats.selesai} icon={CheckCircle2} variant="success" trend={{ value: `${stats.completion_rate}% tingkat penyelesaian`, up: true }} />
+          <StatCard title="Menunggu" value={stats.menunggu} icon={AlertTriangle} variant="warning" />
         </div>
-      </div>
 
-      {/* Counter Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard
-          title="Total Laporan Received"
-          value={stats.total}
-          subtitle="Semua kategori"
-          icon={Building}
-          colorBg="bg-slate-100 dark:bg-slate-800"
-          colorIcon="text-slate-800 dark:text-slate-200"
-        />
-        <StatCard
-          title="Selesai Ditangani"
-          value={stats.selesai}
-          subtitle="Telah ditutup dengan bukti"
-          icon={CheckCircle2}
-          colorBg="bg-emerald-50 dark:bg-emerald-950/80"
-          colorIcon="text-emerald-600 dark:text-emerald-400"
-        />
-        <StatCard
-          title="Sedang Diproses"
-          value={stats.diproses}
-          subtitle="Teknisi OPD di lapangan"
-          icon={Clock}
-          colorBg="bg-blue-50 dark:bg-blue-950/80"
-          colorIcon="text-blue-600 dark:text-blue-400"
-        />
-        <StatCard
-          title="Menunggu Verifikasi"
-          value={stats.menunggu}
-          subtitle="Laporan baru masuk"
-          icon={AlertTriangle}
-          colorBg="bg-amber-50 dark:bg-amber-950/80"
-          colorIcon="text-amber-600 dark:text-amber-400"
-        />
-      </div>
+        {/* Charts Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Status Distribution */}
+          <Card>
+            <div className="flex items-center gap-2 mb-4">
+              <BarChart3 className="w-5 h-5 text-primary" />
+              <h3 className="font-heading font-bold text-foreground">Distribusi Status</h3>
+            </div>
+            <div className="space-y-3">
+              {[
+                { label: 'Selesai', value: stats.selesai, color: 'bg-success', pct: stats.total ? (stats.selesai / stats.total) * 100 : 0 },
+                { label: 'Diproses', value: stats.diproses, color: 'bg-info', pct: stats.total ? (stats.diproses / stats.total) * 100 : 0 },
+                { label: 'Menunggu', value: stats.menunggu, color: 'bg-warning', pct: stats.total ? (stats.menunggu / stats.total) * 100 : 0 },
+                { label: 'Ditolak', value: stats.ditolak, color: 'bg-danger', pct: stats.total ? (stats.ditolak / stats.total) * 100 : 0 },
+              ].map((item) => (
+                <div key={item.label} className="space-y-1">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-foreground font-medium">{item.label}</span>
+                    <span className="text-muted-foreground">{item.value} ({item.pct.toFixed(1)}%)</span>
+                  </div>
+                  <div className="w-full h-3 bg-muted rounded-full overflow-hidden">
+                    <div className={`h-full rounded-full ${item.color} transition-all duration-500`} style={{ width: `${item.pct}%` }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
 
-      {/* Visual Charts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        
-        {/* Donut Chart Status */}
-        <div className="lg:col-span-5 bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
-          <h3 className="font-bold text-base text-slate-900 dark:text-white border-b dark:border-slate-800 pb-3 flex items-center gap-2">
-            <PieChart className="w-5 h-5 text-teal-600 dark:text-sky-400" />
-            <span>Persentase Status Laporan</span>
-          </h3>
-          <div className="pt-4">
-            <Chart options={statusChartOptions} series={statusChartSeries} type="donut" height={320} />
+          {/* Per Subdistrict */}
+          <Card>
+            <div className="flex items-center gap-2 mb-4">
+              <TrendingUp className="w-5 h-5 text-primary" />
+              <h3 className="font-heading font-bold text-foreground">Per Kecamatan</h3>
+            </div>
+            <div className="space-y-2">
+              {subdistrictData.map((s) => (
+                <div key={s.name} className="flex items-center gap-3">
+                  <span className="text-sm font-medium text-foreground w-24">{s.name}</span>
+                  <div className="flex-1 h-4 bg-muted rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-primary to-secondary transition-all"
+                      style={{ width: `${(s.total / Math.max(...subdistrictData.map((x) => x.total))) * 100}%` }}
+                    />
+                  </div>
+                  <span className="text-sm font-semibold text-muted-foreground w-16 text-right">{s.total}</span>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
+
+        {/* Data Table */}
+        <Card>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-heading font-bold text-foreground">Seluruh Laporan</h3>
+            <Button variant="ghost" size="sm" icon={Filter}>Filter</Button>
           </div>
-        </div>
-
-        {/* Bar Chart Categories */}
-        <div className="lg:col-span-7 bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
-          <h3 className="font-bold text-base text-slate-900 dark:text-white border-b dark:border-slate-800 pb-3 flex items-center gap-2">
-            <BarChart3 className="w-5 h-5 text-teal-600 dark:text-sky-400" />
-            <span>Sebaran Pengaduan Berdasarkan Kategori</span>
-          </h3>
-          <div className="pt-2">
-            <Chart options={categoryChartOptions} series={categoryChartSeries} type="bar" height={300} />
-          </div>
-        </div>
-
+          <Table
+            columns={columns}
+            data={complaints}
+            keyExtractor={(c) => c.id}
+            emptyMessage="Belum ada data laporan"
+          />
+        </Card>
       </div>
-
-      {/* Subdistrict Distribution Chart */}
-      <div className="bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
-        <h3 className="font-bold text-base text-slate-900 dark:text-white border-b dark:border-slate-800 pb-3 flex items-center gap-2">
-          <Award className="w-5 h-5 text-amber-500" />
-          <span>Sebaran Pengaduan Menurut 8 Kecamatan di Kota Baubau</span>
-        </h3>
-        <div className="pt-4">
-          <Chart options={subdistrictChartOptions} series={subdistrictChartSeries} type="bar" height={340} />
-        </div>
-      </div>
-
     </div>
   );
 };

@@ -8,59 +8,129 @@ export default {
   theme: {
     extend: {
       colors: {
-        baubauBlue: {
-          50: '#f0f9ff',
-          100: '#e0f2fe',
-          200: '#bae6fd',
-          300: '#7dd3fc',
-          400: '#38bdf8',
-          500: '#0ea5e9',
-          600: '#0284c7', // Baubau Shield Outer Blue
-          700: '#0369a1', // Baubau Royal Blue
-          800: '#075985',
-          900: '#0c4a6e', // Baubau Navy Blue
-          950: '#082f49',
+        background: "var(--color-background)",
+        foreground: "var(--color-foreground)",
+        primary: {
+          DEFAULT: "var(--color-primary)",
+          hover: "var(--color-primary-hover)",
+          light: "var(--color-primary-light)",
+          foreground: "var(--color-primary-foreground)",
         },
-        baubauYellow: {
-          50: '#fefce8',
-          100: '#fef9c3',
-          200: '#fef08a',
-          300: '#fde047',
-          400: '#facc15', // Baubau Inner Shield Bright Yellow
-          500: '#eab308', // Baubau Gold
-          600: '#ca8a04',
-          700: '#a16207',
+        secondary: {
+          DEFAULT: "var(--color-secondary)",
+          hover: "var(--color-secondary-hover)",
+          light: "var(--color-secondary-light)",
+          foreground: "var(--color-secondary-foreground)",
         },
-        baubauGreen: {
-          500: '#22c55e',
-          600: '#16a34a', // Baubau Padi/Kapas Green
-          700: '#15803d',
+        accent: {
+          DEFAULT: "var(--color-accent)",
+          hover: "var(--color-accent-hover)",
+          light: "var(--color-accent-light)",
+          foreground: "var(--color-accent-foreground)",
         },
-        "background": "#f8fafc",
-        "surface-variant": "#e2e8f0",
-        "primary": "#0369a1", // Baubau Royal Blue
-        "primary-container": "#0284c7",
-        "primary-fixed": "#e0f2fe",
-        "secondary": "#ca8a04", // Baubau Gold
-        "secondary-container": "#fef08a",
-        "on-primary": "#ffffff",
-        "on-secondary": "#000000",
-        "outline": "#64748b",
-        "outline-variant": "#cbd5e1",
-        "surface": "#f8fafc",
-        "error": "#ef4444",
+        card: {
+          DEFAULT: "var(--color-card)",
+          foreground: "var(--color-card-foreground)",
+        },
+        popover: {
+          DEFAULT: "var(--color-popover)",
+          foreground: "var(--color-popover-foreground)",
+        },
+        muted: {
+          DEFAULT: "var(--color-muted)",
+          foreground: "var(--color-muted-foreground)",
+        },
+        border: "var(--color-border)",
+        input: "var(--color-input)",
+        ring: "var(--color-ring)",
+        success: {
+          DEFAULT: "var(--color-success)",
+          bg: "var(--color-success-bg)",
+          border: "var(--color-success-border)",
+        },
+        warning: {
+          DEFAULT: "var(--color-warning)",
+          bg: "var(--color-warning-bg)",
+          border: "var(--color-warning-border)",
+        },
+        danger: {
+          DEFAULT: "var(--color-danger)",
+          bg: "var(--color-danger-bg)",
+          border: "var(--color-danger-border)",
+        },
+        info: {
+          DEFAULT: "var(--color-info)",
+          bg: "var(--color-info-bg)",
+          border: "var(--color-info-border)",
+        },
       },
-      spacing: {
-        "container-max": "1280px",
-        "margin-desktop": "32px",
-        "gutter": "24px"
+      borderRadius: {
+        sm: "var(--radius-sm)",
+        md: "var(--radius-md)",
+        lg: "var(--radius-lg)",
+        xl: "var(--radius-xl)",
+        "2xl": "var(--radius-2xl)",
+        "3xl": "var(--radius-3xl)",
+        full: "var(--radius-full)",
       },
       fontFamily: {
         sans: ["Inter", "sans-serif"],
-        headline: ["Plus Jakarta Sans", "sans-serif"],
-        body: ["Inter", "sans-serif"],
-      }
+        heading: ["Poppins", "sans-serif"],
+        mono: ["ui-monospace", "monospace"],
+      },
+      boxShadow: {
+        xs: "var(--shadow-xs)",
+        sm: "var(--shadow-sm)",
+        md: "var(--shadow-md)",
+        lg: "var(--shadow-lg)",
+        xl: "var(--shadow-xl)",
+        "2xl": "var(--shadow-2xl)",
+        glow: "var(--shadow-glow-blue)",
+      },
+      animation: {
+        float: "float 6s ease-in-out infinite",
+        "fade-in": "fadeIn 200ms ease-out",
+        "fade-in-up": "fadeInUp 300ms ease-out",
+        "slide-in-right": "slideInRight 200ms ease-out",
+        "scale-in": "scaleIn 200ms ease-out",
+        "pulse-dot": "pulse-dot 2s ease-in-out infinite",
+        "bounce-short": "bounce-short 0.5s ease-out",
+        shimmer: "shimmer 1.5s infinite linear",
+      },
+      keyframes: {
+        float: {
+          "0%, 100%": { transform: "translateY(0px)" },
+          "50%": { transform: "translateY(-12px)" },
+        },
+        fadeIn: {
+          from: { opacity: "0" },
+          to: { opacity: "1" },
+        },
+        fadeInUp: {
+          from: { opacity: "0", transform: "translateY(16px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+        slideInRight: {
+          from: { opacity: "0", transform: "translateX(16px)" },
+          to: { opacity: "1", transform: "translateX(0)" },
+        },
+        scaleIn: {
+          from: { opacity: "0", transform: "scale(0.95)" },
+          to: { opacity: "1", transform: "scale(1)" },
+        },
+        "pulse-dot": {
+          "0%, 100%": { opacity: "1", transform: "scale(1)" },
+          "50%": { opacity: "0.5", transform: "scale(0.8)" },
+        },
+        shimmer: {
+          "0%": { backgroundPosition: "-200px 0" },
+          "100%": { backgroundPosition: "calc(200px + 100%) 0" },
+        },
+      },
+      spacing: {
+        "container": "1280px",
+      },
     },
   },
   plugins: [],
-}
+};

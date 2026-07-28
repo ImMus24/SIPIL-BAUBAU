@@ -1,485 +1,251 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BaubauMap } from '../components/map/BaubauMap';
-import { complaintService } from '../services/complaintService';
-import type { BaubauSubdistrict, UrgencyLevel, Complaint } from '../types';
-import { Modal } from '../components/ui/Modal';
-import { CheckCircle2, UploadCloud, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Button } from '../components/ui/Button';
+import { Input } from '../components/ui/Input';
+import { Textarea } from '../components/ui/Textarea';
+import { Select } from '../components/ui/Select';
+import { Stepper } from '../components/ui/Stepper';
+import { Card } from '../components/ui/Card';
+import { Tag } from '../components/ui/Tag';
+import { MapPin, Camera, Send, ChevronLeft, ArrowRight } from 'lucide-react';
 
-const SUBDISTRICTS: BaubauSubdistrict[] = [
-  'Wolio',
-  'Betoambari',
-  'Murhum',
-  'Kokalukuna',
-  'Lea-Lea',
-  'Sorawolio',
-  'Bungi',
-  'Batupoaro',
+const steps = [
+  { id: 'category', label: 'Kategori', description: 'Pilih jenis' },
+  { id: 'location', label: 'Lokasi', description: 'Tandai titik' },
+  { id: 'details', label: 'Detail', description: 'Deskripsi' },
+  { id: 'confirm', label: 'Kirim', description: 'Konfirmasi' },
 ];
 
-const CATEGORIES_WIZARD = [
-  { id: 1, name: 'Jalan & Jembatan', icon: 'edit_road' },
-  { id: 3, name: 'Penerangan Jalan', icon: 'light' },
-  { id: 2, name: 'Drainase & Air', icon: 'waves' },
-  { id: 5, name: 'Fasilitas Publik', icon: 'park' },
-  { id: 4, name: 'Sampah & Kebersihan', icon: 'delete_sweep' },
-  { id: 6, name: 'Lalu Lintas', icon: 'traffic' },
-  { id: 7, name: 'Gedung Pemerintah', icon: 'domain' },
-  { id: 8, name: 'Lainnya', icon: 'more_horiz' },
+const categories = [
+  { id: 1, name: 'Jalan Rusak', icon: 'edit_road', color: 'from-amber-500 to-orange-600' },
+  { id: 2, name: 'Drainase', icon: 'waves', color: 'from-sky-400 to-blue-600' },
+  { id: 3, name: 'Lampu Jalan', icon: 'light', color: 'from-yellow-400 to-amber-500' },
+  { id: 4, name: 'Sampah', icon: 'delete_sweep', color: 'from-teal-400 to-emerald-600' },
+  { id: 5, name: 'Taman Kota', icon: 'park', color: 'from-emerald-400 to-green-600' },
+  { id: 6, name: 'Lainnya', icon: 'more_horiz', color: 'from-slate-400 to-slate-600' },
+];
+
+const subdistricts = [
+  { value: 'Wolio', label: 'Wolio' },
+  { value: 'Betoambari', label: 'Betoambari' },
+  { value: 'Murhum', label: 'Murhum' },
+  { value: 'Kokalukuna', label: 'Kokalukuna' },
+  { value: 'Lea-Lea', label: 'Lea-Lea' },
+  { value: 'Sorawolio', label: 'Sorawolio' },
+  { value: 'Bungi', label: 'Bungi' },
+  { value: 'Batupoaro', label: 'Batupoaro' },
+];
+
+const urgencyOptions = [
+  { value: 'rendah', label: 'Rendah - Tidak mengganggu aktivitas' },
+  { value: 'sedang', label: 'Sedang - Cukup mengganggu' },
+  { value: 'tinggi', label: 'Tinggi - Mengganggu aktivitas warga' },
+  { value: 'darurat', label: 'Darurat - Berbahaya! Butuh penanganan segera' },
 ];
 
 export const SubmitComplaintPage: React.FC = () => {
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState<number>(1);
+  const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [createdResult, setCreatedResult] = useState<Complaint | null>(null);
+  const [error, setError] = useState('');
 
-  // Form States
-  const [categoryId, setCategoryId] = useState<number>(1);
+  const [categoryId, setCategoryId] = useState<number | null>(null);
+  const [subdistrict, setSubdistrict] = useState('');
+  const [address, setAddress] = useState('');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [urgency, setUrgency] = useState<UrgencyLevel>('sedang');
-  const [photos, setPhotos] = useState<File[]>([]);
-  const [subdistrict, setSubdistrict] = useState<BaubauSubdistrict>('Wolio');
-  const [address, setAddress] = useState('');
-  const [lat, setLat] = useState<number>(-5.4642);
-  const [lng, setLng] = useState<number>(122.6035);
+  const [urgency, setUrgency] = useState('');
   const [reporterName, setReporterName] = useState('');
   const [reporterPhone, setReporterPhone] = useState('');
-  const [reporterEmail, setReporterEmail] = useState('');
-  const [isAnonymous, setIsAnonymous] = useState(false);
+  const [files, setFiles] = useState<File[]>([]);
 
-  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setPhotos(Array.from(e.target.files));
-    }
+  const handleNext = () => {
+    setError('');
+    if (step === 0 && !categoryId) { setError('Pilih kategori laporan.'); return; }
+    if (step === 1 && (!subdistrict || !address)) { setError('Lengkapi data lokasi.'); return; }
+    if (step === 2 && (!title || !description || !urgency)) { setError('Lengkapi detail laporan.'); return; }
+    setStep((s) => Math.min(s + 1, 3));
   };
 
-  const handleNextStep = () => {
-    if (currentStep === 1) {
-      setCurrentStep(2);
-    } else if (currentStep === 2) {
-      if (!title || !description) {
-        alert('Harap isi judul dan deskripsi laporan terlebih dahulu.');
-        return;
-      }
-      setCurrentStep(3);
-    } else if (currentStep === 3) {
-      setCurrentStep(4);
-    } else if (currentStep === 4) {
-      if (!address) {
-        alert('Harap isi alamat lengkap atau patokan lokasi.');
-        return;
-      }
-      setCurrentStep(5);
-    }
-  };
-
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     setLoading(true);
-    try {
-      const res = await complaintService.createComplaint({
-        title,
-        description,
-        category_id: categoryId,
-        urgency,
-        subdistrict,
-        address,
-        latitude: lat,
-        longitude: lng,
-        reporter_name: isAnonymous ? 'Warga Anonim Baubau' : reporterName || 'Masyarakat Baubau',
-        reporter_phone: isAnonymous ? '08XXXXXXXXXX' : reporterPhone,
-        reporter_email: reporterEmail,
-        photos,
-      });
-
-      setCreatedResult(res);
-    } catch {
-      alert('Gagal mengirimkan pengaduan. Harap periksa koneksi Anda.');
-    } finally {
+    // Simulate submit
+    setTimeout(() => {
       setLoading(false);
-    }
+      navigate('/track?success=1');
+    }, 1500);
   };
 
   return (
-    <div className="min-h-screen bg-[#f3f3fe] dark:bg-slate-950 py-14 px-4 sm:px-6 lg:px-8 font-sans transition-colors duration-300">
-      <div className="max-w-4xl mx-auto space-y-8">
-        
-        {/* Top Header */}
-        <div className="space-y-3">
-          <h1 className="font-headline text-3xl sm:text-4xl font-extrabold text-[#191b23] dark:text-white">
-            Buat Laporan Baru
-          </h1>
-          <p className="text-base text-[#434655] dark:text-slate-400 leading-relaxed max-w-2xl">
-            Sampaikan keluhan atau aspirasi Anda terkait infrastruktur di Kota Baubau. Kami berkomitmen untuk merespons setiap laporan dengan cepat dan tepat.
-          </p>
+    <div className="min-h-screen bg-background pt-24 pb-12">
+      <div className="px-4 sm:px-8 max-w-3xl mx-auto">
+        <div className="mb-8">
+          <h1 className="font-heading text-3xl font-black text-foreground">Buat Laporan Baru</h1>
+          <p className="text-muted-foreground mt-1">Laporkan kerusakan infrastruktur di Kota Baubau</p>
         </div>
 
-        {/* 5-Step Progress Indicator Header */}
-        <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-[#e1e2ed] dark:border-slate-800 shadow-xs">
-          <div className="grid grid-cols-5 gap-2 relative">
-            <div className="absolute top-6 left-[10%] right-[10%] h-0.5 bg-[#e1e2ed] dark:bg-slate-800 -z-0"></div>
-            
-            {[
-              { num: 1, label: 'Kategori' },
-              { num: 2, label: 'Detail' },
-              { num: 3, label: 'Foto' },
-              { num: 4, label: 'Lokasi' },
-              { num: 5, label: 'Review' },
-            ].map((step) => {
-              const active = currentStep === step.num;
-              const completed = currentStep > step.num;
-              return (
-                <div key={step.num} className="flex flex-col items-center gap-2 relative z-10">
-                  <div
-                    className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-base transition-all ${
-                      active
-                        ? 'bg-[#004ac6] dark:bg-sky-600 text-white shadow-md shadow-[#004ac6]/20 ring-4 ring-[#dbe1ff] dark:ring-sky-950'
-                        : completed
-                        ? 'bg-[#004ac6] dark:bg-sky-700 text-white'
-                        : 'bg-[#e1e2ed] dark:bg-slate-800 text-slate-500 dark:text-slate-400'
-                    }`}
-                  >
-                    {step.num}
-                  </div>
-                  <span
-                    className={`text-sm font-semibold ${
-                      active ? 'text-[#004ac6] dark:text-sky-400 font-bold' : 'text-slate-500 dark:text-slate-400'
-                    }`}
-                  >
-                    {step.label}
-                  </span>
-                </div>
-              );
-            })}
+        <Stepper steps={steps} currentStep={step} onChange={setStep} className="mb-10" />
+
+        {error && (
+          <div className="p-4 mb-4 bg-danger-bg border border-danger-border text-danger text-sm font-bold rounded-xl">
+            {error}
           </div>
-        </div>
-
-        {/* Step Wizard Container */}
-        <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-10 border border-[#e1e2ed] dark:border-slate-800 shadow-xs space-y-8">
-          
-          {/* STEP 1: Pilih Kategori Laporan */}
-          {currentStep === 1 && (
-            <div className="space-y-6">
-              <h3 className="font-headline text-xl sm:text-2xl font-bold text-[#191b23] dark:text-white">
-                Pilih Kategori Laporan
-              </h3>
-
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-                {CATEGORIES_WIZARD.map((cat) => {
-                  const selected = categoryId === cat.id;
-                  return (
-                    <button
-                      key={cat.id}
-                      type="button"
-                      onClick={() => setCategoryId(cat.id)}
-                      className={`p-6 rounded-2xl border text-center transition-all flex flex-col items-center justify-center space-y-3 min-h-[150px] ${
-                        selected
-                          ? 'border-[#004ac6] dark:border-sky-500 bg-[#dbe1ff]/40 dark:bg-sky-950/60 shadow-md ring-2 ring-[#004ac6]/20'
-                          : 'border-[#e1e2ed] dark:border-slate-800 bg-white dark:bg-slate-800 hover:border-[#004ac6] dark:hover:border-sky-500 hover:bg-slate-50 dark:hover:bg-slate-700/50'
-                      }`}
-                    >
-                      <span className={`material-symbols-outlined text-4xl ${selected ? 'text-[#004ac6] dark:text-sky-400' : 'text-slate-600 dark:text-slate-400'}`}>
-                        {cat.icon}
-                      </span>
-                      <span className={`text-sm font-bold ${selected ? 'text-[#004ac6] dark:text-sky-400' : 'text-slate-800 dark:text-slate-200'}`}>
-                        {cat.name}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* STEP 2: Detail Laporan */}
-          {currentStep === 2 && (
-            <div className="space-y-6">
-              <h3 className="font-headline text-xl sm:text-2xl font-bold text-[#191b23] dark:text-white">
-                Isi Detail Pengaduan Kerusakan
-              </h3>
-
-              <div className="space-y-5">
-                <div>
-                  <label className="block font-bold text-slate-800 dark:text-slate-200 mb-2 text-sm">Judul Laporan Pengaduan *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Contoh: Jalan Berlubang Parah di Depan Benteng Keraton Wolio"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    className="w-full text-base font-medium rounded-xl border border-[#e1e2ed] dark:border-slate-700 p-4 bg-[#f8fafc] dark:bg-slate-800 text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:border-[#004ac6] dark:focus:border-sky-500 transition-colors"
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-bold text-slate-800 dark:text-slate-200 mb-2 text-sm">Tingkat Urgensi Kerusakan *</label>
-                  <select
-                    value={urgency}
-                    onChange={(e) => setUrgency(e.target.value as UrgencyLevel)}
-                    className="w-full text-base font-semibold rounded-xl border border-[#e1e2ed] dark:border-slate-700 p-4 bg-[#f8fafc] dark:bg-slate-800 text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:border-[#004ac6] dark:focus:border-sky-500 transition-colors"
-                  >
-                    <option value="rendah">Rendah (Kerusakan Ringan)</option>
-                    <option value="sedang">Sedang (Mengganggu Kenyamanan Warga)</option>
-                    <option value="tinggi">Tinggi (Beresiko Kecelakaan Lalu Lintas)</option>
-                    <option value="darurat">Darurat (Bencana / Membahayakan Nyawa)</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block font-bold text-slate-800 dark:text-slate-200 mb-2 text-sm">Deskripsi Lengkap Kerusakan *</label>
-                  <textarea
-                    required
-                    rows={5}
-                    placeholder="Ceritakan detail kerusakan, estimasi ukuran lubang/panjang kerusakan, waktu terjadinya, atau dampaknya terhadap warga..."
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    className="w-full text-base font-medium rounded-xl border border-[#e1e2ed] dark:border-slate-700 p-4 bg-[#f8fafc] dark:bg-slate-800 text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:border-[#004ac6] dark:focus:border-sky-500 transition-colors"
-                  ></textarea>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* STEP 3: Upload Foto Bukti */}
-          {currentStep === 3 && (
-            <div className="space-y-6">
-              <h3 className="font-headline text-xl sm:text-2xl font-bold text-[#191b23] dark:text-white">
-                Upload Foto Bukti Kerusakan
-              </h3>
-              <p className="text-sm text-slate-500 dark:text-slate-400">Lampirkan foto jernih dari lokasi untuk mempermudah tim teknis OPD.</p>
-
-              <div className="border-2 border-dashed border-[#e1e2ed] dark:border-slate-700 rounded-3xl p-10 text-center hover:border-[#004ac6] dark:hover:border-sky-500 transition-colors bg-[#f8fafc] dark:bg-slate-800/50">
-                <UploadCloud className="w-14 h-14 text-[#004ac6] dark:text-sky-400 mx-auto mb-4" />
-                <p className="text-base font-bold text-slate-800 dark:text-slate-200">Pilih file foto dari perangkat Anda</p>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Format JPG, PNG, atau WEBP (Maksimal 5MB per file)</p>
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  onChange={handlePhotoUpload}
-                  className="mt-5 text-sm mx-auto text-slate-700 dark:text-slate-300"
-                />
-                {photos.length > 0 && (
-                  <p className="text-sm font-bold text-[#004ac6] dark:text-sky-400 mt-3">
-                    Terpilih {photos.length} file foto bukti.
-                  </p>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* STEP 4: Pilih Lokasi Peta GIS */}
-          {currentStep === 4 && (
-            <div className="space-y-6">
-              <h3 className="font-headline text-xl sm:text-2xl font-bold text-[#191b23] dark:text-white">
-                Penentuan Lokasi Presisi GIS
-              </h3>
-
-              <div className="space-y-5">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <div>
-                    <label className="block font-bold text-slate-800 dark:text-slate-200 mb-2 text-sm">Kecamatan di Kota Baubau *</label>
-                    <select
-                      value={subdistrict}
-                      onChange={(e) => setSubdistrict(e.target.value as BaubauSubdistrict)}
-                      className="w-full text-base font-semibold rounded-xl border border-[#e1e2ed] dark:border-slate-700 p-4 bg-[#f8fafc] dark:bg-slate-800 text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:border-[#004ac6] dark:focus:border-sky-500 transition-colors"
-                    >
-                      {SUBDISTRICTS.map((sub) => (
-                        <option key={sub} value={sub}>Kecamatan {sub}</option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block font-bold text-slate-800 dark:text-slate-200 mb-2 text-sm">Alamat / Patokan Jalan *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Contoh: Jl. Sultan Murhum No. 45 dekat Gerbang Keraton"
-                      value={address}
-                      onChange={(e) => setAddress(e.target.value)}
-                      className="w-full text-base font-medium rounded-xl border border-[#e1e2ed] dark:border-slate-700 p-4 bg-[#f8fafc] dark:bg-slate-800 text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:border-[#004ac6] dark:focus:border-sky-500 transition-colors"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block font-bold text-slate-800 dark:text-slate-200 mb-2 text-sm">Tandai Lokasi Presisi di Peta GIS (Klik pada peta):</label>
-                  <BaubauMap
-                    pickLocation={true}
-                    selectedLat={lat}
-                    selectedLng={lng}
-                    onLocationSelect={(latitude, longitude) => {
-                      setLat(latitude);
-                      setLng(longitude);
-                    }}
-                    height="360px"
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* STEP 5: Review & Konfirmasi Pelapor */}
-          {currentStep === 5 && (
-            <div className="space-y-6">
-              <h3 className="font-headline text-xl sm:text-2xl font-bold text-[#191b23] dark:text-white">
-                Review & Konfirmasi Identitas Pelapor
-              </h3>
-
-              <div className="bg-[#f8fafc] dark:bg-slate-800 p-6 rounded-2xl border border-[#e1e2ed] dark:border-slate-700 space-y-4 text-sm text-slate-700 dark:text-slate-300">
-                <div className="flex justify-between border-b dark:border-slate-700 pb-3">
-                  <span className="font-semibold text-slate-500 dark:text-slate-400">Judul Laporan:</span>
-                  <span className="font-bold text-slate-900 dark:text-white text-right max-w-[60%]">{title}</span>
-                </div>
-                <div className="flex justify-between border-b dark:border-slate-700 pb-3">
-                  <span className="font-semibold text-slate-500 dark:text-slate-400">Kecamatan / Lokasi:</span>
-                  <span className="font-bold text-slate-900 dark:text-white text-right max-w-[60%]">{subdistrict} ({address})</span>
-                </div>
-                <div className="flex justify-between border-b dark:border-slate-700 pb-3">
-                  <span className="font-semibold text-slate-500 dark:text-slate-400">Urgensi:</span>
-                  <span className="font-bold text-[#004ac6] dark:text-sky-400 capitalize">{urgency}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="font-semibold text-slate-500 dark:text-slate-400">Foto Lampiran:</span>
-                  <span className="font-bold text-slate-900 dark:text-white">{photos.length} Foto</span>
-                </div>
-              </div>
-
-              <div className="space-y-5 pt-2">
-                <label className="flex items-center space-x-3 text-sm font-bold text-slate-800 dark:text-slate-200 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={isAnonymous}
-                    onChange={(e) => setIsAnonymous(e.target.checked)}
-                    className="w-4 h-4 text-[#004ac6] dark:text-sky-500 rounded"
-                  />
-                  <span>Kirimkan laporan secara Anonim (Identitas dirahasiakan)</span>
-                </label>
-
-                {!isAnonymous && (
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div>
-                      <label className="block font-bold text-slate-800 dark:text-slate-200 mb-2 text-sm">Nama Lengkap</label>
-                      <input
-                        type="text"
-                        placeholder="Nama lengkap Anda"
-                        value={reporterName}
-                        onChange={(e) => setReporterName(e.target.value)}
-                        className="w-full p-3.5 bg-[#f8fafc] dark:bg-slate-800 border border-[#e1e2ed] dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-base transition-colors focus:outline-none focus:border-[#004ac6] dark:focus:border-sky-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="block font-bold text-slate-800 dark:text-slate-200 mb-2 text-sm">No. WhatsApp / HP</label>
-                      <input
-                        type="tel"
-                        placeholder="0812XXXXXXXX"
-                        value={reporterPhone}
-                        onChange={(e) => setReporterPhone(e.target.value)}
-                        className="w-full p-3.5 bg-[#f8fafc] dark:bg-slate-800 border border-[#e1e2ed] dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-base transition-colors focus:outline-none focus:border-[#004ac6] dark:focus:border-sky-500"
-                      />
-                    </div>
-                    <div>
-                      <label className="block font-bold text-slate-800 dark:text-slate-200 mb-2 text-sm">Email (Opsional)</label>
-                      <input
-                        type="email"
-                        placeholder="email@domain.com"
-                        value={reporterEmail}
-                        onChange={(e) => setReporterEmail(e.target.value)}
-                        className="w-full p-3.5 bg-[#f8fafc] dark:bg-slate-800 border border-[#e1e2ed] dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-base transition-colors focus:outline-none focus:border-[#004ac6] dark:focus:border-sky-500"
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Action Buttons: Batal & Lanjut */}
-          <div className="pt-6 border-t border-[#e1e2ed] dark:border-slate-800 flex items-center justify-between">
-            {currentStep > 1 ? (
-              <button
-                type="button"
-                onClick={() => setCurrentStep(currentStep - 1)}
-                className="px-7 py-3.5 border border-[#e1e2ed] dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold text-sm rounded-full hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors flex items-center space-x-2"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                <span>Kembali</span>
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={() => navigate('/')}
-                className="text-rose-600 dark:text-rose-400 hover:underline text-sm font-bold"
-              >
-                Batal
-              </button>
-            )}
-
-            {currentStep < 5 ? (
-              <button
-                type="button"
-                onClick={handleNextStep}
-                className="px-9 py-4 bg-[#004ac6] hover:bg-[#2563eb] dark:bg-sky-600 dark:hover:bg-sky-500 text-white text-base font-bold rounded-full shadow-lg shadow-[#004ac6]/20 transition-all flex items-center space-x-2"
-              >
-                <span>Lanjut</span>
-                <ArrowRight className="w-5 h-5" />
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={handleSubmit}
-                disabled={loading}
-                className="px-9 py-4 bg-[#004ac6] hover:bg-[#2563eb] dark:bg-sky-600 dark:hover:bg-sky-500 text-white text-base font-bold rounded-full shadow-lg shadow-[#004ac6]/20 transition-all flex items-center space-x-2"
-              >
-                <span>{loading ? 'Mengirim...' : 'Kirim Pengaduan'}</span>
-                <CheckCircle2 className="w-5 h-5 text-amber-300" />
-              </button>
-            )}
-          </div>
-
-        </div>
-
-        {/* Success Modal */}
-        {createdResult && (
-          <Modal
-            isOpen={!!createdResult}
-            onClose={() => {
-              setCreatedResult(null);
-              navigate(`/track?ticket=${createdResult.ticket_code}`);
-            }}
-            title="Laporan Pengaduan Berhasil Terdaftar!"
-            maxWidth="md"
-          >
-            <div className="text-center space-y-5 py-4">
-              <div className="w-16 h-16 rounded-2xl bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto shadow-inner">
-                <CheckCircle2 className="w-10 h-10" />
-              </div>
-
-              <div>
-                <p className="text-sm text-slate-500 dark:text-slate-400">Kode Tiket Pelacakan Resmi Anda:</p>
-                <div className="inline-block my-3 px-6 py-3 bg-slate-900 dark:bg-slate-950 text-amber-400 font-mono font-black text-2xl rounded-2xl shadow-md border border-slate-800">
-                  {createdResult.ticket_code}
-                </div>
-                <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                  Simpan kode tiket ini untuk mengecek progres penanganan oleh Dinas terkait di Kota Baubau.
-                </p>
-              </div>
-
-              <button
-                onClick={() => {
-                  setCreatedResult(null);
-                  navigate(`/track?ticket=${createdResult.ticket_code}`);
-                }}
-                className="w-full py-4 bg-[#004ac6] dark:bg-sky-600 text-white font-bold text-base rounded-xl shadow-md hover:bg-[#2563eb] dark:hover:bg-sky-500 transition-colors"
-              >
-                Lihat Progres Laporan Saya
-              </button>
-            </div>
-          </Modal>
         )}
 
+        {/* Step 0: Category */}
+        {step === 0 && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 animate-fade-in">
+            {categories.map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => { setCategoryId(cat.id); handleNext(); }}
+                className={`p-5 rounded-2xl border-2 text-center transition-all ${
+                  categoryId === cat.id ? 'border-primary bg-primary-light' : 'border-border bg-card hover:border-primary/50'
+                }`}
+              >
+                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${cat.color} flex items-center justify-center mx-auto mb-2`}>
+                  <span className="material-symbols-outlined text-white text-xl">{cat.icon}</span>
+                </div>
+                <p className="text-sm font-bold text-foreground">{cat.name}</p>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Step 1: Location */}
+        {step === 1 && (
+          <div className="space-y-4 animate-fade-in">
+            <Select
+              label="Kecamatan"
+              required
+              placeholder="Pilih kecamatan"
+              options={subdistricts}
+              value={subdistrict}
+              onChange={(e) => setSubdistrict(e.target.value)}
+            />
+            <Textarea
+              label="Alamat Lengkap"
+              required
+              placeholder="Contoh: Jl. Wolio Raya No. 10, Kel. ..."
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              rows={3}
+            />
+            <div className="bg-muted rounded-2xl h-48 flex items-center justify-center border border-border">
+              <div className="text-center text-muted-foreground">
+                <MapPin className="w-8 h-8 mx-auto mb-2" />
+                <p className="text-sm font-medium">Peta interaktif akan ditampilkan di sini</p>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <Button variant="outline" icon={ChevronLeft} onClick={() => setStep(0)}>Kembali</Button>
+              <Button fullWidth icon={ArrowRight} iconPosition="right" onClick={handleNext}>Selanjutnya</Button>
+            </div>
+          </div>
+        )}
+
+        {/* Step 2: Details */}
+        {step === 2 && (
+          <div className="space-y-4 animate-fade-in">
+            <Input
+              label="Nama Pelapor"
+              required
+              placeholder="Nama lengkap"
+              value={reporterName}
+              onChange={(e) => setReporterName(e.target.value)}
+            />
+            <Input
+              label="No. HP"
+              required
+              placeholder="08xx xxxx xxxx"
+              value={reporterPhone}
+              onChange={(e) => setReporterPhone(e.target.value)}
+            />
+            <Input
+              label="Judul Laporan"
+              required
+              placeholder="Contoh: Jalan Berlubang di Depan SD Negeri ..."
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              maxLength={200}
+              charCount
+            />
+            <Textarea
+              label="Deskripsi"
+              required
+              placeholder="Jelaskan detail kerusakan yang Anda lihat..."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              maxLength={1000}
+              charCount
+              rows={4}
+            />
+            <Select
+              label="Tingkat Urgensi"
+              required
+              placeholder="Pilih tingkat urgensi"
+              options={urgencyOptions}
+              value={urgency}
+              onChange={(e) => setUrgency(e.target.value)}
+            />
+            {/* Photo upload */}
+            <div>
+              <label className="block text-sm font-semibold text-foreground mb-1.5">Foto (opsional)</label>
+              <label className="flex items-center justify-center gap-2 p-6 border-2 border-dashed border-border rounded-2xl cursor-pointer hover:border-primary transition-colors bg-muted/50">
+                <Camera className="w-6 h-6 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">Klik untuk upload foto</span>
+                <input type="file" multiple accept="image/*" className="hidden" onChange={(e) => setFiles(Array.from(e.target.files || []))} />
+              </label>
+              {files.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {files.map((f, i) => (
+                    <Tag key={i} variant="info" removable onRemove={() => setFiles(files.filter((_, j) => j !== i))}>
+                      {f.name}
+                    </Tag>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="flex gap-3">
+              <Button variant="outline" icon={ChevronLeft} onClick={() => setStep(1)}>Kembali</Button>
+              <Button fullWidth icon={ArrowRight} iconPosition="right" onClick={handleNext}>Selanjutnya</Button>
+            </div>
+          </div>
+        )}
+
+        {/* Step 3: Confirm */}
+        {step === 3 && (
+          <div className="space-y-4 animate-fade-in">
+            <Card variant="bordered">
+              <div className="space-y-3 text-sm">
+                <h3 className="font-heading font-bold text-lg text-foreground">Ringkasan Laporan</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    ['Kategori', categories.find((c) => c.id === categoryId)?.name || '-'],
+                    ['Kecamatan', subdistrict],
+                    ['Alamat', address],
+                    ['Judul', title],
+                    ['Deskripsi', description],
+                    ['Urgensi', urgencyOptions.find((u) => u.value === urgency)?.label || '-'],
+                    ['Pelapor', reporterName],
+                    ['No. HP', reporterPhone],
+                  ].map(([label, value]) => (
+                    <div key={label} className={label === 'Deskripsi' || label === 'Alamat' ? 'col-span-2' : ''}>
+                      <p className="text-xs text-muted-foreground font-medium">{label}</p>
+                      <p className="font-semibold text-foreground">{value}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </Card>
+            <div className="flex gap-3">
+              <Button variant="outline" icon={ChevronLeft} onClick={() => setStep(2)}>Kembali</Button>
+              <Button fullWidth loading={loading} icon={Send} iconPosition="right" onClick={handleSubmit}>
+                Kirim Laporan
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

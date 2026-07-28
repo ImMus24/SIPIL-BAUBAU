@@ -1,175 +1,173 @@
-import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Card } from '../components/ui/Card';
+import { Button } from '../components/ui/Button';
+import { StatusBadge } from '../components/ui/Badge';
+import { Skeleton } from '../components/ui/Skeleton';
 import { complaintService } from '../services/complaintService';
 import type { Complaint } from '../types';
-import { StatusBadge } from '../components/ui/Badge';
-import { BaubauMap } from '../components/map/BaubauMap';
-import { Search, AlertTriangle } from 'lucide-react';
+import { MapPin, Search, Clock, User, Building2 } from 'lucide-react';
 
 export const TrackComplaintPage: React.FC = () => {
-  const [searchParams] = useSearchParams();
-  const ticketFromUrl = searchParams.get('ticket') || '';
-
-  const [ticketInput, setTicketInput] = useState(ticketFromUrl);
+  const [ticketCode, setTicketCode] = useState('');
   const [complaint, setComplaint] = useState<Complaint | null>(null);
-  const [searched, setSearched] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const fetchTicket = async (code: string) => {
-    if (!code) return;
+  const handleSearch = async () => {
+    if (!ticketCode.trim()) { setError('Masukkan kode tiket.'); return; }
     setLoading(true);
-    setSearched(true);
+    setError('');
+    setComplaint(null);
     try {
-      const res = await complaintService.getComplaintByTicket(code);
+      const res = await complaintService.getComplaintByTicket(ticketCode);
       setComplaint(res);
     } catch {
-      setComplaint(null);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (ticketFromUrl) {
-      setTicketInput(ticketFromUrl);
-      fetchTicket(ticketFromUrl);
-    }
-  }, [ticketFromUrl]);
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    fetchTicket(ticketInput.trim());
+      setError('Laporan tidak ditemukan. Periksa kembali kode tiket Anda.');
+    } finally { setLoading(false); }
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
-      
-      {/* Search Header */}
-      <div className="text-center space-y-3">
-        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-teal-50 dark:bg-sky-950/80 text-teal-800 dark:text-sky-300 border border-teal-200 dark:border-sky-800 text-xs font-bold uppercase tracking-wider">
-          <Search className="w-4 h-4 text-teal-600 dark:text-sky-400" />
-          <span>Monitoring Transparan Kota Baubau</span>
+    <div className="min-h-screen bg-background pt-24 pb-12">
+      <div className="px-4 sm:px-8 max-w-3xl mx-auto">
+        <div className="mb-8 text-center">
+          <h1 className="font-heading text-3xl font-black text-foreground">Cek Status Laporan</h1>
+          <p className="text-muted-foreground mt-1">Masukkan kode tiket untuk melacak status laporan Anda</p>
         </div>
-        <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Cek Status & Progress Laporan</h1>
-        <p className="text-sm text-slate-600 dark:text-slate-400 max-w-lg mx-auto">
-          Masukkan Kode Tiket Pengaduan (contoh: <span className="font-mono font-bold text-teal-700 dark:text-sky-400">SIPIL-2026-8A91</span>) untuk memantau pengerjaan oleh Dinas terkait.
-        </p>
-      </div>
 
-      {/* Search Input Bar */}
-      <form onSubmit={handleSearch} className="max-w-2xl mx-auto flex gap-2 bg-white dark:bg-slate-900 p-2 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-lg">
-        <input
-          type="text"
-          required
-          placeholder="Masukkan Kode Tiket (SIPIL-2026-XXXX)"
-          value={ticketInput}
-          onChange={(e) => setTicketInput(e.target.value)}
-          className="flex-1 px-4 py-3 text-sm font-mono font-bold text-slate-800 dark:text-white bg-transparent focus:outline-none uppercase"
-        />
-        <button
-          type="submit"
-          disabled={loading}
-          className="px-6 py-3 bg-teal-700 hover:bg-teal-800 dark:bg-sky-600 dark:hover:bg-sky-500 text-white text-xs font-bold rounded-xl shadow-md transition-colors flex items-center space-x-2"
-        >
-          {loading ? <span>Mencari...</span> : <><Search className="w-4 h-4" /><span>Lacak Status</span></>}
-        </button>
-      </form>
-
-      {/* Results View */}
-      {searched && (
-        <>
-          {!complaint ? (
-            <div className="bg-white dark:bg-slate-900 rounded-3xl p-10 text-center border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-              <div className="w-16 h-16 rounded-full bg-rose-50 dark:bg-rose-950/80 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto">
-                <AlertTriangle className="w-8 h-8" />
-              </div>
-              <h3 className="text-lg font-bold text-slate-800 dark:text-white">Kode Tiket Tidak Ditemukan</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto">
-                Pastikan Anda memasukkan kode tiket dengan benar. Silakan periksa kembali tanda terima pengaduan Anda.
-              </p>
+        {/* Search */}
+        <Card className="mb-8">
+          <div className="flex gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Masukkan kode tiket (contoh: SIPIL-001)"
+                value={ticketCode}
+                onChange={(e) => setTicketCode(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                className="w-full pl-12 pr-4 py-3 rounded-xl border border-border bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              />
             </div>
-          ) : (
-            <div className="space-y-6">
-              
-              {/* Status Header Card */}
-              <div className="bg-slate-900 dark:bg-slate-900 text-white rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl border border-slate-800">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
-                  <div>
-                    <span className="text-[11px] font-mono font-bold text-amber-400 uppercase tracking-wider">
-                      {complaint.ticket_code}
-                    </span>
-                    <h2 className="text-xl font-bold text-white mt-1">{complaint.title}</h2>
-                  </div>
-                  <StatusBadge status={complaint.status} size="lg" />
-                </div>
+            <Button onClick={handleSearch} loading={loading} icon={Search}>
+              Cari
+            </Button>
+          </div>
+          {error && <p className="text-sm text-danger font-medium mt-2">{error}</p>}
+        </Card>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs text-slate-300">
-                  <div className="bg-white/5 p-3 rounded-xl border border-white/10">
-                    <p className="text-[10px] uppercase font-bold text-slate-400">Kecamatan & Alamat</p>
-                    <p className="font-bold text-white mt-0.5">{complaint.subdistrict}</p>
-                    <p className="text-slate-400 truncate">{complaint.address}</p>
+        {/* Loading */}
+        {loading && (
+          <Card>
+            <div className="space-y-4">
+              <Skeleton className="w-1/3 h-6" />
+              <Skeleton className="w-full h-4" />
+              <Skeleton className="w-3/4 h-4" />
+              <Skeleton className="w-full h-32" variant="rectangular" />
+            </div>
+          </Card>
+        )}
+
+        {/* Result */}
+        {complaint && !loading && (
+          <div className="space-y-6 animate-fade-in-up">
+            {/* Header */}
+            <Card variant="bordered">
+              <div className="flex items-center justify-between flex-wrap gap-4">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <h2 className="font-heading text-xl font-bold text-foreground">{complaint.title}</h2>
                   </div>
-                  <div className="bg-white/5 p-3 rounded-xl border border-white/10">
-                    <p className="text-[10px] uppercase font-bold text-slate-400">OPD Penanggung Jawab</p>
-                    <p className="font-bold text-teal-300 dark:text-sky-300 mt-0.5">{complaint.agency?.name || 'Dinas PUPR / PERKIM Kota Baubau'}</p>
-                  </div>
-                  <div className="bg-white/5 p-3 rounded-xl border border-white/10">
-                    <p className="text-[10px] uppercase font-bold text-slate-400">Tanggal Pengaduan</p>
-                    <p className="font-bold text-white mt-0.5">{complaint.created_at}</p>
-                  </div>
+                  <p className="text-sm text-muted-foreground font-mono">{complaint.ticket_code}</p>
                 </div>
+                <StatusBadge status={complaint.status} size="lg" />
+              </div>
+            </Card>
+
+            {/* Detail */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Card>
+                <div className="flex items-center gap-2 mb-3">
+                  <User className="w-4 h-4 text-muted-foreground" />
+                  <h3 className="font-bold text-sm text-foreground">Data Pelapor</h3>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between"><span className="text-muted-foreground">Nama</span><span className="font-semibold text-foreground">{complaint.reporter_name}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">HP</span><span className="font-semibold text-foreground">{complaint.reporter_phone}</span></div>
+                </div>
+              </Card>
+              <Card>
+                <div className="flex items-center gap-2 mb-3">
+                  <MapPin className="w-4 h-4 text-muted-foreground" />
+                  <h3 className="font-bold text-sm text-foreground">Lokasi</h3>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between"><span className="text-muted-foreground">Kecamatan</span><span className="font-semibold text-foreground">{complaint.subdistrict}</span></div>
+                  <div className="flex justify-between"><span className="text-muted-foreground">Alamat</span><span className="font-semibold text-foreground text-right max-w-[200px]">{complaint.address}</span></div>
+                </div>
+              </Card>
+            </div>
+
+            {/* Status Timeline */}
+            <Card>
+              <div className="flex items-center gap-2 mb-4">
+                <Clock className="w-5 h-5 text-primary" />
+                <h3 className="font-heading font-bold text-foreground">Riwayat Status</h3>
               </div>
 
-              {/* Progress Timeline */}
-              <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
-                <h3 className="font-extrabold text-base text-slate-900 dark:text-white border-b dark:border-slate-800 pb-3">
-                  Riwayat Progres & Timeline Penanganan
-                </h3>
-
-                <div className="relative pl-6 border-l-2 border-slate-200 dark:border-slate-700 space-y-8 my-4">
-                  {complaint.status_logs && complaint.status_logs.map((log) => (
-                    <div key={log.id} className="relative group">
-                      <div className="absolute -left-[31px] top-0.5 w-4 h-4 rounded-full bg-teal-600 dark:bg-sky-500 border-2 border-white dark:border-slate-900 ring-4 ring-teal-50 dark:ring-sky-950"></div>
+              {complaint.status_logs && complaint.status_logs.length > 0 ? (
+                <div className="relative pl-6 space-y-5">
+                  <div className="absolute left-2.5 top-2 bottom-0 w-0.5 bg-border" />
+                  {complaint.status_logs.map((log, idx) => (
+                    <div key={log.id} className="relative">
+                      <div className={`absolute -left-4 mt-1.5 w-3 h-3 rounded-full border-2 ${
+                        idx === 0 ? 'bg-primary border-primary' : 'bg-card border-border'
+                      }`} />
                       <div className="space-y-1">
-                        <div className="flex items-center justify-between">
-                          <span className="text-xs font-bold text-slate-900 dark:text-white uppercase">{log.status}</span>
-                          <span className="text-[10px] text-slate-400 font-mono">{log.created_at}</span>
+                        <div className="flex items-center gap-2">
+                          <StatusBadge status={log.status} size="sm" dot={false} />
+                          <span className="text-xs text-muted-foreground">{new Date(log.created_at).toLocaleString('id-ID')}</span>
                         </div>
-                        <p className="text-xs text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 p-3 rounded-xl border border-slate-100 dark:border-slate-700">
-                          {log.notes}
-                        </p>
-                        <p className="text-[10px] text-slate-400 font-semibold">Oleh: {log.updated_by}</p>
-                        
-                        {log.photo_proof && (
-                          <div className="mt-2">
-                            <p className="text-[11px] font-bold text-emerald-700 dark:text-emerald-400 mb-1">Bukti Foto Penanganan Selesai:</p>
-                            <img
-                              src={log.photo_proof}
-                              alt="Bukti Selesai"
-                              className="w-48 h-32 object-cover rounded-xl border border-slate-200 dark:border-slate-700 shadow-xs"
-                            />
-                          </div>
-                        )}
+                        {log.notes && <p className="text-sm text-foreground/80">{log.notes}</p>}
+                        <p className="text-xs text-muted-foreground">Oleh: {log.updated_by}</p>
                       </div>
                     </div>
                   ))}
                 </div>
-              </div>
+              ) : (
+                <div className="text-center py-6">
+                  <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mx-auto mb-2">
+                    <Clock className="w-6 h-6 text-muted-foreground" />
+                  </div>
+                  <p className="text-sm text-muted-foreground">Laporan menunggu verifikasi</p>
+                </div>
+              )}
+            </Card>
 
-              {/* Map GIS Location Preview */}
-              <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
-                <h4 className="font-bold text-xs text-slate-800 dark:text-slate-200 uppercase tracking-wider">Lokasi Titik Laporan di Peta Baubau</h4>
-                <BaubauMap
-                  complaints={[complaint]}
-                  height="300px"
-                />
-              </div>
+            {/* Related info */}
+            {complaint.agency && (
+              <Card>
+                <div className="flex items-center gap-2 mb-3">
+                  <Building2 className="w-5 h-5 text-primary" />
+                  <h3 className="font-heading font-bold text-foreground">OPD Penanggung Jawab</h3>
+                </div>
+                <p className="font-semibold text-foreground">{complaint.agency.name}</p>
+                {complaint.agency.phone && <p className="text-sm text-muted-foreground">{complaint.agency.phone}</p>}
+              </Card>
+            )}
+          </div>
+        )}
 
+        {/* Empty state */}
+        {!complaint && !loading && !error && (
+          <div className="text-center py-16">
+            <div className="w-20 h-20 rounded-2xl bg-muted flex items-center justify-center mx-auto mb-4">
+              <Search className="w-10 h-10 text-muted-foreground" />
             </div>
-          )}
-        </>
-      )}
-
+            <h3 className="font-heading text-lg font-bold text-foreground">Cari Laporan Anda</h3>
+            <p className="text-sm text-muted-foreground mt-1">Masukkan kode tiket yang didapatkan saat membuat laporan</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

@@ -1,174 +1,96 @@
 import React, { useEffect, useState } from 'react';
+import { Badge } from '../components/ui/Badge';
+import { Tabs } from '../components/ui/Tabs';
 import { BaubauMap } from '../components/map/BaubauMap';
 import { complaintService } from '../services/complaintService';
-import type { Complaint, BaubauSubdistrict, ComplaintStatus, Category } from '../types';
-import { StatusBadge, UrgencyBadge } from '../components/ui/Badge';
-import { Modal } from '../components/ui/Modal';
-import { MapPin, ExternalLink } from 'lucide-react';
-import { Link } from 'react-router-dom';
-
-const SUBDISTRICTS: BaubauSubdistrict[] = [
-  'Wolio',
-  'Betoambari',
-  'Murhum',
-  'Kokalukuna',
-  'Lea-Lea',
-  'Sorawolio',
-  'Bungi',
-  'Batupoaro',
-];
+import type { Complaint } from '../types';
+import { MapPin, List } from 'lucide-react';
 
 export const MapPage: React.FC = () => {
   const [complaints, setComplaints] = useState<Complaint[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedSubdistrict, setSelectedSubdistrict] = useState<BaubauSubdistrict | 'all'>('all');
-  const [selectedStatus, setSelectedStatus] = useState<ComplaintStatus | 'all'>('all');
-  const [selectedCategory, setSelectedCategory] = useState<number | 'all'>('all');
-  const [selectedComplaint, setSelectedComplaint] = useState<Complaint | null>(null);
+  const [activeTab, setActiveTab] = useState('semua');
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  useEffect(() => {
-    complaintService.getComplaints().then(setComplaints);
-    complaintService.getCategories().then(setCategories);
-  }, []);
+  useEffect(() => { complaintService.getComplaints().then(setComplaints); }, []);
 
-  const filteredComplaints = complaints.filter((item) => {
-    if (selectedSubdistrict !== 'all' && item.subdistrict !== selectedSubdistrict) return false;
-    if (selectedStatus !== 'all' && item.status !== selectedStatus) return false;
-    if (selectedCategory !== 'all' && item.category_id !== selectedCategory) return false;
-    return true;
-  });
+  const tabs = [
+    { id: 'semua', label: 'Semua' },
+    { id: 'menunggu', label: 'Menunggu' },
+    { id: 'diproses', label: 'Diproses' },
+    { id: 'selesai', label: 'Selesai' },
+  ];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-      
-      {/* Title */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
-        <div>
-          <div className="flex items-center space-x-2 text-xs font-bold text-teal-700 dark:text-sky-400 uppercase tracking-wider">
-            <MapPin className="w-4 h-4" />
-            <span>GIS Pemetaan Interaktif Kota Baubau</span>
-          </div>
-          <h1 className="text-2xl font-black text-slate-900 dark:text-white mt-1">Peta Sebaran Laporan Infrastruktur</h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
-            Menampilkan lokasi titik pengaduan masyarakat di 8 Kecamatan se-Kota Baubau
-          </p>
+    <div className="pt-20 h-screen flex flex-col bg-background">
+      {/* Top Bar */}
+      <div className="flex items-center justify-between px-4 sm:px-8 py-3 border-b border-border bg-card">
+        <div className="flex items-center gap-3">
+          <MapPin className="w-5 h-5 text-primary" />
+          <h1 className="font-heading text-lg font-bold text-foreground">Peta Interaktif</h1>
         </div>
-        <div className="flex items-center space-x-3 text-xs">
-          <span className="px-3 py-1.5 rounded-lg bg-teal-50 dark:bg-sky-950/80 text-teal-800 dark:text-sky-300 font-bold border border-teal-200 dark:border-sky-800">
-            Total Titik: {filteredComplaints.length} Laporan
-          </span>
+        <div className="flex items-center gap-2">
+          <Tabs tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="p-2 rounded-xl border border-border hover:bg-muted transition-colors"
+            title={sidebarOpen ? 'Tutup panel' : 'Buka panel'}
+          >
+            <List className="w-4 h-4 text-muted-foreground" />
+          </button>
         </div>
       </div>
 
-      {/* Filter Toolbar */}
-      <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div>
-          <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Filter Kecamatan</label>
-          <select
-            value={selectedSubdistrict}
-            onChange={(e) => setSelectedSubdistrict(e.target.value as BaubauSubdistrict | 'all')}
-            className="w-full text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 p-2.5 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-teal-500"
-          >
-            <option value="all">Semua Kecamatan (8 Wilayah)</option>
-            {SUBDISTRICTS.map((sub) => (
-              <option key={sub} value={sub}>Kecamatan {sub}</option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Filter Status Penanganan</label>
-          <select
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value as ComplaintStatus | 'all')}
-            className="w-full text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 p-2.5 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-teal-500"
-          >
-            <option value="all">Semua Status Penanganan</option>
-            <option value="menunggu">Menunggu Verifikasi</option>
-            <option value="diproses">Sedang Diproses</option>
-            <option value="selesai">Selesai Ditangani</option>
-            <option value="ditolak">Laporan Ditolak</option>
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Filter Kategori</label>
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value === 'all' ? 'all' : Number(e.target.value))}
-            className="w-full text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 p-2.5 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-800 focus:ring-2 focus:ring-teal-500"
-          >
-            <option value="all">Semua Kategori Infrastruktur</option>
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.id}>{cat.name}</option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      {/* Map Display */}
-      <BaubauMap
-        complaints={filteredComplaints}
-        height="620px"
-        selectedSubdistrict={selectedSubdistrict}
-        onSelectComplaint={(c) => setSelectedComplaint(c)}
-      />
-
-      {/* Complaint Detail Popup Modal */}
-      {selectedComplaint && (
-        <Modal
-          isOpen={!!selectedComplaint}
-          onClose={() => setSelectedComplaint(null)}
-          title={`Detail Laporan: ${selectedComplaint.ticket_code}`}
-          maxWidth="2xl"
-        >
-          <div className="space-y-4 text-xs">
-            <div className="flex items-center justify-between border-b dark:border-slate-700 pb-3">
-              <StatusBadge status={selectedComplaint.status} size="lg" />
-              <UrgencyBadge urgency={selectedComplaint.urgency} />
-            </div>
-
-            <div>
-              <h3 className="text-base font-bold text-slate-900 dark:text-white">{selectedComplaint.title}</h3>
-              <p className="text-slate-500 dark:text-slate-400 font-mono text-[11px] mt-0.5">
-                Kecamatan {selectedComplaint.subdistrict} • {selectedComplaint.address}
-              </p>
-            </div>
-
-            <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
-              <p className="text-slate-700 dark:text-slate-300 leading-relaxed">{selectedComplaint.description}</p>
-            </div>
-
-            {selectedComplaint.attachments && selectedComplaint.attachments.length > 0 && (
-              <div>
-                <p className="font-bold text-slate-800 dark:text-slate-200 mb-2">Foto Bukti Kerusakan:</p>
-                <div className="grid grid-cols-2 gap-2">
-                  {selectedComplaint.attachments.map((att) => (
-                    <img
-                      key={att.id}
-                      src={att.file_path}
-                      alt="Foto bukti"
-                      className="rounded-xl border border-slate-200 dark:border-slate-700 w-full h-32 object-cover"
-                    />
-                  ))}
+      {/* Map + Sidebar */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Map */}
+        <div className="flex-1 relative">
+          <BaubauMap />
+          {/* Legend */}
+          <div className="absolute bottom-4 left-4 z-10 bg-card border border-border rounded-2xl p-3 shadow-lg">
+            <div className="space-y-1.5 text-xs">
+              {[
+                { label: 'Menunggu', color: 'bg-warning' },
+                { label: 'Diproses', color: 'bg-info' },
+                { label: 'Selesai', color: 'bg-success' },
+                { label: 'Ditolak', color: 'bg-danger' },
+              ].map((item) => (
+                <div key={item.label} className="flex items-center gap-2">
+                  <div className={`w-3 h-3 rounded-full ${item.color}`} />
+                  <span className="text-muted-foreground font-medium">{item.label}</span>
                 </div>
-              </div>
-            )}
-
-            <div className="pt-3 border-t dark:border-slate-700 flex items-center justify-between">
-              <span className="text-slate-400">Dilaporkan: {selectedComplaint.created_at}</span>
-              <Link
-                to={`/track?ticket=${selectedComplaint.ticket_code}`}
-                className="px-4 py-2 bg-teal-700 hover:bg-teal-800 dark:bg-sky-600 dark:hover:bg-sky-500 text-white font-bold rounded-xl transition-colors inline-flex items-center space-x-1"
-              >
-                <span>Lacak Timeline Laporan</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </Link>
+              ))}
             </div>
           </div>
-        </Modal>
-      )}
+        </div>
 
+        {/* Sidebar */}
+        {sidebarOpen && (
+          <div className="w-80 border-l border-border bg-card overflow-y-auto animate-slide-in-right">
+            <div className="p-4">
+              <h3 className="font-heading font-bold text-foreground text-sm mb-3">
+                Daftar Laporan ({complaints.length})
+              </h3>
+              <div className="space-y-2">
+                {complaints.map((c) => (
+                  <div key={c.id} className="p-3 rounded-xl border border-border hover:border-primary/30 hover:bg-muted/50 transition-colors cursor-pointer">
+                    <div className="flex items-center justify-between mb-1">
+                      <p className="text-xs font-mono text-muted-foreground">{c.ticket_code}</p>
+                      <Badge
+                        variant={c.status === 'selesai' ? 'success' : c.status === 'diproses' ? 'info' : c.status === 'ditolak' ? 'danger' : 'warning'}
+                        size="sm"
+                      >
+                        {c.status}
+                      </Badge>
+                    </div>
+                    <p className="text-sm font-semibold text-foreground truncate">{c.title}</p>
+                    <p className="text-xs text-muted-foreground">{c.subdistrict}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

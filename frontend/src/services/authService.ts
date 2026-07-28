@@ -44,12 +44,7 @@ export const authService = {
     } catch (error: any) {
       localStorage.removeItem('sipil_auth_token');
       localStorage.removeItem('sipil_user');
-
-      const message =
-        error.response?.data?.message ||
-        error.response?.data?.errors?.email?.[0] ||
-        'Gagal mendaftarkan akun. Periksa kembali kelengkapan data.';
-      throw new Error(message);
+      throw error;
     }
   },
 

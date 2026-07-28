@@ -1,50 +1,48 @@
 import React from 'react';
+import { clsx } from 'clsx';
 import type { ComplaintStatus, UrgencyLevel } from '../../types';
 
 interface StatusBadgeProps {
   status: ComplaintStatus;
   size?: 'sm' | 'md' | 'lg';
+  dot?: boolean;
 }
 
-export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'md' }) => {
-  const sizeClasses = {
-    sm: 'px-2 py-0.5 text-xs font-semibold',
-    md: 'px-2.5 py-1 text-xs font-bold',
-    lg: 'px-3.5 py-1.5 text-sm font-bold',
-  };
+export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'md', dot = true }) => {
+  const sizeClasses = { sm: 'px-2 py-0.5 text-xs', md: 'px-2.5 py-1 text-xs', lg: 'px-3 py-1.5 text-sm' };
 
   const statusMap: Record<ComplaintStatus, { label: string; bg: string; text: string; ring: string }> = {
     menunggu: {
-      label: 'Menunggu Verifikasi',
-      bg: 'bg-amber-50 dark:bg-amber-950/80',
-      text: 'text-amber-700 dark:text-amber-300',
-      ring: 'ring-1 ring-inset ring-amber-600/20 dark:ring-amber-500/30',
+      label: 'Menunggu',
+      bg: 'bg-warning-bg',
+      text: 'text-warning',
+      ring: 'ring-1 ring-inset ring-warning-border',
     },
     diproses: {
-      label: 'Sedang Diproses',
-      bg: 'bg-blue-50 dark:bg-blue-950/80',
-      text: 'text-blue-700 dark:text-blue-300',
-      ring: 'ring-1 ring-inset ring-blue-700/20 dark:ring-blue-500/30',
+      label: 'Diproses',
+      bg: 'bg-info-bg',
+      text: 'text-info',
+      ring: 'ring-1 ring-inset ring-info-border',
     },
     selesai: {
-      label: 'Selesai Ditangani',
-      bg: 'bg-emerald-50 dark:bg-emerald-950/80',
-      text: 'text-emerald-700 dark:text-emerald-300',
-      ring: 'ring-1 ring-inset ring-emerald-600/20 dark:ring-emerald-500/30',
+      label: 'Selesai',
+      bg: 'bg-success-bg',
+      text: 'text-success',
+      ring: 'ring-1 ring-inset ring-success-border',
     },
     ditolak: {
-      label: 'Laporan Ditolak',
-      bg: 'bg-rose-50 dark:bg-rose-950/80',
-      text: 'text-rose-700 dark:text-rose-300',
-      ring: 'ring-1 ring-inset ring-rose-600/20 dark:ring-rose-500/30',
+      label: 'Ditolak',
+      bg: 'bg-danger-bg',
+      text: 'text-danger',
+      ring: 'ring-1 ring-inset ring-danger-border',
     },
   };
 
   const current = statusMap[status] || statusMap['menunggu'];
 
   return (
-    <span className={`inline-flex items-center rounded-md ${current.bg} ${current.text} ${current.ring} ${sizeClasses[size]}`}>
-      <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-current"></span>
+    <span className={clsx('inline-flex items-center rounded-lg font-bold', sizeClasses[size], current.bg, current.text, current.ring)}>
+      {dot && <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-current animate-pulse-dot" />}
       {current.label}
     </span>
   );
@@ -52,22 +50,50 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({ status, size = 'md' })
 
 interface UrgencyBadgeProps {
   urgency: UrgencyLevel;
+  size?: 'sm' | 'md';
 }
 
-export const UrgencyBadge: React.FC<UrgencyBadgeProps> = ({ urgency }) => {
+export const UrgencyBadge: React.FC<UrgencyBadgeProps> = ({ urgency, size = 'sm' }) => {
+  const sizeClasses = { sm: 'px-2 py-0.5 text-xs', md: 'px-2.5 py-1 text-sm' };
+
   const urgencyMap: Record<UrgencyLevel, { label: string; bg: string; text: string }> = {
-    rendah: { label: 'Rendah', bg: 'bg-slate-100 dark:bg-slate-800', text: 'text-slate-700 dark:text-slate-300' },
-    sedang: { label: 'Sedang', bg: 'bg-sky-100 dark:bg-sky-950/80', text: 'text-sky-800 dark:text-sky-300' },
-    tinggi: { label: 'Tinggi', bg: 'bg-orange-100 dark:bg-orange-950/80', text: 'text-orange-800 dark:text-orange-300' },
-    darurat: { label: 'Darurat', bg: 'bg-red-100 dark:bg-red-950/80', text: 'text-red-800 dark:text-red-300 font-extrabold animate-pulse' },
+    rendah: { label: 'Rendah', bg: 'bg-muted', text: 'text-muted-foreground' },
+    sedang: { label: 'Sedang', bg: 'bg-info-bg', text: 'text-info' },
+    tinggi: { label: 'Tinggi', bg: 'bg-warning-bg', text: 'text-warning' },
+    darurat: { label: 'Darurat', bg: 'bg-danger-bg', text: 'text-danger font-extrabold' },
   };
 
   const current = urgencyMap[urgency] || urgencyMap['sedang'];
 
   return (
-    <span className={`inline-flex items-center rounded px-2 py-0.5 text-xs font-medium ${current.bg} ${current.text}`}>
-      Tingkat: {current.label}
+    <span className={clsx('inline-flex items-center rounded-lg font-semibold', sizeClasses[size], current.bg, current.text)}>
+      {current.label}
     </span>
   );
 };
 
+interface BadgeProps {
+  children: React.ReactNode;
+  variant?: 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info';
+  size?: 'sm' | 'md';
+  dot?: boolean;
+}
+
+export const Badge: React.FC<BadgeProps> = ({ children, variant = 'default', size = 'md', dot }) => {
+  const sizeClasses = { sm: 'px-2 py-0.5 text-xs', md: 'px-2.5 py-1 text-xs' };
+  const variantStyles = {
+    default: 'bg-muted text-muted-foreground',
+    primary: 'bg-primary-light text-primary',
+    success: 'bg-success-bg text-success',
+    warning: 'bg-warning-bg text-warning',
+    danger: 'bg-danger-bg text-danger',
+    info: 'bg-info-bg text-info',
+  };
+
+  return (
+    <span className={clsx('inline-flex items-center rounded-lg font-bold', sizeClasses[size], variantStyles[variant])}>
+      {dot && <span className="mr-1.5 h-1.5 w-1.5 rounded-full bg-current" />}
+      {children}
+    </span>
+  );
+};
