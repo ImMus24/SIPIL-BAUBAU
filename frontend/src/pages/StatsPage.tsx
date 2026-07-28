@@ -2,132 +2,151 @@ import React, { useEffect, useState } from 'react';
 import { Card } from '../components/ui/Card';
 import { StatCard } from '../components/ui/StatCard';
 import { StatusBadge } from '../components/ui/Badge';
-import { Table } from '../components/ui/Table';
 import { PageBreadcrumb } from '../components/ui/Breadcrumb';
 import { Button } from '../components/ui/Button';
 import { complaintService } from '../services/complaintService';
 import type { Complaint, StatSummary } from '../types';
 import {
-  BarChart3,
   FileText,
   CheckCircle2,
   Clock,
   AlertTriangle,
   TrendingUp,
   Download,
-  Filter,
 } from 'lucide-react';
 
 export const StatsPage: React.FC = () => {
-  const [stats, setStats] = useState<StatSummary>({ total: 0, menunggu: 0, diproses: 0, selesai: 0, ditolak: 0, completion_rate: 0 });
+  const [stats, setStats] = useState<StatSummary | null>(null);
   const [complaints, setComplaints] = useState<Complaint[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
+    setLoading(true);
+    setError('');
     Promise.all([complaintService.getStatsSummary(), complaintService.getComplaints()])
       .then(([s, c]) => { setStats(s); setComplaints(c); })
-      .catch(() => {});
+      .catch(() => setError('Gagal memuat data statistik.'))
+      .finally(() => setLoading(false));
   }, []);
 
-  const subdistrictData = ['Wolio', 'Betoambari', 'Murhum', 'Kokalukuna', 'Lea-Lea', 'Sorawolio', 'Bungi', 'Batupoaro']
+  // Compute subdistrict stats from real API data
+  const subdistrictStats = ['Wolio', 'Betoambari', 'Murhum', 'Kokalukuna', 'Lea-Lea', 'Sorawolio', 'Bungi', 'Batupoaro']
     .map((s) => ({
       name: s,
-      total: Math.floor(Math.random() * 50) + 5,
-      resolved: Math.floor(Math.random() * 30) + 2,
+      total: complaints.filter((c) => c.subdistrict === s).length,
+      resolved: complaints.filter((c) => c.subdistrict === s && c.status === 'selesai').length,
     }));
 
-  const columns = [
-    { key: 'ticket_code', header: 'Tiket', width: '120px' },
-    { key: 'title', header: 'Judul', render: (item: Complaint) => <span className="font-semibold text-foreground">{item.title}</span> },
-    { key: 'subdistrict', header: 'Kecamatan', width: '120px' },
-    { key: 'status', header: 'Status', render: (item: Complaint) => <StatusBadge status={item.status} />, width: '140px' },
-    { key: 'created_at', header: 'Tanggal', render: (item: Complaint) => new Date(item.created_at).toLocaleDateString('id-ID'), width: '120px' },
-  ];
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background pt-24 pb-12">
+        <div className="px-4 sm:px-8 max-w-container mx-auto">
+          <div className="animate-pulse space-y-6">
+            <div className="h-8 w-48 bg-muted rounded" />
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+              {[...Array(5)].map((_, i) => <div key={i} className="h-28 bg-muted rounded-xl" />)}
+            </div>
+            <div className="h-64 bg-muted rounded-xl" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background pt-24 pb-12">
+        <div className="px-4 sm:px-8 max-w-container mx-auto text-center">
+          <AlertTriangle className="w-12 h-12 mx-auto text-warning mb-4" />
+          <p className="text-muted-foreground">{error}</p>
+          <Button className="mt-4" onClick={() => window.location.reload()}>Coba Lagi</Button>
+        </div>
+      </div>
+    );
+  }
+
+  const sortedSubdistricts = [...subdistrictStats].sort((a, b) => b.total - a.total);
 
   return (
     <div className="min-h-screen bg-background pt-24 pb-12">
       <div className="px-4 sm:px-8 max-w-container mx-auto space-y-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <PageBreadcrumb items={[{ label: 'Statistik Publik' }]} />
-            <h1 className="font-heading text-3xl font-black text-foreground mt-2">Statistik Publik</h1>
-            <p className="text-muted-foreground">Data laporan infrastruktur Kota Baubau secara real-time</p>
+            <PageBreadcrumb items={[{ label: 'Beranda', href: '/' }, { label: 'Statistik' }]} />
+            <h1 className="font-heading text-3xl font-black text-foreground mt-2">Statistik Infrastruktur</h1>
+            <p className="text-muted-foreground">Data real-time dari database SIPIL BAUBAU</p>
           </div>
-          <Button variant="outline" icon={Download}>Ekspor Data</Button>
+          <Button variant="outline" icon={Download}>Export Laporan</Button>
         </div>
 
-        {/* KPI */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard title="Total Laporan" value={stats.total} icon={FileText} variant="primary" />
-          <StatCard title="Diproses" value={stats.diproses} icon={Clock} variant="info" />
-          <StatCard title="Selesai" value={stats.selesai} icon={CheckCircle2} variant="success" trend={{ value: `${stats.completion_rate}% tingkat penyelesaian`, up: true }} />
-          <StatCard title="Menunggu" value={stats.menunggu} icon={AlertTriangle} variant="warning" />
+        {/* KPI Cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+          <StatCard title="Total Laporan" value={stats?.total ?? 0} icon={FileText} variant="primary" />
+          <StatCard title="Menunggu" value={stats?.menunggu ?? 0} icon={Clock} variant="warning" />
+          <StatCard title="Diproses" value={stats?.diproses ?? 0} icon={TrendingUp} variant="info" />
+          <StatCard title="Selesai" value={stats?.selesai ?? 0} icon={CheckCircle2} variant="success" />
+          <StatCard title="Ditolak" value={stats?.ditolak ?? 0} icon={AlertTriangle} variant="danger" />
         </div>
 
-        {/* Charts Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Status Distribution */}
-          <Card>
-            <div className="flex items-center gap-2 mb-4">
-              <BarChart3 className="w-5 h-5 text-primary" />
-              <h3 className="font-heading font-bold text-foreground">Distribusi Status</h3>
+        {/* Completion Rate */}
+        <Card variant="bordered">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-bold text-foreground">Tingkat Penyelesaian</h3>
+              <p className="text-sm text-muted-foreground">{stats?.selesai ?? 0} dari {stats?.total ?? 0} laporan terselesaikan</p>
             </div>
-            <div className="space-y-3">
-              {[
-                { label: 'Selesai', value: stats.selesai, color: 'bg-success', pct: stats.total ? (stats.selesai / stats.total) * 100 : 0 },
-                { label: 'Diproses', value: stats.diproses, color: 'bg-info', pct: stats.total ? (stats.diproses / stats.total) * 100 : 0 },
-                { label: 'Menunggu', value: stats.menunggu, color: 'bg-warning', pct: stats.total ? (stats.menunggu / stats.total) * 100 : 0 },
-                { label: 'Ditolak', value: stats.ditolak, color: 'bg-danger', pct: stats.total ? (stats.ditolak / stats.total) * 100 : 0 },
-              ].map((item) => (
-                <div key={item.label} className="space-y-1">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-foreground font-medium">{item.label}</span>
-                    <span className="text-muted-foreground">{item.value} ({item.pct.toFixed(1)}%)</span>
+            <div className="text-3xl font-black text-primary">{stats?.completion_rate ?? 0}%</div>
+          </div>
+          <div className="w-full bg-muted rounded-full h-2.5 mt-3">
+            <div className="bg-primary h-2.5 rounded-full transition-all duration-500" style={{ width: `${stats?.completion_rate ?? 0}%` }} />
+          </div>
+        </Card>
+
+        {/* Per Subdistrict */}
+        <Card variant="bordered" header={<h3 className="font-bold">Laporan Per Kecamatan</h3>}>
+          <div className="space-y-3">
+            {sortedSubdistricts.map((s) => (
+              <div key={s.name} className="flex items-center gap-4">
+                <span className="w-28 text-sm font-medium text-foreground">{s.name}</span>
+                <div className="flex-1 bg-muted rounded-full h-3">
+                  <div
+                    className="bg-primary rounded-full h-3 transition-all"
+                    style={{ width: `${stats?.total ? (s.total / stats.total) * 100 : 0}%` }}
+                  />
+                </div>
+                <div className="flex items-center gap-3 text-xs text-muted-foreground w-28 justify-end">
+                  <span>{s.total}</span>
+                  <span className="text-success">{s.resolved} ✓</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        {/* Recent Reports */}
+        <Card variant="bordered" header={<h3 className="font-bold">Laporan Terbaru</h3>}>
+          {complaints.length > 0 ? (
+            <div className="divide-y divide-border">
+              {complaints.slice(0, 10).map((c) => (
+                <div key={c.id} className="flex items-center justify-between py-3">
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-foreground truncate">{c.title}</p>
+                    <p className="text-xs text-muted-foreground font-mono">{c.ticket_code} • {c.subdistrict}</p>
                   </div>
-                  <div className="w-full h-3 bg-muted rounded-full overflow-hidden">
-                    <div className={`h-full rounded-full ${item.color} transition-all duration-500`} style={{ width: `${item.pct}%` }} />
-                  </div>
+                  <StatusBadge status={c.status} />
                 </div>
               ))}
             </div>
-          </Card>
-
-          {/* Per Subdistrict */}
-          <Card>
-            <div className="flex items-center gap-2 mb-4">
-              <TrendingUp className="w-5 h-5 text-primary" />
-              <h3 className="font-heading font-bold text-foreground">Per Kecamatan</h3>
+          ) : (
+            <div className="text-center py-10 text-muted-foreground text-sm">
+              Belum ada laporan.
             </div>
-            <div className="space-y-2">
-              {subdistrictData.map((s) => (
-                <div key={s.name} className="flex items-center gap-3">
-                  <span className="text-sm font-medium text-foreground w-24">{s.name}</span>
-                  <div className="flex-1 h-4 bg-muted rounded-full overflow-hidden">
-                    <div
-                      className="h-full rounded-full bg-gradient-to-r from-primary to-secondary transition-all"
-                      style={{ width: `${(s.total / Math.max(...subdistrictData.map((x) => x.total))) * 100}%` }}
-                    />
-                  </div>
-                  <span className="text-sm font-semibold text-muted-foreground w-16 text-right">{s.total}</span>
-                </div>
-              ))}
-            </div>
-          </Card>
-        </div>
-
-        {/* Data Table */}
-        <Card>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-heading font-bold text-foreground">Seluruh Laporan</h3>
-            <Button variant="ghost" size="sm" icon={Filter}>Filter</Button>
-          </div>
-          <Table
-            columns={columns}
-            data={complaints}
-            keyExtractor={(c) => c.id}
-            emptyMessage="Belum ada data laporan"
-          />
+          )}
         </Card>
       </div>
     </div>
   );
 };
+
+export default StatsPage;
