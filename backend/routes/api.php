@@ -1,11 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\ComplaintController;
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\AgencyController;
-use App\Http\Controllers\StatController;
+use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\ComplaintController;
+use App\Http\Controllers\Api\V1\CategoryController;
+use App\Http\Controllers\Api\V1\AgencyController;
+use App\Http\Controllers\Api\V1\StatController;
 use App\Http\Middleware\SecurityHeaders;
 use App\Http\Middleware\RoleMiddleware;
 

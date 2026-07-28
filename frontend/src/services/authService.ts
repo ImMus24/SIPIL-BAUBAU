@@ -11,7 +11,7 @@ export const authService = {
     try {
       const response = await api.post('/auth/login', { email, password });
       
-      if (response.data && response.data.status === 'success' && response.data.data) {
+      if (response.data && (response.data.success === true || response.data.status === 'success') && response.data.data) {
         const { user, token } = response.data.data;
         localStorage.setItem('sipil_auth_token', token);
         localStorage.setItem('sipil_user', JSON.stringify(user));
@@ -34,7 +34,7 @@ export const authService = {
     try {
       const response = await api.post('/auth/register', { name, email, password, phone });
       
-      if (response.data && response.data.status === 'success' && response.data.data) {
+      if (response.data && (response.data.success === true || response.data.status === 'success') && response.data.data) {
         const { user, token } = response.data.data;
         localStorage.setItem('sipil_auth_token', token);
         localStorage.setItem('sipil_user', JSON.stringify(user));
@@ -70,7 +70,7 @@ export const authService = {
 
     try {
       const response = await api.get('/auth/me');
-      if (response.data && response.data.status === 'success' && response.data.data) {
+      if (response.data && (response.data.success === true || response.data.status === 'success') && response.data.data) {
         const user = response.data.data;
         localStorage.setItem('sipil_user', JSON.stringify(user));
         return user;
