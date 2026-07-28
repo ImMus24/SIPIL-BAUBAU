@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Complaint;
 use App\Models\ComplaintStatusLog;
 use App\Models\Attachment;
+use App\Models\AuditLog;
+use App\Http\Requests\StoreComplaintRequest;
+use App\Http\Requests\UpdateComplaintStatusRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -31,7 +34,7 @@ class ComplaintController extends Controller
         }
 
         if ($request->filled('search')) {
-            $q = $request->search;
+            $q = trim(strip_tags($request->search));
             $query->where(function ($sub) use ($q) {
                 $sub->where('title', 'like', "%{$q}%")
                     ->orWhere('ticket_code', 'like', "%{$q}%")
@@ -48,21 +51,9 @@ class ComplaintController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreComplaintRequest $request)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'required|string',
-            'category_id' => 'required|exists:categories,id',
-            'subdistrict' => 'required|string',
-            'address' => 'required|string',
-            'latitude' => 'nullable|numeric',
-            'longitude' => 'nullable|numeric',
-            'urgency' => 'required|in:rendah,sedang,tinggi,darurat',
-            'reporter_name' => 'required|string',
-            'reporter_phone' => 'nullable|string',
-            'reporter_email' => 'nullable|email',
-        ]);
+        $validated = $request->validated();
 
         $ticketCode = 'SIPIL-' . date('Y') . '-' . strtoupper(Str::random(4));
 
@@ -83,10 +74,13 @@ class ComplaintController extends Controller
             'status' => 'menunggu',
         ]);
 
-        // Attachments
+        // Secure File Upload Handling (Randomized Filenames, Validated MIME)
         if ($request->hasFile('attachments')) {
             foreach ($request->file('attachments') as $file) {
-                $path = $file->store('complaints', 'public');
+                $extension = strtolower($file->getClientOriginalExtension());
+                $filename = Str::uuid()->toString() . '.' . $extension;
+                $path = $file->storeAs('complaints', $filename, 'public');
+
                 Attachment::create([
                     'complaint_id' => $complaint->id,
                     'file_path' => '/storage/' . $path,
@@ -104,6 +98,12 @@ class ComplaintController extends Controller
             'updated_by' => 'Sistem',
         ]);
 
+        AuditLog::log('COMPLAINT_CREATED', "Laporan pengaduan baru disubmit dengan Kode Tiket: {$ticketCode}", null, [
+            'ticket_code' => $ticketCode,
+            'title' => $complaint->title,
+            'subdistrict' => $complaint->subdistrict,
+        ]);
+
         return response()->json([
             'status' => 'success',
             'message' => 'Laporan pengaduan berhasil terdaftar.',
@@ -113,9 +113,18 @@ class ComplaintController extends Controller
 
     public function showByTicket($ticketCode)
     {
+        $sanitizedCode = strtoupper(trim(strip_tags($ticketCode)));
+
         $complaint = Complaint::with(['category', 'agency', 'attachments', 'statusLogs'])
-            ->where('ticket_code', strtoupper($ticketCode))
-            ->firstOrFail();
+            ->where('ticket_code', $sanitizedCode)
+            ->first();
+
+        if (!$complaint) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Kode tiket pengaduan tidak ditemukan.',
+            ], 404);
+        }
 
         return response()->json([
             'status' => 'success',
@@ -123,16 +132,12 @@ class ComplaintController extends Controller
         ]);
     }
 
-    public function updateStatus(Request $request, $id)
+    public function updateStatus(UpdateComplaintStatusRequest $request, $id)
     {
         $complaint = Complaint::findOrFail($id);
+        $oldStatus = $complaint->status;
 
-        $validated = $request->validate([
-            'status' => 'required|in:menunggu,diproses,selesai,ditolak',
-            'notes' => 'required|string',
-            'agency_id' => 'nullable|exists:agencies,id',
-            'photo_proof' => 'nullable|image|max:5120',
-        ]);
+        $validated = $request->validated();
 
         $complaint->status = $validated['status'];
         if (isset($validated['agency_id'])) {
@@ -145,7 +150,11 @@ class ComplaintController extends Controller
 
         $photoPath = null;
         if ($request->hasFile('photo_proof')) {
-            $photoPath = '/storage/' . $request->file('photo_proof')->store('proofs', 'public');
+            $file = $request->file('photo_proof');
+            $extension = strtolower($file->getClientOriginalExtension());
+            $filename = 'proof_' . Str::uuid()->toString() . '.' . $extension;
+            $path = $file->storeAs('proofs', $filename, 'public');
+            $photoPath = '/storage/' . $path;
         }
 
         ComplaintStatusLog::create([
@@ -154,6 +163,14 @@ class ComplaintController extends Controller
             'notes' => $validated['notes'],
             'updated_by' => $request->user() ? $request->user()->name : 'Petugas OPD',
             'photo_proof' => $photoPath,
+        ]);
+
+        AuditLog::log('COMPLAINT_STATUS_UPDATED', "Status laporan {$complaint->ticket_code} diubah dari {$oldStatus} menjadi {$validated['status']}", [
+            'status' => $oldStatus,
+        ], [
+            'status' => $validated['status'],
+            'agency_id' => $complaint->agency_id,
+            'notes' => $validated['notes'],
         ]);
 
         return response()->json([
