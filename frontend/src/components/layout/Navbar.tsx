@@ -6,7 +6,7 @@ import { ShieldCheck, LogOut, Menu, X, LayoutDashboard, Sun, Moon, Monitor } fro
 
 export const Navbar: React.FC = () => {
   const { user, isAuthenticated, role, logout } = useAuth();
-  const { mode, toggleTheme } = useTheme();
+  const { mode, setMode } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -38,12 +38,6 @@ export const Navbar: React.FC = () => {
   const handleLogout = async () => {
     await logout();
     navigate('/login');
-  };
-
-  const getThemeTitle = () => {
-    if (mode === 'light') return 'Mode Terang (Klik untuk Gelap)';
-    if (mode === 'dark') return 'Mode Gelap (Klik untuk Sistem OS)';
-    return 'Mode Sistem OS (Klik untuk Terang)';
   };
 
   return (
@@ -94,18 +88,48 @@ export const Navbar: React.FC = () => {
           })}
         </div>
 
-        {/* User Auth Action Button + 3-Way Dark/Light/System Mode Toggle */}
+        {/* Explicit Theme Mode Segmented Controller (Terang / Gelap / System) */}
         <div className="hidden lg:flex items-center space-x-3">
-          <button
-            onClick={toggleTheme}
-            className="flex items-center space-x-1.5 px-3 py-2 rounded-full border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all hover:scale-105 text-xs font-bold"
-            title={getThemeTitle()}
-          >
-            {mode === 'light' && <Sun className="w-4 h-4 text-amber-500" />}
-            {mode === 'dark' && <Moon className="w-4 h-4 text-sky-400" />}
-            {mode === 'system' && <Monitor className="w-4 h-4 text-emerald-500" />}
-            <span className="capitalize">{mode}</span>
-          </button>
+          <div className="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-full border border-slate-200 dark:border-slate-700 text-xs font-bold shadow-xs">
+            <button
+              onClick={() => setMode('light')}
+              className={`flex items-center space-x-1 px-3 py-1.5 rounded-full transition-all ${
+                mode === 'light'
+                  ? 'bg-white text-sky-900 shadow-sm font-extrabold border border-sky-200'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+              title="Aktifkan Mode Terang (Light)"
+            >
+              <Sun className={`w-3.5 h-3.5 ${mode === 'light' ? 'text-amber-500' : ''}`} />
+              <span>Terang</span>
+            </button>
+            
+            <button
+              onClick={() => setMode('dark')}
+              className={`flex items-center space-x-1 px-3 py-1.5 rounded-full transition-all ${
+                mode === 'dark'
+                  ? 'bg-slate-900 text-sky-300 shadow-sm font-extrabold border border-sky-700'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+              title="Aktifkan Mode Gelap (Dark)"
+            >
+              <Moon className={`w-3.5 h-3.5 ${mode === 'dark' ? 'text-sky-400' : ''}`} />
+              <span>Gelap</span>
+            </button>
+
+            <button
+              onClick={() => setMode('system')}
+              className={`flex items-center space-x-1 px-3 py-1.5 rounded-full transition-all ${
+                mode === 'system'
+                  ? 'bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-400 shadow-sm font-extrabold border border-emerald-300 dark:border-emerald-700'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+              title="Gunakan Mode Sistem OS"
+            >
+              <Monitor className={`w-3.5 h-3.5 ${mode === 'system' ? 'text-emerald-500' : ''}`} />
+              <span>OS</span>
+            </button>
+          </div>
 
           {isAuthenticated && user ? (
             <div className="flex items-center space-x-3">
@@ -135,16 +159,14 @@ export const Navbar: React.FC = () => {
           )}
         </div>
 
-        {/* Mobile Menu Button + Dark Toggle */}
+        {/* Mobile Menu Button + Explicit Theme Toggle */}
         <div className="lg:hidden flex items-center space-x-2">
           <button
-            onClick={toggleTheme}
-            className="p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 transition-colors"
-            title={getThemeTitle()}
+            onClick={() => setMode(mode === 'dark' ? 'light' : 'dark')}
+            className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 transition-colors"
+            title={mode === 'dark' ? 'Ubah ke Mode Terang' : 'Ubah ke Mode Gelap'}
           >
-            {mode === 'light' && <Sun className="w-5 h-5 text-amber-500" />}
-            {mode === 'dark' && <Moon className="w-5 h-5 text-sky-400" />}
-            {mode === 'system' && <Monitor className="w-5 h-5 text-emerald-500" />}
+            {mode === 'dark' ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5 text-sky-600" />}
           </button>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -158,7 +180,7 @@ export const Navbar: React.FC = () => {
 
       {/* Mobile Dropdown Menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 px-6 py-5 space-y-3 shadow-xl">
+        <div className="lg:hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 px-6 py-5 space-y-4 shadow-xl">
           {navLinks.map((link) => (
             <Link
               key={link.path}
@@ -171,11 +193,32 @@ export const Navbar: React.FC = () => {
               {link.label}
             </Link>
           ))}
-          <div className="pt-3 border-t border-slate-100 dark:border-slate-700 flex flex-col gap-3">
-            <div className="flex items-center justify-between text-xs font-bold text-slate-500 dark:text-slate-400">
-              <span>Tema Tampilan:</span>
-              <span className="capitalize text-sky-600 dark:text-sky-400">{mode}</span>
+          
+          <div className="pt-3 border-t border-slate-100 dark:border-slate-700 space-y-3">
+            <div className="flex items-center justify-between text-xs font-bold text-slate-600 dark:text-slate-400">
+              <span>Pilih Tema:</span>
+              <div className="flex items-center space-x-1 p-0.5 bg-slate-100 dark:bg-slate-800 rounded-lg">
+                <button
+                  onClick={() => setMode('light')}
+                  className={`px-2.5 py-1 rounded-md ${mode === 'light' ? 'bg-white text-sky-900 font-bold shadow-xs' : 'text-slate-500'}`}
+                >
+                  Terang
+                </button>
+                <button
+                  onClick={() => setMode('dark')}
+                  className={`px-2.5 py-1 rounded-md ${mode === 'dark' ? 'bg-slate-900 text-sky-300 font-bold shadow-xs' : 'text-slate-500'}`}
+                >
+                  Gelap
+                </button>
+                <button
+                  onClick={() => setMode('system')}
+                  className={`px-2.5 py-1 rounded-md ${mode === 'system' ? 'bg-white dark:bg-slate-900 text-emerald-500 font-bold shadow-xs' : 'text-slate-500'}`}
+                >
+                  OS
+                </button>
+              </div>
             </div>
+
             {isAuthenticated ? (
               <button
                 onClick={() => {
