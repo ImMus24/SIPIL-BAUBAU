@@ -20,10 +20,10 @@ const createCustomIcon = (color: string) => {
 
 const icons = {
   menunggu: createCustomIcon('#f59e0b'), // Amber/Yellow
-  diproses: createCustomIcon('#3b82f6'), // Blue
-  selesai: createCustomIcon('#10b981'),  // Green
+  diproses: createCustomIcon('#0284c7'), // Baubau Royal Blue
+  selesai: createCustomIcon('#16a34a'),  // Baubau Green
   ditolak: createCustomIcon('#ef4444'),   // Red
-  picker: createCustomIcon('#0f766e'),    // Baubau Deep Emerald
+  picker: createCustomIcon('#0369a1'),    // Baubau Deep Royal Blue
 };
 
 interface BaubauMapProps {
@@ -58,7 +58,7 @@ const LocationPickerMarker: React.FC<{
     <Marker position={position} icon={icons.picker}>
       <Popup>
         <div className="p-2 text-center">
-          <p className="text-xs font-bold text-teal-800">Lokasi Terpilih</p>
+          <p className="text-xs font-bold text-sky-900">Lokasi Terpilih</p>
           <p className="text-[10px] text-slate-500 font-mono mt-0.5">
             {position[0].toFixed(5)}, {position[1].toFixed(5)}
           </p>
@@ -95,10 +95,10 @@ export const BaubauMap: React.FC<BaubauMapProps> = ({
   return (
     <div className="relative rounded-2xl overflow-hidden shadow-lg border border-slate-200" style={{ height }}>
       {/* Map Control Header Bar */}
-      <div className="absolute top-3 left-3 right-3 z-10 bg-white/90 backdrop-blur-md rounded-xl p-3 shadow-md border border-slate-100 flex items-center justify-between pointer-events-auto">
+      <div className="absolute top-3 left-3 right-3 z-10 bg-white/95 backdrop-blur-md rounded-xl p-3 shadow-md border border-sky-100 flex items-center justify-between pointer-events-auto">
         <div className="flex items-center space-x-2">
-          <div className="p-2 bg-teal-700 text-white rounded-lg">
-            <MapPin className="w-4 h-4" />
+          <div className="p-2 bg-sky-700 text-white rounded-lg">
+            <MapPin className="w-4 h-4 text-amber-300" />
           </div>
           <div>
             <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Pemetaan Lokasi GIS Kota Baubau</h4>
@@ -107,8 +107,8 @@ export const BaubauMap: React.FC<BaubauMapProps> = ({
         </div>
         <div className="hidden sm:flex items-center space-x-3 text-xs">
           <span className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-amber-500 mr-1.5"></span>Menunggu</span>
-          <span className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-blue-500 mr-1.5"></span>Diproses</span>
-          <span className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500 mr-1.5"></span>Selesai</span>
+          <span className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-sky-600 mr-1.5"></span>Diproses</span>
+          <span className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-emerald-600 mr-1.5"></span>Selesai</span>
         </div>
       </div>
 
@@ -145,14 +145,14 @@ export const BaubauMap: React.FC<BaubauMapProps> = ({
               <Popup>
                 <div className="p-3 max-w-xs space-y-2">
                   <div className="flex items-center justify-between gap-2 border-b pb-2">
-                    <span className="font-mono text-[10px] font-bold text-teal-800 bg-teal-50 px-1.5 py-0.5 rounded border border-teal-200">
+                    <span className="font-mono text-[10px] font-bold text-sky-900 bg-sky-50 px-1.5 py-0.5 rounded border border-sky-200">
                       {item.ticket_code}
                     </span>
                     <StatusBadge status={item.status} size="sm" />
                   </div>
                   <h4 className="font-bold text-xs text-slate-800 line-clamp-2 leading-tight">{item.title}</h4>
                   <div className="text-[11px] text-slate-600 flex items-center space-x-1">
-                    <Navigation className="w-3 h-3 text-teal-600 shrink-0" />
+                    <Navigation className="w-3 h-3 text-sky-600 shrink-0" />
                     <span className="truncate">{item.address} ({item.subdistrict})</span>
                   </div>
                   <div className="pt-1 flex items-center justify-between">
@@ -160,7 +160,7 @@ export const BaubauMap: React.FC<BaubauMapProps> = ({
                     {onSelectComplaint && (
                       <button
                         onClick={() => onSelectComplaint(item)}
-                        className="inline-flex items-center space-x-1 px-2.5 py-1 text-xs font-semibold bg-teal-700 hover:bg-teal-800 text-white rounded-md transition-colors"
+                        className="inline-flex items-center space-x-1 px-2.5 py-1 text-xs font-semibold bg-sky-700 hover:bg-sky-800 text-white rounded-md transition-colors"
                       >
                         <Eye className="w-3 h-3" />
                         <span>Detail</span>
