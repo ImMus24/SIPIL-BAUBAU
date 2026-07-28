@@ -53,7 +53,7 @@ class AuthController extends Controller
             AuditLog::log('LOGIN_FAILED', "Percobaan login gagal untuk email: {$validated['email']}");
 
             throw ValidationException::withMessages([
-                'email' => ['Kombinasi email atau kata sandi tidak valid.'],
+                'email' => ['Email atau kata sandi salah.'],
             ]);
         }
 

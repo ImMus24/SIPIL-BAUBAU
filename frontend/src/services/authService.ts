@@ -1,5 +1,5 @@
 import { api } from './api';
-import type { User, UserRole } from '../types';
+import type { User } from '../types';
 
 export interface LoginResponse {
   user: User;
@@ -10,61 +10,46 @@ export const authService = {
   async login(email: string, password: string): Promise<LoginResponse> {
     try {
       const response = await api.post('/auth/login', { email, password });
-      const { user, token } = response.data.data;
-      localStorage.setItem('sipil_auth_token', token);
-      localStorage.setItem('sipil_user', JSON.stringify(user));
-      return { user, token };
-    } catch {
-      // Mock login handling for dev preview
-      let role: UserRole = 'citizen';
-      let name = 'Warga Kota Baubau';
-      let agency_name = undefined;
-
-      if (email.includes('admin')) {
-        role = 'admin';
-        name = 'Administrator Master Baubau';
-      } else if (email.includes('pupr') || email.includes('officer')) {
-        role = 'officer';
-        name = 'Petugas Lapangan PUPR';
-        agency_name = 'Dinas Pekerjaan Umum dan Penataan Ruang Kota Baubau';
+      
+      if (response.data && response.data.status === 'success' && response.data.data) {
+        const { user, token } = response.data.data;
+        localStorage.setItem('sipil_auth_token', token);
+        localStorage.setItem('sipil_user', JSON.stringify(user));
+        return { user, token };
       }
-
-      const mockUser: User = {
-        id: role === 'admin' ? 1 : role === 'officer' ? 2 : 3,
-        name,
-        email,
-        role,
-        agency_name,
-        phone: '081245678901',
-        created_at: new Date().toISOString(),
-      };
-      const token = 'mock-jwt-token-sipil-baubau';
-      localStorage.setItem('sipil_auth_token', token);
-      localStorage.setItem('sipil_user', JSON.stringify(mockUser));
-      return { user: mockUser, token };
+      throw new Error('Email atau kata sandi salah.');
+    } catch (error: any) {
+      localStorage.removeItem('sipil_auth_token');
+      localStorage.removeItem('sipil_user');
+      
+      const message =
+        error.response?.data?.message ||
+        error.response?.data?.errors?.email?.[0] ||
+        'Email atau kata sandi salah.';
+      throw new Error(message);
     }
   },
 
   async register(name: string, email: string, password: string, phone?: string): Promise<LoginResponse> {
     try {
       const response = await api.post('/auth/register', { name, email, password, phone });
-      const { user, token } = response.data.data;
-      localStorage.setItem('sipil_auth_token', token);
-      localStorage.setItem('sipil_user', JSON.stringify(user));
-      return { user, token };
-    } catch {
-      const mockUser: User = {
-        id: Date.now(),
-        name,
-        email,
-        role: 'citizen',
-        phone,
-        created_at: new Date().toISOString(),
-      };
-      const token = 'mock-jwt-token-sipil-baubau';
-      localStorage.setItem('sipil_auth_token', token);
-      localStorage.setItem('sipil_user', JSON.stringify(mockUser));
-      return { user: mockUser, token };
+      
+      if (response.data && response.data.status === 'success' && response.data.data) {
+        const { user, token } = response.data.data;
+        localStorage.setItem('sipil_auth_token', token);
+        localStorage.setItem('sipil_user', JSON.stringify(user));
+        return { user, token };
+      }
+      throw new Error('Gagal mendaftarkan akun.');
+    } catch (error: any) {
+      localStorage.removeItem('sipil_auth_token');
+      localStorage.removeItem('sipil_user');
+
+      const message =
+        error.response?.data?.message ||
+        error.response?.data?.errors?.email?.[0] ||
+        'Gagal mendaftarkan akun. Periksa kembali kelengkapan data.';
+      throw new Error(message);
     }
   },
 
@@ -72,10 +57,29 @@ export const authService = {
     try {
       await api.post('/auth/logout');
     } catch {
-      // ignore offline errors
+      // Ignore network failures on logout
     } finally {
       localStorage.removeItem('sipil_auth_token');
       localStorage.removeItem('sipil_user');
+    }
+  },
+
+  async fetchCurrentUser(): Promise<User | null> {
+    const token = localStorage.getItem('sipil_auth_token');
+    if (!token) return null;
+
+    try {
+      const response = await api.get('/auth/me');
+      if (response.data && response.data.status === 'success' && response.data.data) {
+        const user = response.data.data;
+        localStorage.setItem('sipil_user', JSON.stringify(user));
+        return user;
+      }
+      return null;
+    } catch {
+      localStorage.removeItem('sipil_auth_token');
+      localStorage.removeItem('sipil_user');
+      return null;
     }
   },
 

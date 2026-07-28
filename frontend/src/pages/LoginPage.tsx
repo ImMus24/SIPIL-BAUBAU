@@ -29,8 +29,8 @@ export const LoginPage: React.FC = () => {
       } else {
         navigate('/dashboard');
       }
-    } catch {
-      setErrorMsg('Kredensial login tidak valid. Silakan coba lagi.');
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Email atau kata sandi salah.');
     } finally {
       setLoading(false);
     }
