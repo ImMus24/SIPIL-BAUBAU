@@ -59,6 +59,10 @@ class FullApiQATest extends TestCase
 
     public function test_full_complaint_creation_and_lookup(): void
     {
+        // Complaint submission now requires authentication
+        $citizen = User::factory()->create(['role' => UserRole::CITIZEN]);
+        Sanctum::actingAs($citizen);
+
         $category = Category::create(['name' => 'Lampu Jalan', 'slug' => 'lampu-jalan', 'description' => 'Test', 'icon' => 'Lightbulb']);
 
         // 1. Create complaint
@@ -130,12 +134,18 @@ class FullApiQATest extends TestCase
 
     public function test_complaint_validation_errors(): void
     {
+        $citizen = User::factory()->create(['role' => UserRole::CITIZEN]);
+        Sanctum::actingAs($citizen);
+
         $response = $this->postJson('/api/v1/complaints', []);
         $response->assertStatus(422)->assertJson(['success' => false]);
     }
 
     public function test_complaint_invalid_subdistrict(): void
     {
+        $citizen = User::factory()->create(['role' => UserRole::CITIZEN]);
+        Sanctum::actingAs($citizen);
+
         $category = Category::create(['name' => 'Test', 'slug' => 'test', 'description' => 'Test', 'icon' => 'test']);
 
         $response = $this->postJson('/api/v1/complaints', [
@@ -346,6 +356,9 @@ class FullApiQATest extends TestCase
      */
     public function test_duplicate_complaint_is_rejected(): void
     {
+        $citizen = User::factory()->create(['role' => UserRole::CITIZEN]);
+        Sanctum::actingAs($citizen);
+
         $category = Category::create(['name' => 'Jalan', 'slug' => 'jalan-dup', 'description' => 'Test', 'icon' => 'road']);
 
         $payload = [

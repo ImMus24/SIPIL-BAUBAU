@@ -54,6 +54,16 @@ return Application::configure(basePath: dirname(__DIR__))
             }
         });
 
+        // Handle unauthenticated requests — must be BEFORE the catch-all
+        $exceptions->render(function (\Illuminate\Auth\AuthenticationException $e, Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Sesi Anda telah berakhir. Silakan login kembali.',
+                ], 401);
+            }
+        });
+
         // Catch-all for 500 errors - never expose stack traces
         $exceptions->render(function (\Throwable $e, Request $request) {
             if ($request->is('api/*')) {

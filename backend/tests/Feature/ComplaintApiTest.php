@@ -5,6 +5,9 @@ namespace Tests\Feature;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\Models\Category;
+use App\Models\User;
+use App\Enums\UserRole;
+use Laravel\Sanctum\Sanctum;
 
 class ComplaintApiTest extends TestCase
 {
@@ -32,6 +35,10 @@ class ComplaintApiTest extends TestCase
 
     public function test_can_submit_complaint_and_lookup_by_ticket(): void
     {
+        // Authentication is now required for complaint submission
+        $citizen = User::factory()->create(['role' => UserRole::CITIZEN]);
+        Sanctum::actingAs($citizen);
+
         $category = Category::create([
             'name' => 'Lampu Jalan',
             'slug' => 'lampu-jalan',
@@ -40,12 +47,12 @@ class ComplaintApiTest extends TestCase
         ]);
 
         $response = $this->postJson('/api/v1/complaints', [
-            'title' => 'Lampu Jalan Padam Pantai Kamali',
-            'description' => 'Lampu jalan mati total di area dermaga',
-            'category_id' => $category->id,
-            'subdistrict' => 'Wolio',
-            'address' => 'Kawasan Pantai Kamali, Baubau',
-            'urgency' => 'tinggi',
+            'title'         => 'Lampu Jalan Padam Pantai Kamali',
+            'description'   => 'Lampu jalan mati total di area dermaga',
+            'category_id'   => $category->id,
+            'subdistrict'   => 'Wolio',
+            'address'       => 'Kawasan Pantai Kamali, Baubau',
+            'urgency'       => 'tinggi',
             'reporter_name' => 'Masyarakat Kamali',
             'reporter_phone' => '08123456789',
         ]);
@@ -80,5 +87,13 @@ class ComplaintApiTest extends TestCase
                 'message',
                 'data' => ['total', 'menunggu', 'diproses', 'selesai', 'ditolak', 'completion_rate'],
             ]);
+    }
+
+    /** Complaint submission now requires authentication. */
+    public function test_unauthenticated_submission_returns_401(): void
+    {
+        $response = $this->postJson('/api/v1/complaints', []);
+
+        $response->assertStatus(401);
     }
 }

@@ -138,9 +138,11 @@ class DashboardService
             $new = Complaint::where('agency_id', $agencyId)
                 ->whereDate('created_at', $date)
                 ->count();
+
+            $dayNames = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', "Jum'at", 'Sabtu'];
             $performanceChart[] = [
                 'date' => $date,
-                'label' => now()->subDays($i)->isoFormat('dddd'),
+                'label' => $dayNames[(int) now()->subDays($i)->format('w')],
                 'completed' => $completed,
                 'new' => $new,
             ];

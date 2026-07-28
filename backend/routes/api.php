@@ -26,14 +26,13 @@ Route::middleware([SecurityHeaders::class])->prefix('v1')->group(function () {
     Route::get('/complaints', [ComplaintController::class, 'index']);
     Route::get('/complaints/ticket/{ticket_code}', [ComplaintController::class, 'showByTicket']);
 
-    // Complaint Submission with Rate Limiting (10 submissions per minute)
-    Route::post('/complaints', [ComplaintController::class, 'store'])->middleware('throttle:10,1');
-
     // Public Statistics
     Route::get('/stats/summary', [StatController::class, 'summary']);
 
     // Protected Routes (Sanctum Authentication Required)
     Route::middleware('auth:sanctum')->group(function () {
+        // Rate-limited complaint submission (10 per minute per user)
+        Route::post('/complaints', [ComplaintController::class, 'store'])->middleware('throttle:10,1');
         Route::get('/auth/me', [AuthController::class, 'me']);
         Route::post('/auth/logout', [AuthController::class, 'logout']);
 
