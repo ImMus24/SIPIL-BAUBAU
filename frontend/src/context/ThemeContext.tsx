@@ -10,7 +10,7 @@ interface ThemeContextType {
 }
 
 const ThemeContext = createContext<ThemeContextType>({
-  mode: 'system',
+  mode: 'light',
   isDark: false,
   setMode: () => {},
   toggleTheme: () => {},
@@ -24,7 +24,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     if (stored === 'light' || stored === 'dark' || stored === 'system') {
       return stored;
     }
-    return 'system';
+    return 'light';
   });
 
   const [isDark, setIsDark] = useState<boolean>(() => {
