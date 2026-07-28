@@ -70,40 +70,38 @@ class DashboardService
 
     public function getCitizenOverview(int $userId): array
     {
-        $stats = $this->complaintRepository->getSummaryStats();
+        $stats     = $this->complaintRepository->getCitizenStats($userId);
         $myReports = $this->complaintRepository->getByUserId($userId);
-        $userComplaints = $this->complaintRepository->getByUserIdWithTimeline($userId);
 
-        // Timeline from status logs
+        // Build timeline from all status-log entries across the citizen's reports
         $timeline = [];
         foreach ($myReports as $report) {
             foreach ($report->statusLogs ?? [] as $log) {
                 $timeline[] = [
                     'complaint_id' => $report->id,
-                    'ticket_code' => $report->ticket_code,
-                    'title' => $report->title,
-                    'status' => $log->status,
-                    'notes' => $log->notes,
-                    'updated_by' => $log->updated_by,
-                    'created_at' => $log->created_at,
+                    'ticket_code'  => $report->ticket_code,
+                    'title'        => $report->title,
+                    'status'       => $log->status,
+                    'notes'        => $log->notes,
+                    'updated_by'   => $log->updated_by,
+                    'created_at'   => $log->created_at,
                 ];
             }
         }
         usort($timeline, fn($a, $b) => strtotime($b['created_at']) - strtotime($a['created_at']));
 
         $satisfaction = [
-            'completion_rate' => $stats['completion_rate'],
-            'total_completed' => $stats['selesai'],
-            'total_reports' => $myReports->count(),
+            'completion_rate'  => $stats['completion_rate'],
+            'total_completed'  => $stats['selesai'],
+            'total_reports'    => $stats['total'],
         ];
 
         return [
-            'stats' => $stats,
-            'my_reports' => $myReports,
-            'user_complaints' => $userComplaints,
-            'timeline' => array_slice($timeline, 0, 10),
+            'stats'               => $stats,
+            'my_reports'          => $myReports,
+            'timeline'            => array_slice($timeline, 0, 10),
             'notifications_count' => $this->getNotificationsCount($userId),
-            'satisfaction' => $satisfaction,
+            'satisfaction'        => $satisfaction,
         ];
     }
 

@@ -2,7 +2,11 @@
 
 namespace App\Models;
 
+use App\Enums\ComplaintStatus;
+use App\Enums\UrgencyLevel;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Complaint extends Model
 {
@@ -28,32 +32,34 @@ class Complaint extends Model
     ];
 
     protected $casts = [
-        'latitude' => 'float',
-        'longitude' => 'float',
+        'latitude'    => 'float',
+        'longitude'   => 'float',
         'completed_at' => 'datetime',
+        'status'      => ComplaintStatus::class,
+        'urgency'     => UrgencyLevel::class,
     ];
 
-    public function category()
+    public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
     }
 
-    public function agency()
+    public function agency(): BelongsTo
     {
         return $this->belongsTo(Agency::class);
     }
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function attachments()
+    public function attachments(): HasMany
     {
         return $this->hasMany(Attachment::class);
     }
 
-    public function statusLogs()
+    public function statusLogs(): HasMany
     {
         return $this->hasMany(ComplaintStatusLog::class)->orderBy('created_at', 'asc');
     }

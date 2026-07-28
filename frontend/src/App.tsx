@@ -82,18 +82,20 @@ const ProtectedRoute: React.FC<{
   return <>{children}</>;
 };
 
-// Role-based redirector for the main dashboard route
-const DashboardRouter: React.FC = () => {
+// Route /dashboard: tampilkan CitizenDashboard untuk citizen,
+// redirect role lain ke halaman dashboard masing-masing.
+const CitizenDashboardRoute: React.FC = () => {
   const { isAuthenticated, role } = useAuth();
   if (!isAuthenticated) return <Navigate to="/login" replace />;
-
-  const routeMap: Record<string, string> = {
-    citizen: '/dashboard',
-    officer: '/officer',
-    admin: '/admin',
-    head_of_agency: '/kepala-dinas',
-  };
-  return <Navigate to={routeMap[role ?? 'citizen'] ?? '/dashboard'} replace />;
+  if (role === 'officer') return <Navigate to="/officer" replace />;
+  if (role === 'admin') return <Navigate to="/admin" replace />;
+  if (role === 'head_of_agency') return <Navigate to="/kepala-dinas" replace />;
+  // citizen (atau role tidak dikenali) tampilkan halaman warga
+  return (
+    <Suspense fallback={<PageLoader />}>
+      <CitizenDashboard />
+    </Suspense>
+  );
 };
 
 export function App() {
@@ -119,13 +121,8 @@ export function App() {
                     <Route path="/register" element={<GuestRoute><RegisterPage /></GuestRoute>} />
                   </Route>
 
-                  {/* Dashboard router - redirect based on role */}
-                  <Route path="/dashboard" element={<DashboardRouter />} />
-
-                  {/* Protected: citizen */}
-                  <Route path="/dashboard" element={
-                    <ProtectedRoute allowedRoles={['citizen']}><CitizenDashboard /></ProtectedRoute>
-                  } />
+                  {/* /dashboard: citizen lihat dashboard warga, role lain diredirect */}
+                  <Route path="/dashboard" element={<CitizenDashboardRoute />} />
 
                   {/* Protected: officer */}
                   <Route path="/officer" element={

@@ -9,15 +9,7 @@ class ComplaintObserver
 {
     public function created(Complaint $complaint): void
     {
-        ProcessComplaintImages::dispatch($complaint)
-            ->onQueue('images');
-    }
-
-    public function updated(Complaint $complaint): void
-    {
-        if ($complaint->wasChanged('status')) {
-            // Status change logging is handled in UpdateComplaintStatusAction
-        }
+        ProcessComplaintImages::dispatch($complaint)->onQueue('images');
     }
 
     public function deleted(Complaint $complaint): void

@@ -63,30 +63,31 @@ class FullApiQATest extends TestCase
 
         // 1. Create complaint
         $response = $this->postJson('/api/v1/complaints', [
-            'title' => 'Lampu Mati di Jalan Wolio',
-            'description' => 'Lampu jalan mati total selama 3 hari',
-            'category_id' => $category->id,
-            'subdistrict' => 'Wolio',
-            'address' => 'Jl. Wolio Raya No. 10',
-            'urgency' => 'tinggi',
+            'title'         => 'Lampu Mati di Jalan Wolio',
+            'description'   => 'Lampu jalan mati total selama 3 hari',
+            'category_id'   => $category->id,
+            'subdistrict'   => 'Wolio',
+            'address'       => 'Jl. Wolio Raya No. 10',
+            'urgency'       => 'tinggi',
             'reporter_name' => 'Masyarakat Baubau',
             'reporter_phone' => '08123456789',
             'reporter_email' => 'test@example.com',
         ]);
         $response->assertStatus(201)->assertJson(['success' => true]);
 
-        $ticketCode = $response->json('data.ticket_code');
+        $ticketCode  = $response->json('data.ticket_code');
         $complaintId = $response->json('data.id');
 
         $this->assertNotNull($ticketCode);
-        $this->assertStringStartsWith('SIPIL-', $ticketCode);
+        // Ticket code format: SPL-{YEAR}-{6-digit-sequence}
+        $this->assertStringStartsWith('SPL-', $ticketCode);
         $this->assertEquals('menunggu', $response->json('data.status'));
 
         // 2. Verify database row exists
         $this->assertDatabaseHas('complaints', [
-            'id' => $complaintId,
+            'id'          => $complaintId,
             'ticket_code' => $ticketCode,
-            'status' => 'menunggu',
+            'status'      => 'menunggu',
         ]);
 
         // 3. Lookup by ticket code
@@ -96,7 +97,7 @@ class FullApiQATest extends TestCase
         // 4. Verify status log was created
         $this->assertDatabaseHas('complaint_status_logs', [
             'complaint_id' => $complaintId,
-            'status' => 'menunggu',
+            'status'       => 'menunggu',
         ]);
 
         // 5. Update status — use Sanctum authentication (route uses auth:sanctum)
@@ -105,19 +106,19 @@ class FullApiQATest extends TestCase
 
         $update = $this->postJson("/api/v1/complaints/{$complaintId}/status", [
             'status' => 'diproses',
-            'notes' => 'Sedang ditangani oleh tim teknis',
+            'notes'  => 'Sedang ditangani oleh tim teknis',
         ]);
         $update->assertStatus(200);
         $this->assertDatabaseHas('complaints', ['id' => $complaintId, 'status' => 'diproses']);
         $this->assertDatabaseHas('complaint_status_logs', [
             'complaint_id' => $complaintId,
-            'status' => 'diproses',
+            'status'       => 'diproses',
         ]);
 
         // 6. Complete the complaint
         $complete = $this->postJson("/api/v1/complaints/{$complaintId}/status", [
             'status' => 'selesai',
-            'notes' => 'Perbaikan selesai dikerjakan',
+            'notes'  => 'Perbaikan selesai dikerjakan',
         ]);
         $complete->assertStatus(200);
         $this->assertDatabaseHas('complaints', ['id' => $complaintId, 'status' => 'selesai']);
@@ -138,12 +139,12 @@ class FullApiQATest extends TestCase
         $category = Category::create(['name' => 'Test', 'slug' => 'test', 'description' => 'Test', 'icon' => 'test']);
 
         $response = $this->postJson('/api/v1/complaints', [
-            'title' => 'Test',
-            'description' => 'Test',
-            'category_id' => $category->id,
-            'subdistrict' => 'InvalidSubdistrict',
-            'address' => 'Test',
-            'urgency' => 'rendah',
+            'title'         => 'Test',
+            'description'   => 'Test',
+            'category_id'   => $category->id,
+            'subdistrict'   => 'InvalidSubdistrict',
+            'address'       => 'Test',
+            'urgency'       => 'rendah',
             'reporter_name' => 'Test',
         ]);
         $response->assertStatus(422);
@@ -163,9 +164,9 @@ class FullApiQATest extends TestCase
     {
         // Register
         $register = $this->postJson('/api/v1/auth/register', [
-            'name' => 'Warga Baubau',
-            'email' => 'warga@baubau.go.id',
-            'password' => 'Password123!',
+            'name'                  => 'Warga Baubau',
+            'email'                 => 'warga@baubau.go.id',
+            'password'              => 'Password123!',
             'password_confirmation' => 'Password123!',
         ]);
         $register->assertStatus(201)->assertJson(['success' => true]);
@@ -175,7 +176,7 @@ class FullApiQATest extends TestCase
 
         // Login
         $login = $this->postJson('/api/v1/auth/login', [
-            'email' => 'warga@baubau.go.id',
+            'email'    => 'warga@baubau.go.id',
             'password' => 'Password123!',
         ]);
         $login->assertStatus(200)->assertJson(['success' => true]);
@@ -195,11 +196,6 @@ class FullApiQATest extends TestCase
             ->postJson('/api/v1/auth/logout');
         $logout->assertStatus(200);
 
-        // Protected route after logout
-        // Note: In testing, Sanctum preserves session state. Verify token revocation in DB.
-        $fresh = $this->getJson('/api/v1/auth/me');
-        $fresh->assertStatus(200); // Session persists in test env
-
         // Actual verification: tokens deleted from DB
         $this->assertDatabaseMissing('personal_access_tokens', [
             'tokenable_id' => $register->json('data.user.id'),
@@ -211,7 +207,7 @@ class FullApiQATest extends TestCase
         User::factory()->create(['email' => 'user@test.com', 'password' => bcrypt('Correct1')]);
 
         $response = $this->postJson('/api/v1/auth/login', [
-            'email' => 'user@test.com',
+            'email'    => 'user@test.com',
             'password' => 'wrongpassword',
         ]);
         $response->assertStatus(422)->assertJson(['success' => false]);
@@ -228,18 +224,18 @@ class FullApiQATest extends TestCase
         foreach (['menunggu' => 3, 'diproses' => 2, 'selesai' => 5, 'ditolak' => 1] as $status => $count) {
             for ($i = 0; $i < $count; $i++) {
                 Complaint::create([
-                    'ticket_code' => 'SPL-TEST-' . uniqid(),
-                    'title' => "Test {$status} {$i}",
-                    'description' => 'Test',
-                    'category_id' => $category->id,
-                    'subdistrict' => 'Wolio',
-                    'address' => 'Test',
+                    'ticket_code'   => 'SPL-TEST-' . uniqid(),
+                    'title'         => "Test {$status} {$i}",
+                    'description'   => 'Test',
+                    'category_id'   => $category->id,
+                    'subdistrict'   => 'Wolio',
+                    'address'       => 'Test',
                     'reporter_name' => 'Test',
-                    'urgency' => 'sedang',
-                    'status' => $status,
-                    'latitude' => -5.4642,
-                    'longitude' => 122.6035,
-                    'completed_at' => $status === 'selesai' ? now() : null,
+                    'urgency'       => 'sedang',
+                    'status'        => $status,
+                    'latitude'      => -5.4642,
+                    'longitude'     => 122.6035,
+                    'completed_at'  => $status === 'selesai' ? now() : null,
                 ]);
             }
         }
@@ -283,17 +279,17 @@ class FullApiQATest extends TestCase
     {
         $category = Category::create(['name' => 'Test', 'slug' => 'test', 'description' => 'Test', 'icon' => 't']);
         $complaint = Complaint::create([
-            'ticket_code' => 'SPL-UNAUTH',
-            'title' => 'Test',
-            'description' => 'Test',
-            'category_id' => $category->id,
-            'subdistrict' => 'Wolio',
-            'address' => 'Test',
+            'ticket_code'   => 'SPL-UNAUTH',
+            'title'         => 'Test',
+            'description'   => 'Test',
+            'category_id'   => $category->id,
+            'subdistrict'   => 'Wolio',
+            'address'       => 'Test',
             'reporter_name' => 'Test',
-            'urgency' => 'sedang',
-            'status' => 'menunggu',
-            'latitude' => -5.4642,
-            'longitude' => 122.6035,
+            'urgency'       => 'sedang',
+            'status'        => 'menunggu',
+            'latitude'      => -5.4642,
+            'longitude'     => 122.6035,
         ]);
 
         $citizen = User::factory()->create(['role' => UserRole::CITIZEN]);
@@ -301,8 +297,74 @@ class FullApiQATest extends TestCase
 
         $response = $this->postJson("/api/v1/complaints/{$complaint->id}/status", [
             'status' => 'diproses',
-            'notes' => 'Test',
+            'notes'  => 'Test',
         ]);
         $response->assertStatus(403);
+    }
+
+    /**
+     * An officer cannot update a complaint that belongs to a different agency.
+     */
+    public function test_officer_from_wrong_agency_cannot_update_status(): void
+    {
+        $agencyA  = Agency::create(['code' => 'PUPR', 'name' => 'Dinas PU', 'description' => 'Test', 'contact_email' => 'a@test.com', 'phone' => '1']);
+        $agencyB  = Agency::create(['code' => 'DKES', 'name' => 'Dinas Kesehatan', 'description' => 'Test', 'contact_email' => 'b@test.com', 'phone' => '2']);
+        $category = Category::create(['name' => 'Test', 'slug' => 'test-agencyb', 'description' => 'Test', 'icon' => 't']);
+
+        // Complaint assigned to agency A
+        $complaint = Complaint::create([
+            'ticket_code'   => 'SPL-AGENCYA-001',
+            'title'         => 'Test',
+            'description'   => 'Test',
+            'category_id'   => $category->id,
+            'agency_id'     => $agencyA->id,
+            'subdistrict'   => 'Wolio',
+            'address'       => 'Test',
+            'reporter_name' => 'Test',
+            'urgency'       => 'sedang',
+            'status'        => 'menunggu',
+            'latitude'      => -5.4642,
+            'longitude'     => 122.6035,
+        ]);
+
+        // Officer from agency B tries to update
+        $officerB = User::factory()->create([
+            'role'      => UserRole::OFFICER,
+            'agency_id' => $agencyB->id,
+        ]);
+        Sanctum::actingAs($officerB);
+
+        $response = $this->postJson("/api/v1/complaints/{$complaint->id}/status", [
+            'status' => 'diproses',
+            'notes'  => 'Mencoba mengambil alih',
+        ]);
+        $response->assertStatus(403);
+    }
+
+    /**
+     * Submitting a duplicate complaint (same email+address+category within 24h) is rejected.
+     */
+    public function test_duplicate_complaint_is_rejected(): void
+    {
+        $category = Category::create(['name' => 'Jalan', 'slug' => 'jalan-dup', 'description' => 'Test', 'icon' => 'road']);
+
+        $payload = [
+            'title'          => 'Jalan Rusak',
+            'description'    => 'Jalan berlubang besar',
+            'category_id'    => $category->id,
+            'subdistrict'    => 'Wolio',
+            'address'        => 'Jl. Wolio No. 1',
+            'urgency'        => 'tinggi',
+            'reporter_name'  => 'Test Warga',
+            'reporter_email' => 'duplicate@test.com',
+        ];
+
+        // First submission succeeds
+        $first = $this->postJson('/api/v1/complaints', $payload);
+        $first->assertStatus(201);
+
+        // Second submission with identical identity+address+category should be rejected
+        $second = $this->postJson('/api/v1/complaints', $payload);
+        $second->assertStatus(409);
     }
 }

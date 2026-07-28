@@ -29,9 +29,14 @@ class UpdateComplaintStatusAction
                 throw new ComplaintNotFoundException();
             }
 
-            $this->validateTransition($complaint->status, $dto->status);
+            $oldEnumStatus = $complaint->status;
+            $oldStatusValue = $oldEnumStatus instanceof \App\Enums\ComplaintStatus
+                ? $oldEnumStatus->value
+                : $oldEnumStatus;
 
-            $oldStatus = $complaint->status;
+            $this->validateTransition($oldStatusValue, $dto->status);
+
+            $oldStatus = $oldEnumStatus;
             $updateData = ['status' => $dto->status];
 
             if ($dto->agencyId) {
@@ -55,12 +60,12 @@ class UpdateComplaintStatusAction
             ]);
 
             $this->auditLog('COMPLAINT_STATUS_UPDATED',
-                "Status {$complaint->ticket_code}: {$oldStatus} → {$dto->status}",
-                previous: ['status' => $oldStatus],
+                "Status {$complaint->ticket_code}: {$oldStatusValue} → {$dto->status}",
+                previous: ['status' => $oldStatusValue],
                 metadata: ['status' => $dto->status, 'agency_id' => $complaint->agency_id, 'notes' => $dto->notes],
             );
 
-            ComplaintStatusUpdated::dispatch($complaint, $oldStatus, $dto->status);
+            ComplaintStatusUpdated::dispatch($complaint, $oldStatusValue, $dto->status);
 
             return $complaint->fresh(['category', 'agency', 'attachments', 'statusLogs']);
         });

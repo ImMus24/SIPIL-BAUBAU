@@ -66,6 +66,19 @@ class ComplaintController extends Controller
 
     public function updateStatus(UpdateComplaintStatusRequest $request, int $id): JsonResponse
     {
+        // Fetch the complaint first to pass to the policy gate
+        $complaint = $this->complaintService->getComplaintById($id);
+
+        if (!$complaint) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pengaduan tidak ditemukan.',
+            ], 404);
+        }
+
+        // Authorize via ComplaintPolicy::updateStatus (agency-scoped)
+        $this->authorize('updateStatus', $complaint);
+
         $dto = UpdateComplaintStatusDTO::fromRequest(
             $id,
             $request->validated(),

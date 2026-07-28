@@ -8,15 +8,8 @@ class UpdateComplaintStatusRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        $user = $this->user();
-        if (!$user) return false;
-
-        // $user->role is UserRole backed enum — compare by value
-        $role = $user->role instanceof \App\Enums\UserRole
-            ? $user->role->value
-            : $user->role;
-
-        return in_array($role, ['admin', 'officer', 'head_of_agency'], true);
+        // Authorization is handled upstream by RoleMiddleware(':admin,officer,head_of_agency').
+        return true;
     }
 
     protected function prepareForValidation(): void

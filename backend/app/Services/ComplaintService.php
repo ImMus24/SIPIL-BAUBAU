@@ -8,6 +8,8 @@ use App\Contracts\ComplaintRepositoryInterface;
 use App\DTOs\StoreComplaintDTO;
 use App\DTOs\UpdateComplaintStatusDTO;
 use App\Models\Complaint;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ComplaintService
 {
@@ -17,9 +19,14 @@ class ComplaintService
         protected UpdateComplaintStatusAction $updateComplaintStatusAction,
     ) {}
 
-    public function getComplaints(array $filters): mixed
+    public function getComplaints(array $filters): LengthAwarePaginator|Collection
     {
         return $this->complaintRepository->getAllFiltered($filters);
+    }
+
+    public function getComplaintById(int $id): ?Complaint
+    {
+        return $this->complaintRepository->findById($id);
     }
 
     public function getComplaintByTicket(string $ticketCode): ?Complaint
@@ -27,7 +34,7 @@ class ComplaintService
         return $this->complaintRepository->findByTicketCode($ticketCode);
     }
 
-    public function getComplaintsByUser(int $userId): mixed
+    public function getComplaintsByUser(int $userId): Collection
     {
         return $this->complaintRepository->getByUserId($userId);
     }

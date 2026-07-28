@@ -37,12 +37,11 @@ class ProcessComplaintImages implements ShouldQueue
                 continue;
             }
 
-            // Generate thumbnail
-            $thumbnailPath = 'thumbnails/' . Str::uuid()->toString() . '.webp';
-            // Thumbnail generation would use Intervention Image here
-            // For now, we just mark it as processed
-            $attachment->update([
-                'thumbnail_path' => '/storage/' . $thumbnailPath,
+            // TODO: implement actual thumbnail generation using Intervention Image.
+            // Do NOT write thumbnail_path until a real thumbnail file is produced.
+            logger()->info('Image processing placeholder — thumbnail generation not yet implemented.', [
+                'attachment_id' => $attachment->id,
+                'source'        => $sourcePath,
             ]);
         }
     }

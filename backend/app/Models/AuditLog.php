@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
 
 class AuditLog extends Model
@@ -24,11 +25,12 @@ class AuditLog extends Model
         'new_data' => 'array',
     ];
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    // TODO: extract this static factory to a dedicated AuditService to keep the model focused on schema+relations.
     public static function log($action, $description = null, $oldData = null, $newData = null, $user = null)
     {
         $request = request();

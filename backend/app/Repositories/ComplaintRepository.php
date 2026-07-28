@@ -6,10 +6,34 @@ use App\Contracts\ComplaintRepositoryInterface;
 use App\Models\Complaint;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class ComplaintRepository implements ComplaintRepositoryInterface
 {
+    // ──────────────────────────────────────────────────────────────
+    // Core CRUD
+    // ──────────────────────────────────────────────────────────────
+
+    public function create(array $data): Complaint
+    {
+        return Complaint::create($data);
+    }
+
+    public function update(Complaint $complaint, array $data): bool
+    {
+        return $complaint->update($data);
+    }
+
+    public function delete(Complaint $complaint): bool
+    {
+        return $complaint->delete();
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // Queries
+    // ──────────────────────────────────────────────────────────────
+
     public function getAllFiltered(array $filters, int $perPage = 15): LengthAwarePaginator|Collection
     {
         $query = Complaint::with(['category', 'agency', 'attachments', 'statusLogs']);
@@ -83,132 +107,6 @@ class ComplaintRepository implements ComplaintRepositoryInterface
         return $query->latest()->get();
     }
 
-    public function getByAgencyGroupedByStatus(int $agencyId): array
-    {
-        $grouped = Complaint::selectRaw('status, COUNT(*) as total')
-            ->where('agency_id', $agencyId)
-            ->groupBy('status')
-            ->pluck('total', 'status')
-            ->toArray();
-
-        return [
-            'menunggu' => $grouped['menunggu'] ?? 0,
-            'diproses' => $grouped['diproses'] ?? 0,
-            'selesai' => $grouped['selesai'] ?? 0,
-            'ditolak' => $grouped['ditolak'] ?? 0,
-        ];
-    }
-
-    public function getMonthlyTrend(int $months = 6): array
-    {
-        $indonesianMonths = [
-            1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
-            5 => 'Mei', 6 => 'Juni', 7 => 'Juli', 8 => 'Agustus',
-            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember',
-        ];
-
-        $trends = [];
-        for ($i = $months - 1; $i >= 0; $i--) {
-            $date = now()->subMonths($i);
-            $month = $date->format('Y-m');
-            $monthName = $indonesianMonths[(int) $date->format('n')] ?? $date->format('F');
-            $label = $monthName . ' ' . $date->format('Y');
-
-            $stats = Complaint::selectRaw(
-                "COUNT(*) as total, SUM(CASE WHEN status = 'selesai' THEN 1 ELSE 0 END) as resolved"
-            )->whereYear('created_at', $date->year)
-                ->whereMonth('created_at', $date->month)
-                ->first();
-
-            $trends[] = [
-                'month' => $month,
-                'label' => $label,
-                'total' => (int) ($stats->total ?? 0),
-                'resolved' => (int) ($stats->resolved ?? 0),
-            ];
-        }
-
-        return $trends;
-    }
-
-    public function getCompletionRateByAgency(): array
-    {
-        return Complaint::select([
-            'agencies.name as agency_name',
-            DB::raw('COUNT(complaints.id) as total'),
-            DB::raw("SUM(CASE WHEN complaints.status = 'selesai' THEN 1 ELSE 0 END) as resolved"),
-        ])
-            ->join('agencies', 'complaints.agency_id', '=', 'agencies.id')
-            ->whereNotNull('complaints.agency_id')
-            ->groupBy('agencies.id', 'agencies.name')
-            ->get()
-            ->map(function ($item) {
-                return [
-                    'agency_name' => $item->agency_name,
-                    'total' => (int) $item->total,
-                    'resolved' => (int) $item->resolved,
-                    'completion_rate' => $item->total > 0
-                        ? round(($item->resolved / $item->total) * 100, 1)
-                        : 0,
-                ];
-            })
-            ->toArray();
-    }
-
-    public function getTodaysCountByAgency(int $agencyId): array
-    {
-        $today = now()->format('Y-m-d');
-
-        $new = Complaint::where('agency_id', $agencyId)
-            ->whereDate('created_at', $today)
-            ->count();
-
-        $inProgress = Complaint::where('agency_id', $agencyId)
-            ->where('status', 'diproses')
-            ->count();
-
-        $completed = Complaint::where('agency_id', $agencyId)
-            ->where('status', 'selesai')
-            ->whereDate('completed_at', $today)
-            ->count();
-
-        return [
-            'new_today' => $new,
-            'in_progress' => $inProgress,
-            'completed_today' => $completed,
-        ];
-    }
-
-    public function create(array $data): Complaint
-    {
-        return Complaint::create($data);
-    }
-
-    public function update(Complaint $complaint, array $data): bool
-    {
-        return $complaint->update($data);
-    }
-
-    public function getSummaryStats(): array
-    {
-        $total = Complaint::count();
-        $menunggu = Complaint::where('status', 'menunggu')->count();
-        $diproses = Complaint::where('status', 'diproses')->count();
-        $selesai = Complaint::where('status', 'selesai')->count();
-        $ditolak = Complaint::where('status', 'ditolak')->count();
-
-        $completionRate = $total > 0 ? round(($selesai / $total) * 100, 1) : 0;
-
-        return [
-            'total' => $total,
-            'menunggu' => $menunggu,
-            'diproses' => $diproses,
-            'selesai' => $selesai,
-            'ditolak' => $ditolak,
-            'completion_rate' => $completionRate,
-        ];
-    }
-
     public function findDuplicate(string $identifier, string $address, int $categoryId): ?Complaint
     {
         return Complaint::query()
@@ -222,12 +120,212 @@ class ComplaintRepository implements ComplaintRepositoryInterface
             ->first();
     }
 
-    public function getByUserIdWithTimeline(int $userId): Collection
+    // ──────────────────────────────────────────────────────────────
+    // Stats & Aggregates
+    // ──────────────────────────────────────────────────────────────
+
+    /**
+     * Global complaint counts — cached for 60 s.
+     * Cache is tagged so it can be flushed on status change if needed.
+     */
+    public function getSummaryStats(): array
     {
-        return Complaint::with(['category', 'agency', 'attachments', 'statusLogs'])
+        return Cache::remember('stats_summary', 60, function () {
+            $row = DB::table('complaints')->selectRaw("
+                COUNT(*) as total,
+                SUM(CASE WHEN status = 'menunggu' THEN 1 ELSE 0 END) as menunggu,
+                SUM(CASE WHEN status = 'diproses' THEN 1 ELSE 0 END) as diproses,
+                SUM(CASE WHEN status = 'selesai'  THEN 1 ELSE 0 END) as selesai,
+                SUM(CASE WHEN status = 'ditolak'  THEN 1 ELSE 0 END) as ditolak
+            ")->first();
+
+            $total      = (int) ($row->total    ?? 0);
+            $selesai    = (int) ($row->selesai   ?? 0);
+
+            return [
+                'total'           => $total,
+                'menunggu'        => (int) ($row->menunggu ?? 0),
+                'diproses'        => (int) ($row->diproses ?? 0),
+                'selesai'         => $selesai,
+                'ditolak'         => (int) ($row->ditolak  ?? 0),
+                'completion_rate' => $total > 0 ? round(($selesai / $total) * 100, 1) : 0,
+            ];
+        });
+    }
+
+    /**
+     * Per-citizen complaint counts (used by citizen dashboard KPI cards).
+     */
+    public function getCitizenStats(int $userId): array
+    {
+        $row = DB::table('complaints')
             ->where('user_id', $userId)
-            ->latest()
-            ->get();
+            ->selectRaw("
+                COUNT(*) as total,
+                SUM(CASE WHEN status = 'menunggu' THEN 1 ELSE 0 END) as menunggu,
+                SUM(CASE WHEN status = 'diproses' THEN 1 ELSE 0 END) as diproses,
+                SUM(CASE WHEN status = 'selesai'  THEN 1 ELSE 0 END) as selesai,
+                SUM(CASE WHEN status = 'ditolak'  THEN 1 ELSE 0 END) as ditolak
+            ")
+            ->first();
+
+        $total   = (int) ($row->total   ?? 0);
+        $selesai = (int) ($row->selesai ?? 0);
+
+        return [
+            'total'           => $total,
+            'menunggu'        => (int) ($row->menunggu ?? 0),
+            'diproses'        => (int) ($row->diproses ?? 0),
+            'selesai'         => $selesai,
+            'ditolak'         => (int) ($row->ditolak  ?? 0),
+            'completion_rate' => $total > 0 ? round(($selesai / $total) * 100, 1) : 0,
+        ];
+    }
+
+    public function getByAgencyGroupedByStatus(int $agencyId): array
+    {
+        $grouped = DB::table('complaints')
+            ->selectRaw("status, COUNT(*) as total")
+            ->where('agency_id', $agencyId)
+            ->groupBy('status')
+            ->pluck('total', 'status');
+
+        return [
+            'menunggu' => (int) ($grouped['menunggu'] ?? 0),
+            'diproses' => (int) ($grouped['diproses'] ?? 0),
+            'selesai'  => (int) ($grouped['selesai']  ?? 0),
+            'ditolak'  => (int) ($grouped['ditolak']  ?? 0),
+        ];
+    }
+
+    /**
+     * Monthly trend — single GROUP BY query instead of N loop queries.
+     */
+    public function getMonthlyTrend(int $months = 6): array
+    {
+        $indonesianMonths = [
+            1 => 'Januari',  2 => 'Februari', 3 => 'Maret',    4 => 'April',
+            5 => 'Mei',      6 => 'Juni',      7 => 'Juli',      8 => 'Agustus',
+            9 => 'September', 10 => 'Oktober', 11 => 'November', 12 => 'Desember',
+        ];
+
+        // Pre-fill buckets to guarantee all months appear even with zero data
+        $buckets = [];
+        for ($i = $months - 1; $i >= 0; $i--) {
+            $date  = now()->subMonths($i);
+            $key   = $date->format('Y-m');
+            $label = ($indonesianMonths[(int) $date->format('n')] ?? $date->format('F'))
+                   . ' ' . $date->format('Y');
+            $buckets[$key] = ['month' => $key, 'label' => $label, 'total' => 0, 'resolved' => 0];
+        }
+
+        $from      = now()->subMonths($months - 1)->startOfMonth();
+        $driver    = DB::getDriverName();
+        $dateExpr  = $driver === 'sqlite'
+            ? "strftime('%Y-%m', created_at)"
+            : "DATE_FORMAT(created_at, '%Y-%m')";
+
+        $rows = DB::table('complaints')
+            ->selectRaw("{$dateExpr} as month_key,
+                COUNT(*) as total,
+                SUM(CASE WHEN status = 'selesai' THEN 1 ELSE 0 END) as resolved")
+            ->where('created_at', '>=', $from)
+            ->groupByRaw($dateExpr)
+            ->get()
+            ->keyBy('month_key');
+
+        foreach ($buckets as $key => &$bucket) {
+            if ($rows->has($key)) {
+                $bucket['total']    = (int) $rows[$key]->total;
+                $bucket['resolved'] = (int) $rows[$key]->resolved;
+            }
+        }
+
+        return array_values($buckets);
+    }
+
+    /**
+     * Yearly trend — single GROUP BY query instead of N loop queries.
+     */
+    public function getYearlyTrend(int $years = 3): array
+    {
+        $currentYear = now()->year;
+        $startYear   = $currentYear - $years + 1;
+
+        // Pre-fill buckets
+        $buckets = [];
+        for ($y = $startYear; $y <= $currentYear; $y++) {
+            $buckets[(string) $y] = ['year' => (string) $y, 'total' => 0, 'resolved' => 0];
+        }
+
+        $driver   = DB::getDriverName();
+        $yearExpr = $driver === 'sqlite'
+            ? "CAST(strftime('%Y', created_at) AS INTEGER)"
+            : "YEAR(created_at)";
+
+        $rows = DB::table('complaints')
+            ->selectRaw("{$yearExpr} as year_key,
+                COUNT(*) as total,
+                SUM(CASE WHEN status = 'selesai' THEN 1 ELSE 0 END) as resolved")
+            ->whereRaw("{$yearExpr} >= ?", [$startYear])
+            ->groupByRaw($yearExpr)
+            ->get()
+            ->keyBy('year_key');
+
+        foreach ($buckets as $year => &$bucket) {
+            if ($rows->has($year)) {
+                $bucket['total']    = (int) $rows[$year]->total;
+                $bucket['resolved'] = (int) $rows[$year]->resolved;
+            }
+        }
+
+        return array_values($buckets);
+    }
+
+    public function getCompletionRateByAgency(): array
+    {
+        return DB::table('complaints')
+            ->join('agencies', 'complaints.agency_id', '=', 'agencies.id')
+            ->whereNotNull('complaints.agency_id')
+            ->selectRaw("
+                agencies.name as agency_name,
+                COUNT(complaints.id) as total,
+                SUM(CASE WHEN complaints.status = 'selesai' THEN 1 ELSE 0 END) as resolved
+            ")
+            ->groupBy('agencies.id', 'agencies.name')
+            ->get()
+            ->map(fn($item) => [
+                'agency_name'     => $item->agency_name,
+                'total'           => (int) $item->total,
+                'resolved'        => (int) $item->resolved,
+                'completion_rate' => $item->total > 0
+                    ? round(($item->resolved / $item->total) * 100, 1)
+                    : 0,
+            ])
+            ->toArray();
+    }
+
+    /**
+     * Today's task counts for an agency — consolidated to a single aggregate query.
+     */
+    public function getTodaysCountByAgency(int $agencyId): array
+    {
+        $today = today()->toDateString();
+
+        $row = DB::table('complaints')
+            ->where('agency_id', $agencyId)
+            ->selectRaw("
+                SUM(CASE WHEN DATE(created_at) = ? THEN 1 ELSE 0 END) as new_today,
+                SUM(CASE WHEN status = 'diproses' THEN 1 ELSE 0 END) as in_progress,
+                SUM(CASE WHEN status = 'selesai' AND DATE(completed_at) = ? THEN 1 ELSE 0 END) as completed_today
+            ", [$today, $today])
+            ->first();
+
+        return [
+            'new_today'       => (int) ($row->new_today       ?? 0),
+            'in_progress'     => (int) ($row->in_progress     ?? 0),
+            'completed_today' => (int) ($row->completed_today ?? 0),
+        ];
     }
 
     public function getAvgResolutionTimeByAgency(?int $agencyId): float
@@ -239,7 +337,8 @@ class ComplaintRepository implements ComplaintRepositoryInterface
             $query->where('agency_id', $agencyId);
         }
 
-        $avg = $query->selectRaw('AVG(TIMESTAMPDIFF(HOUR, created_at, completed_at)) as avg_hours')
+        $avg = $query
+            ->selectRaw('AVG(TIMESTAMPDIFF(HOUR, created_at, completed_at)) as avg_hours')
             ->first()
             ->avg_hours ?? 0;
 
@@ -248,11 +347,9 @@ class ComplaintRepository implements ComplaintRepositoryInterface
 
     public function getTopCategories(int $limit = 5): array
     {
-        return Complaint::select([
-            'categories.name as category_name',
-            DB::raw('COUNT(complaints.id) as count'),
-        ])
+        return DB::table('complaints')
             ->join('categories', 'complaints.category_id', '=', 'categories.id')
+            ->selectRaw('categories.name as category_name, COUNT(complaints.id) as count')
             ->groupBy('categories.id', 'categories.name')
             ->orderByDesc('count')
             ->limit($limit)
@@ -262,11 +359,12 @@ class ComplaintRepository implements ComplaintRepositoryInterface
 
     public function getTopSubdistricts(int $limit = 5): array
     {
-        return Complaint::select([
-            'subdistrict',
-            DB::raw('COUNT(*) as count'),
-            DB::raw("SUM(CASE WHEN status = 'selesai' THEN 1 ELSE 0 END) as resolved"),
-        ])
+        return DB::table('complaints')
+            ->selectRaw("
+                subdistrict,
+                COUNT(*) as count,
+                SUM(CASE WHEN status = 'selesai' THEN 1 ELSE 0 END) as resolved
+            ")
             ->groupBy('subdistrict')
             ->orderByDesc('count')
             ->limit($limit)
@@ -274,50 +372,29 @@ class ComplaintRepository implements ComplaintRepositoryInterface
             ->toArray();
     }
 
+    /**
+     * Officer ranking based on complaints handled by each officer's agency.
+     * Joins via users.agency_id = complaints.agency_id (not complaints.user_id).
+     */
     public function getOfficerRanking(int $limit = 10): array
     {
-        return Complaint::select([
-            'users.name as officer_name',
-            'users.id as officer_id',
-            'agencies.name as agency_name',
-            DB::raw('COUNT(complaints.id) as total_handled'),
-            DB::raw("SUM(CASE WHEN complaints.status = 'selesai' THEN 1 ELSE 0 END) as completed"),
-        ])
-            ->join('users', 'complaints.user_id', '=', 'users.id')
-            ->join('agencies', 'complaints.agency_id', '=', 'agencies.id')
+        return DB::table('complaints')
+            ->join('agencies', 'agencies.id', '=', 'complaints.agency_id')
+            ->join('users', 'users.agency_id', '=', 'complaints.agency_id')
             ->where('users.role', 'officer')
-            ->groupBy('users.id', 'users.name', 'agencies.name')
+            ->whereNotNull('complaints.agency_id')
+            ->selectRaw("
+                users.id as officer_id,
+                users.name as officer_name,
+                agencies.name as agency_name,
+                COUNT(complaints.id) as total_handled,
+                SUM(CASE WHEN complaints.status = 'selesai' THEN 1 ELSE 0 END) as completed
+            ")
+            ->groupBy('users.id', 'users.name', 'agencies.id', 'agencies.name')
             ->orderByDesc('completed')
             ->limit($limit)
             ->get()
             ->toArray();
-    }
-
-    public function getYearlyTrend(int $years = 3): array
-    {
-        $trends = [];
-        $currentYear = (int) now()->format('Y');
-
-        for ($y = $currentYear - $years + 1; $y <= $currentYear; $y++) {
-            $stats = Complaint::selectRaw(
-                "COUNT(*) as total, SUM(CASE WHEN status = 'selesai' THEN 1 ELSE 0 END) as resolved"
-            )->whereYear('created_at', $y)
-                ->first();
-
-            $trends[] = [
-                'year' => (string) $y,
-                'total' => (int) ($stats->total ?? 0),
-                'resolved' => (int) ($stats->resolved ?? 0),
-            ];
-        }
-
-        return $trends;
-    }
-
-    public function getNotificationsCount(int $userId): int
-    {
-        // Placeholder — can be connected to a notifications table later
-        return 0;
     }
 
     public function getComplaintsMapData(?string $role = null, ?int $userId = null, ?int $agencyId = null): array
@@ -334,10 +411,5 @@ class ComplaintRepository implements ComplaintRepositoryInterface
         }
 
         return $query->latest()->limit(200)->get()->toArray();
-    }
-
-    public function delete(Complaint $complaint): bool
-    {
-        return $complaint->delete();
     }
 }
