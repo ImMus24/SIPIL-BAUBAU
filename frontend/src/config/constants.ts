@@ -35,6 +35,8 @@ export const ROUTES = {
   REGISTER: '/register',
   DASHBOARD: '/dashboard',
   ADMIN: '/admin',
+  OFFICER: '/officer',
+  KEPALA_DINAS: '/kepala-dinas',
 } as const;
 
 export const SUBDISTRICTS = [

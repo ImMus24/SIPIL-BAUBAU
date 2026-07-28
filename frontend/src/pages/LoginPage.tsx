@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { authService } from '../services/authService';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { ShieldCheck, Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
@@ -21,7 +22,14 @@ export const LoginPage: React.FC = () => {
     setErrorMsg('');
     try {
       await login(email, password);
-      navigate(email.includes('admin') || email === 'officer.pupr@baubaukota.go.id' ? '/admin' : '/dashboard');
+      const user = authService.getCurrentUser();
+      const routeMap: Record<string, string> = {
+        citizen: '/dashboard',
+        officer: '/officer',
+        admin: '/admin',
+        head_of_agency: '/kepala-dinas',
+      };
+      navigate(routeMap[user?.role ?? 'citizen'] ?? '/dashboard');
     } catch (err: any) {
       setErrorMsg(err?.response?.data?.message || err?.response?.data?.errors?.email?.[0] || 'Email atau kata sandi salah.');
     } finally { setLoading(false); }

@@ -21,10 +21,10 @@ const RegisterPage = lazy(() => import('./pages/RegisterPage').then(m => ({ defa
 const ComplaintDetailPage = lazy(() => import('./pages/ComplaintDetailPage').then(m => ({ default: m.ComplaintDetailPage })));
 
 // Dashboard pages
-const CitizenDashboard = lazy(() => import('./pages/CitizenDashboard').then(m => ({ default: m.CitizenDashboard })));
-const AdminDashboard = lazy(() => import('./pages/AdminDashboard').then(m => ({ default: m.AdminDashboard })));
-const OfficerDashboard = lazy(() => import('./pages/OfficerDashboard').then(m => ({ default: m.OfficerDashboard })));
-const KepalaDinasDashboard = lazy(() => import('./pages/KepalaDinasDashboard').then(m => ({ default: m.KepalaDinasDashboard })));
+const CitizenDashboard = lazy(() => import('./pages/dashboards/CitizenDashboard').then(m => ({ default: m.CitizenDashboard })));
+const AdminDashboard = lazy(() => import('./pages/dashboards/AdminDashboard').then(m => ({ default: m.AdminDashboard })));
+const OfficerDashboard = lazy(() => import('./pages/dashboards/OfficerDashboard').then(m => ({ default: m.OfficerDashboard })));
+const KepalaDinasDashboard = lazy(() => import('./pages/dashboards/KepalaDinasDashboard').then(m => ({ default: m.KepalaDinasDashboard })));
 const ProfilePage = lazy(() => import('./pages/ProfilePage').then(m => ({ default: m.ProfilePage })));
 const NotificationPage = lazy(() => import('./pages/NotificationPage').then(m => ({ default: m.NotificationPage })));
 
@@ -119,17 +119,12 @@ export function App() {
                     <Route path="/register" element={<GuestRoute><RegisterPage /></GuestRoute>} />
                   </Route>
 
-                  {/* Dashboard router */}
+                  {/* Dashboard router - redirect based on role */}
                   <Route path="/dashboard" element={<DashboardRouter />} />
 
                   {/* Protected: citizen */}
-                  <Route path="/dashboard/masyarakat" element={
-                    <ProtectedRoute allowedRoles={['citizen']}><CitizenDashboard /></ProtectedRoute>
-                  } />
-
-                  {/* Protected: citizen + admin */}
                   <Route path="/dashboard" element={
-                    <ProtectedRoute allowedRoles={['citizen', 'admin', 'officer']}><CitizenDashboard /></ProtectedRoute>
+                    <ProtectedRoute allowedRoles={['citizen']}><CitizenDashboard /></ProtectedRoute>
                   } />
 
                   {/* Protected: officer */}
@@ -137,14 +132,14 @@ export function App() {
                     <ProtectedRoute allowedRoles={['officer']}><OfficerDashboard /></ProtectedRoute>
                   } />
 
-                  {/* Protected: admin */}
+                  {/* Protected: admin only */}
                   <Route path="/admin" element={
-                    <ProtectedRoute allowedRoles={['admin', 'officer']}><AdminDashboard /></ProtectedRoute>
+                    <ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>
                   } />
 
-                  {/* Protected: head_of_agency */}
+                  {/* Protected: head_of_agency only */}
                   <Route path="/kepala-dinas" element={
-                    <ProtectedRoute allowedRoles={['head_of_agency', 'admin']}><KepalaDinasDashboard /></ProtectedRoute>
+                    <ProtectedRoute allowedRoles={['head_of_agency']}><KepalaDinasDashboard /></ProtectedRoute>
                   } />
 
                   {/* Protected: profile + notifications */}
