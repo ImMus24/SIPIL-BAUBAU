@@ -49,25 +49,25 @@ export const CitizenDashboard: React.FC = () => {
     switch (status) {
       case 'menunggu':
         return (
-          <span className="px-3 py-1.5 bg-slate-200 text-slate-700 text-xs font-extrabold uppercase rounded-full tracking-wider">
+          <span className="px-3 py-1.5 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-extrabold uppercase rounded-full tracking-wider">
             BELUM DIPROSES
           </span>
         );
       case 'diproses':
         return (
-          <span className="px-3 py-1.5 bg-sky-100 text-sky-700 text-xs font-extrabold uppercase rounded-full tracking-wider">
+          <span className="px-3 py-1.5 bg-sky-100 dark:bg-sky-950/80 text-sky-700 dark:text-sky-300 text-xs font-extrabold uppercase rounded-full tracking-wider">
             DIPROSES
           </span>
         );
       case 'selesai':
         return (
-          <span className="px-3 py-1.5 bg-amber-100 text-amber-800 text-xs font-extrabold uppercase rounded-full tracking-wider">
+          <span className="px-3 py-1.5 bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 text-xs font-extrabold uppercase rounded-full tracking-wider">
             SELESAI
           </span>
         );
       case 'ditolak':
         return (
-          <span className="px-3 py-1.5 bg-rose-100 text-rose-700 text-xs font-extrabold uppercase rounded-full tracking-wider">
+          <span className="px-3 py-1.5 bg-rose-100 dark:bg-rose-950/80 text-rose-700 dark:text-rose-300 text-xs font-extrabold uppercase rounded-full tracking-wider">
             DITOLAK
           </span>
         );

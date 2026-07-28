@@ -96,9 +96,9 @@ export const HomePage: React.FC = () => {
           <div className="hidden lg:block relative">
             <div className="animate-float">
               <div className="relative bg-slate-950 rounded-[2.5rem] p-4 shadow-2xl border-[6px] border-amber-400/80 w-[330px] mx-auto overflow-hidden">
-                <div className="bg-slate-50 h-[540px] rounded-[1.8rem] overflow-hidden flex flex-col">
+                <div className="bg-slate-50 dark:bg-slate-900 h-[540px] rounded-[1.8rem] overflow-hidden flex flex-col">
                   
-                  <div className="bg-gradient-to-r from-sky-700 to-sky-900 p-6 text-white border-b border-amber-400/40">
+                  <div className="bg-gradient-to-r from-sky-700 to-sky-900 dark:from-sky-900 dark:to-slate-950 p-6 text-white border-b border-amber-400/40">
                     <div className="flex justify-between items-center mb-4">
                       <span className="material-symbols-outlined text-amber-300">menu</span>
                       <span className="material-symbols-outlined text-amber-300">notifications</span>
@@ -107,33 +107,33 @@ export const HomePage: React.FC = () => {
                   </div>
 
                   <div className="p-4 space-y-3.5">
-                    <div className="p-3.5 bg-white rounded-xl shadow-xs border border-sky-100 flex gap-3 items-center">
-                      <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-700 shrink-0 border border-amber-300">
+                    <div className="p-3.5 bg-white dark:bg-slate-800 rounded-xl shadow-xs border border-sky-100 dark:border-slate-700 flex gap-3 items-center">
+                      <div className="w-10 h-10 rounded-full bg-amber-100 dark:bg-amber-950/80 flex items-center justify-center text-amber-700 dark:text-amber-300 shrink-0 border border-amber-300 dark:border-amber-700">
                         <span className="material-symbols-outlined">lightbulb</span>
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-slate-900">Lampu Padam</p>
-                        <p className="text-xs text-slate-500">Kawasan Pantai Kamali</p>
+                        <p className="text-sm font-bold text-slate-900 dark:text-white">Lampu Padam</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">Kawasan Pantai Kamali</p>
                       </div>
                     </div>
 
-                    <div className="p-3.5 bg-white rounded-xl shadow-xs border border-sky-100 flex gap-3 items-center">
-                      <div className="w-10 h-10 rounded-full bg-sky-100 flex items-center justify-center text-sky-700 shrink-0 border border-sky-300">
+                    <div className="p-3.5 bg-white dark:bg-slate-800 rounded-xl shadow-xs border border-sky-100 dark:border-slate-700 flex gap-3 items-center">
+                      <div className="w-10 h-10 rounded-full bg-sky-100 dark:bg-sky-950/80 flex items-center justify-center text-sky-700 dark:text-sky-300 shrink-0 border border-sky-300 dark:border-sky-700">
                         <span className="material-symbols-outlined">warning</span>
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-slate-900">Jalan Berlubang</p>
-                        <p className="text-xs text-slate-500">Jl. Sudirman No. 45 (Wolio)</p>
+                        <p className="text-sm font-bold text-slate-900 dark:text-white">Jalan Berlubang</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">Jl. Sudirman No. 45 (Wolio)</p>
                       </div>
                     </div>
 
-                    <div className="p-3.5 bg-white rounded-xl shadow-xs border border-sky-100 flex gap-3 items-center">
-                      <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 shrink-0 border border-emerald-300">
+                    <div className="p-3.5 bg-white dark:bg-slate-800 rounded-xl shadow-xs border border-sky-100 dark:border-slate-700 flex gap-3 items-center">
+                      <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-950/80 flex items-center justify-center text-emerald-700 dark:text-emerald-300 shrink-0 border border-emerald-300 dark:border-emerald-700">
                         <span className="material-symbols-outlined">verified</span>
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-slate-900">Drainase Selesai</p>
-                        <p className="text-xs text-slate-500">Kecamatan Murhum</p>
+                        <p className="text-sm font-bold text-slate-900 dark:text-white">Drainase Selesai</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">Kecamatan Murhum</p>
                       </div>
                     </div>
                   </div>
