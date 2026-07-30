@@ -5,7 +5,7 @@ import { authService } from '../services/authService';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { ShieldCheck, Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
-import heroPng from '../assets/hero.png';
+import loginPng from '../assets/login.png';
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -62,8 +62,8 @@ export const LoginPage: React.FC = () => {
             {/* Login Illustration */}
             <div className="w-full max-w-sm mx-auto mt-4">
               <img
-                src={heroPng}
-                alt="Ilustrasi SIPIL BAUBAU"
+                src={loginPng}
+                alt="Ilustrasi Login SIPIL BAUBAU"
                 className="w-full h-auto object-contain rounded-xl"
                 loading="lazy"
               />

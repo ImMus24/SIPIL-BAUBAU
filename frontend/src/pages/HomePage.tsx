@@ -119,7 +119,7 @@ export const HomePage: React.FC = () => {
   return (
     <div className="pt-20">
       {/* ============ HERO ============ */}
-      <section className="relative min-h-[600px] lg:min-h-[700px] xl:min-h-[750px] flex items-center overflow-hidden">
+      <section className="relative min-h-[700px] lg:min-h-[850px] xl:min-h-[900px] flex items-center overflow-hidden">
         {/* Background Image */}
         <div className="absolute inset-0">
           <img
@@ -139,7 +139,7 @@ export const HomePage: React.FC = () => {
         />
 
         <div className="relative z-10 px-4 sm:px-8 max-w-container mx-auto w-full">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center py-12 lg:py-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center py-16 lg:py-20">
             {/* Left Content */}
             <div className="space-y-8 animate-fade-in-up">
               {/* Badge */}
@@ -149,8 +149,7 @@ export const HomePage: React.FC = () => {
               </div>
 
               {/* Headline */}
-              {/* Headline */}
-              <h1 className="font-heading text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-black leading-tight tracking-tight text-foreground">
+              <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black leading-tight tracking-tight text-foreground">
                 Laporkan Kerusakan{' '}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-primary dark:from-accent dark:via-yellow-400 dark:to-secondary">
                   Infrastruktur Kota Baubau
@@ -200,15 +199,15 @@ export const HomePage: React.FC = () => {
 
             {/* Right - Hero Illustration */}
             <div className="hidden lg:flex justify-center items-center animate-slide-in-right">
-              <div className="relative group w-full max-w-lg mx-auto">
+              <div className="relative group w-full max-w-2xl mx-auto">
                 {/* Decorative glow behind image */}
-                <div className="absolute -inset-3 bg-gradient-to-br from-primary/15 via-accent/15 to-secondary/15 rounded-2xl blur-xl opacity-60 group-hover:opacity-90 transition-opacity duration-700" />
+                <div className="absolute -inset-4 bg-gradient-to-br from-primary/15 via-accent/15 to-secondary/15 rounded-3xl blur-2xl opacity-60 group-hover:opacity-90 transition-opacity duration-700" />
                 {/* Glass card frame */}
-                <div className="relative bg-white/10 dark:bg-white/5 backdrop-blur-sm border border-white/20 dark:border-white/10 rounded-xl p-1.5 shadow-2xl">
+                <div className="relative bg-white/10 dark:bg-white/5 backdrop-blur-sm border border-white/20 dark:border-white/10 rounded-2xl p-2 shadow-2xl">
                   <img
                     src={heroPng}
                     alt="Hero ilustrasi SIPIL BAUBAU - Sistem Pengaduan Infrastruktur Kota Baubau"
-                    className="w-full h-auto rounded-lg"
+                    className="w-full h-auto rounded-xl"
                   />
                 </div>
                 {/* Floating sparkle */}
