@@ -1,16 +1,18 @@
 import { Link } from 'react-router-dom';
 import { Home, LogIn } from 'lucide-react';
-import { Error403 } from '../assets/illustrations';
+import heroPng from '../assets/hero.png';
 
 export function ForbiddenPage() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-6">
       <div className="text-center max-w-lg mx-auto animate-fade-in-up">
         {/* Illustration */}
-        <div className="w-64 h-64 mx-auto mb-8">
-          <Error403
-            variant="light"
-            className="w-full h-full"
+        <div className="w-48 h-48 mx-auto mb-8 rounded-2xl overflow-hidden shadow-lg">
+          <img
+            src={heroPng}
+            alt="Ilustrasi"
+            className="w-full h-full object-contain"
+            loading="lazy"
           />
         </div>
 

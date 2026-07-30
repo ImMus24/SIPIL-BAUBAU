@@ -5,7 +5,7 @@ import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Stepper } from '../components/ui/Stepper';
 import { ShieldCheck, User, Phone, Mail, Lock, ArrowRight, ArrowLeft } from 'lucide-react';
-import { RegisterIllustration } from '../assets/illustrations';
+import heroPng from '../assets/hero.png';
 
 const steps = [
   { id: 'personal', label: 'Data Pribadi', description: 'Nama & kontak' },
@@ -79,9 +79,11 @@ export const RegisterPage: React.FC = () => {
 
               {/* Register Illustration */}
               <div className="w-full max-w-xs mx-auto">
-                <RegisterIllustration
-                  variant="light"
-                  className="w-full h-auto"
+                <img
+                  src={heroPng}
+                  alt="Ilustrasi SIPIL BAUBAU"
+                  className="w-full h-auto object-contain rounded-xl"
+                  loading="lazy"
                 />
               </div>
 
