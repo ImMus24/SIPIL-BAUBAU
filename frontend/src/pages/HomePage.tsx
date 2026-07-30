@@ -23,6 +23,7 @@ import {
 import { Button } from '../components/ui/Button';
 import { StatCard } from '../components/ui/StatCard';
 import heroPng from '../assets/hero.png';
+import baubauCityBg from '../assets/baubau-city.png';
 
 /* ─── Scroll Animation Hook ─── */
 function useScrollReveal(threshold = 0.15) {
@@ -118,14 +119,23 @@ export const HomePage: React.FC = () => {
   return (
     <div className="pt-20">
       {/* ============ HERO ============ */}
-      <section className="relative min-h-[800px] lg:min-h-[900px] flex items-center overflow-hidden bg-gradient-to-b from-primary-light via-background to-background dark:from-slate-900 dark:via-slate-950 dark:to-background">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]"
+      <section className="relative min-h-[800px] lg:min-h-[900px] flex items-center overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0">
+          <img
+            src={baubauCityBg}
+            alt=""
+            className="w-full h-full object-cover"
+          />
+          {/* Dark overlay gradient */}
+          <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-background/60 dark:from-slate-950/95 dark:via-slate-950/80 dark:to-slate-950/60" />
+          {/* Extra bottom fade */}
+          <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-background to-transparent dark:from-slate-950" />
+        </div>
+        {/* Subtle pattern overlay */}
+        <div className="absolute inset-0 opacity-[0.04]"
           style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)', backgroundSize: '24px 24px' }}
         />
-        {/* Gradient Orbs */}
-        <div className="absolute top-20 -left-40 w-[500px] h-[500px] bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-20 -right-40 w-[400px] h-[400px] bg-secondary/5 rounded-full blur-3xl" />
 
         <div className="relative z-10 px-4 sm:px-8 max-w-container mx-auto w-full">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center py-16">
