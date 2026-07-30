@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { StatCard } from '../components/ui/StatCard';
+import { HeroIllustration } from '../assets/illustrations';
 
 export const HomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -138,48 +139,15 @@ export const HomePage: React.FC = () => {
               </div>
             </div>
 
-            {/* Right - Phone Mockup */}
-            <div className="hidden lg:flex justify-center animate-float">
-              <div className="relative bg-gradient-to-b from-slate-900 to-slate-950 rounded-[3rem] p-4 shadow-2xl border-[6px] border-accent/80 w-[330px]">
-                {/* Notch */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-6 bg-slate-950 rounded-b-2xl z-10" />
-
-                <div className="bg-background rounded-[2rem] overflow-hidden h-[580px] flex flex-col">
-                  {/* App Header */}
-                  <div className="bg-primary px-4 py-5 text-white">
-                    <div className="flex items-center gap-2 mb-3">
-                      <ShieldCheck className="w-5 h-5 text-accent" />
-                      <span className="font-heading font-bold text-sm">SIPIL BAUBAU</span>
-                    </div>
-                    <p className="text-xs text-white/80">Selamat datang, Warga Baubau</p>
-                  </div>
-
-                  {/* App Content */}
-                  <div className="flex-1 p-4 space-y-3 overflow-hidden">
-                    <div className="bg-card rounded-xl p-3 border border-border shadow-sm">
-                      <p className="text-xs font-bold text-foreground mb-1">Jalan Wolio Raya Rusak</p>
-                      <p className="text-[11px] text-muted-foreground">Status: <span className="text-warning font-bold">Diproses</span></p>
-                    </div>
-                    <div className="bg-card rounded-xl p-3 border border-border shadow-sm">
-                      <p className="text-xs font-bold text-foreground mb-1">Drainase Tersumbat</p>
-                      <p className="text-[11px] text-muted-foreground">Status: <span className="text-success font-bold">Selesai ✓</span></p>
-                    </div>
-                    <div className="bg-card rounded-xl p-3 border border-border shadow-sm">
-                      <p className="text-xs font-bold text-foreground mb-1">Lampu Jalan Mati</p>
-                      <p className="text-[11px] text-muted-foreground">Status: <span className="text-info font-bold">Menunggu</span></p>
-                    </div>
-                    <div className="bg-primary-light rounded-xl p-3 text-center mt-auto">
-                      <p className="text-xs font-bold text-primary">+ Buat Laporan Baru</p>
-                    </div>
-                  </div>
-
-                  {/* Bottom Nav */}
-                  <div className="flex items-center justify-around py-3 border-t border-border px-2">
-                    {['Beranda', 'Laporan', 'Profil'].map((l) => (
-                      <span key={l} className={`text-[10px] font-bold ${l === 'Beranda' ? 'text-primary' : 'text-muted-foreground'}`}>{l}</span>
-                    ))}
-                  </div>
-                </div>
+            {/* Right - Hero Illustration */}
+            <div className="hidden lg:flex justify-center items-center animate-fade-in">
+              <div className="w-full max-w-[520px]">
+                <HeroIllustration
+                  size="full"
+                  variant="light"
+                  animated={true}
+                  className="w-full h-auto drop-shadow-2xl"
+                />
               </div>
             </div>
           </div>

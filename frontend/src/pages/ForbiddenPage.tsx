@@ -1,25 +1,40 @@
 import { Link } from 'react-router-dom';
+import { Home, LogIn } from 'lucide-react';
+import { Error403 } from '../assets/illustrations';
 
 export function ForbiddenPage() {
   return (
-    <div className="min-h-[70vh] flex items-center justify-center p-6">
-      <div className="text-center max-w-md">
-        <div className="text-7xl font-bold text-danger/30 mb-4">403</div>
-        <h1 className="text-2xl font-semibold mb-2">Akses Ditolak</h1>
-        <p className="text-muted-foreground mb-6">
-          Anda tidak memiliki izin untuk mengakses halaman ini. Silakan hubungi administrator jika Anda yakin ini adalah kesalahan.
+    <div className="min-h-screen bg-background flex items-center justify-center p-6">
+      <div className="text-center max-w-lg mx-auto animate-fade-in-up">
+        {/* Illustration */}
+        <div className="w-64 h-64 mx-auto mb-8">
+          <Error403
+            variant="light"
+            className="w-full h-full"
+          />
+        </div>
+
+        <h1 className="font-heading text-3xl sm:text-4xl font-black text-foreground mb-3">
+          Akses Ditolak
+        </h1>
+        <p className="text-muted-foreground text-base leading-relaxed mb-8 max-w-md mx-auto">
+          Anda tidak memiliki izin untuk mengakses halaman ini. 
+          Silakan hubungi administrator jika Anda yakin ini adalah kesalahan.
         </p>
-        <div className="flex gap-3 justify-center">
+
+        <div className="flex flex-wrap justify-center gap-3">
           <Link
             to="/"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-all"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-primary-foreground font-semibold hover:bg-primary-hover transition-all shadow-lg shadow-primary/25 hover:shadow-xl hover:-translate-y-0.5"
           >
+            <Home className="w-4 h-4" />
             Kembali ke Beranda
           </Link>
           <Link
             to="/login"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-border text-foreground font-medium hover:bg-accent transition-all"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-border text-foreground font-semibold hover:bg-muted transition-all"
           >
+            <LogIn className="w-4 h-4" />
             Masuk
           </Link>
         </div>

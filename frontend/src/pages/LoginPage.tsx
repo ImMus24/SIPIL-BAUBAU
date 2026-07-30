@@ -5,6 +5,7 @@ import { authService } from '../services/authService';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { ShieldCheck, Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
+import { LoginIllustration } from '../assets/illustrations';
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -42,7 +43,14 @@ export const LoginPage: React.FC = () => {
       <div className="max-w-5xl w-full bg-card rounded-3xl border border-border shadow-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[680px] animate-fade-in-up">
         
         {/* Left Panel */}
-        <div className="lg:col-span-6 bg-gradient-to-br from-primary to-primary-hover text-primary-foreground p-8 sm:p-12 flex flex-col justify-between relative overflow-hidden">
+        <div className="lg:col-span-6 bg-gradient-to-br from-primary to-primary-hover text-primary-foreground p-8 sm:p-12 flex flex-col justify-between relative overflow-hidden min-h-[500px]">
+          {/* Background decorative elements */}
+          <div className="absolute inset-0 opacity-[0.08]"
+            style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '20px 20px' }}
+          />
+          <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-secondary/20 blur-3xl rounded-full" />
+          <div className="absolute top-40 -right-20 w-60 h-60 bg-accent/10 blur-3xl rounded-full" />
+
           <div className="space-y-6 relative z-10">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center ring-1 ring-white/40">
@@ -50,16 +58,25 @@ export const LoginPage: React.FC = () => {
               </div>
               <h2 className="font-heading font-black text-2xl tracking-tight">SIPIL BAUBAU</h2>
             </div>
-            <div className="space-y-3">
-              <h1 className="font-heading text-3xl font-black leading-tight">Selamat Datang</h1>
-              <p className="text-base text-white/80 leading-relaxed max-w-md">
+
+            {/* Login Illustration */}
+            <div className="w-full max-w-sm mx-auto mt-4">
+              <LoginIllustration
+                variant="light"
+                className="w-full h-auto"
+              />
+            </div>
+
+            <div className="space-y-3 text-center">
+              <h1 className="font-heading text-2xl font-black leading-tight">Selamat Datang</h1>
+              <p className="text-sm text-white/80 leading-relaxed max-w-sm mx-auto">
                 Sistem Pengaduan Infrastruktur Kota Terpadu untuk Baubau yang lebih baik dan transparan.
               </p>
             </div>
           </div>
 
           {/* Highlights */}
-          <div className="space-y-3 relative z-10">
+          <div className="space-y-3 relative z-10 mt-4">
             {['Keamanan Data Terjamin', 'Respon Cepat Tanggap OPD', 'Pantau Real-time via Dashboard'].map((h) => (
               <div key={h} className="flex items-center gap-2.5 text-sm text-white/90 font-medium">
                 <div className="w-5 h-5 rounded-full bg-accent/30 flex items-center justify-center">
@@ -69,8 +86,6 @@ export const LoginPage: React.FC = () => {
               </div>
             ))}
           </div>
-
-          <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-secondary/20 blur-3xl rounded-full" />
         </div>
 
         {/* Right Panel */}

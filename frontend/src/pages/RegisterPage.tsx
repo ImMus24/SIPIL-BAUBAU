@@ -5,6 +5,7 @@ import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Stepper } from '../components/ui/Stepper';
 import { ShieldCheck, User, Phone, Mail, Lock, ArrowRight, ArrowLeft } from 'lucide-react';
+import { RegisterIllustration } from '../assets/illustrations';
 
 const steps = [
   { id: 'personal', label: 'Data Pribadi', description: 'Nama & kontak' },
@@ -61,6 +62,13 @@ export const RegisterPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12">
           {/* Left */}
           <div className="lg:col-span-5 bg-gradient-to-br from-primary to-primary-hover text-primary-foreground p-8 sm:p-10 flex flex-col justify-between relative overflow-hidden">
+            {/* Background pattern */}
+            <div className="absolute inset-0 opacity-[0.08]"
+              style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '20px 20px' }}
+            />
+            <div className="absolute -bottom-20 -right-20 w-60 h-60 bg-secondary/20 blur-3xl rounded-full" />
+            <div className="absolute top-20 -left-20 w-40 h-40 bg-accent/10 blur-3xl rounded-full" />
+
             <div className="space-y-6 relative z-10">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center ring-1 ring-white/40">
@@ -68,8 +76,17 @@ export const RegisterPage: React.FC = () => {
                 </div>
                 <h2 className="font-heading font-black text-xl">SIPIL BAUBAU</h2>
               </div>
-              <div>
-                <h1 className="font-heading text-2xl sm:text-3xl font-black leading-tight">Buat Akun Baru</h1>
+
+              {/* Register Illustration */}
+              <div className="w-full max-w-xs mx-auto">
+                <RegisterIllustration
+                  variant="light"
+                  className="w-full h-auto"
+                />
+              </div>
+
+              <div className="text-center">
+                <h1 className="font-heading text-2xl font-black leading-tight">Buat Akun Baru</h1>
                 <p className="text-sm text-white/80 mt-2">Bergabunglah dengan ribuan warga Baubau yang peduli dengan infrastruktur kota.</p>
               </div>
             </div>
@@ -77,8 +94,6 @@ export const RegisterPage: React.FC = () => {
             <div className="relative z-10">
               <Stepper steps={steps} currentStep={step} orientation="vertical" />
             </div>
-
-            <div className="absolute -bottom-20 -right-20 w-60 h-60 bg-secondary/20 blur-3xl rounded-full" />
           </div>
 
           {/* Right */}
