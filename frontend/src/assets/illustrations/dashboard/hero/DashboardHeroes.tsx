@@ -242,8 +242,16 @@ export const ExecutiveDashboardHero: React.FC<IllustrationProps> = ({ className 
       <rect x="0" y="0" width="400" height="200" rx="12" fill="url(#edBlue)" />
       {/* City skyline */}
       <g transform="translate(30, 80)" opacity="0.4">
-        {[0, 1, 2, 3, 4, 5, 6].map(i => (
-          <rect key={i} x={i * 25} y={-10 - Math.random() * 30} width="20" height={100 + Math.random() * 20} rx="2" fill={slate} opacity={0.15 + Math.random() * 0.15} />
+        {[
+          { y: -25, h: 112 },
+          { y: -30, h: 120 },
+          { y: -15, h: 108 },
+          { y: -35, h: 115 },
+          { y: -20, h: 105 },
+          { y: -28, h: 118 },
+          { y: -18, h: 110 },
+        ].map((b, i) => (
+          <rect key={i} x={i * 25} y={b.y} width="20" height={b.h} rx="2" fill={slate} opacity={[0.2, 0.18, 0.25, 0.15, 0.22, 0.28, 0.2][i]} />
         ))}
       </g>
       {/* Executive character */}
@@ -265,12 +273,12 @@ export const ExecutiveDashboardHero: React.FC<IllustrationProps> = ({ className 
           <text x="32" y="35" fontSize="7" fill={slate} opacity="0.7" fontFamily="Inter, sans-serif">Total</text>
         </g>
         <g transform="translate(85, 12)">
-          <rect x="0" y="0" width="65" height="44" rx="6" fill={emerald === '#10b981' ? '#f0fdf4' : '#f0fdf4'} />
+          <rect x="0" y="0" width="65" height="44" rx="6" fill={isDark ? '#052e16' : '#f0fdf4'} />
           <text x="20" y="18" fontSize="16" fontWeight="900" fill={emerald} fontFamily="Inter, sans-serif">85%</text>
           <text x="25" y="35" fontSize="7" fill={slate} opacity="0.7" fontFamily="Inter, sans-serif">Selesai</text>
         </g>
         <g transform="translate(158, 12)">
-          <rect x="0" y="0" width="65" height="44" rx="6" fill={gold === '#facc15' ? '#fefce8' : '#fefce8'} />
+          <rect x="0" y="0" width="65" height="44" rx="6" fill={isDark ? '#422006' : '#fefce8'} />
           <text x="15" y="18" fontSize="16" fontWeight="900" fill="#d97706" fontFamily="Inter, sans-serif">48h</text>
           <text x="22" y="35" fontSize="7" fill={slate} opacity="0.7" fontFamily="Inter, sans-serif">Rata-rata</text>
         </g>

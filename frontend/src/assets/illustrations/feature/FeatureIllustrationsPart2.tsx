@@ -127,7 +127,7 @@ export const ComplaintTimelineIllustration: React.FC<IllustrationProps> = ({ cla
         </g>
         {/* Step 2 - Verified */}
         <g transform="translate(0, 45)">
-          <circle cx="40" cy="0" r="22" fill={emerald === '#10b981' ? '#f0fdf4' : isDark ? '#052e16' : '#f0fdf4'} />
+          <circle cx="40" cy="0" r="22" fill={isDark ? '#052e16' : '#f0fdf4'} />
           <circle cx="40" cy="0" r="16" fill={emerald} />
           <path d="M34 0l4 4 8-8" stroke={card} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           <text x="75" y="-3" fontSize="11" fontWeight="600" fill={slate} fontFamily="Inter, sans-serif">Diverifikasi</text>
@@ -144,7 +144,7 @@ export const ComplaintTimelineIllustration: React.FC<IllustrationProps> = ({ cla
         </g>
         {/* Step 4 - Completed */}
         <g transform="translate(190, 0)">
-          <circle cx="40" cy="135" r="22" fill={emerald === '#10b981' ? '#f0fdf4' : isDark ? '#052e16' : '#f0fdf4'} />
+          <circle cx="40" cy="135" r="22" fill={isDark ? '#052e16' : '#f0fdf4'} />
           <circle cx="40" cy="135" r="16" fill={emerald} />
           <path d="M34 135l4 4 8-8" stroke={card} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
         </g>
