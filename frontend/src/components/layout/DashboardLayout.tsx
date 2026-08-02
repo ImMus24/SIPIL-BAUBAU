@@ -19,6 +19,9 @@ import { Dropdown } from '../ui/Dropdown';
 import { CommandPalette } from '../ui/CommandPalette';
 import { Avatar } from '../ui/Avatar';
 import { Tooltip } from '../ui/Tooltip';
+import { dashboardService } from '../../services/dashboardService';
+import type { AppNotification } from '../../types';
+import { formatDateTime } from '../../lib/utils';
 
 const SIDEBAR_WIDTH = 268;
 const SIDEBAR_COLLAPSED = 84;
@@ -31,6 +34,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false); // desktop rail
   const [notifOpen, setNotifOpen] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
+  const [notifications, setNotifications] = useState<AppNotification[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const isItemActive = useCallback((path: string) => {
     const [p, q] = path.split('?');
@@ -49,6 +54,27 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     document.addEventListener('mousedown', onClick);
     return () => document.removeEventListener('mousedown', onClick);
   }, []);
+
+  // Fetch real notifications + unread count
+  const fetchNotifications = useCallback(async () => {
+    try {
+      const [list, count] = await Promise.all([
+        dashboardService.getNotifications({ per_page: 5 }),
+        dashboardService.getUnreadCount(),
+      ]);
+      setNotifications(list.items);
+      setUnreadCount(count);
+    } catch {
+      // Silent — header should never crash on notification fetch failure.
+    }
+  }, []);
+
+  useEffect(() => { fetchNotifications(); }, [fetchNotifications]);
+
+  // Refresh the bell when the dropdown opens so badges stay current.
+  useEffect(() => {
+    if (notifOpen) fetchNotifications();
+  }, [notifOpen, fetchNotifications]);
 
   const getSections = useCallback((): SidebarSection[] => {
     switch (role) {
@@ -75,12 +101,6 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     };
     return map[role ?? 'citizen'] ?? '/dashboard';
   }, [role]);
-
-  const notifications = [
-    { id: 1, title: 'Laporan baru menunggu verifikasi', desc: 'SIPIL-1024 · Jalan Berlubang di Wolio', time: '5 menit lalu', unread: true },
-    { id: 2, title: 'Progress diperbarui', desc: 'SIPIL-1001 · Drainase Murhum', time: '1 jam lalu', unread: true },
-    { id: 3, title: 'Laporan selesai ditangani', desc: 'SIPIL-0998 · Lampu Jalan Kokalukuna', time: '3 jam lalu', unread: false },
-  ];
 
   const breadcrumbLabel = useMemo(() => {
     const map: Record<string, string> = {
@@ -307,7 +327,11 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                 aria-expanded={notifOpen}
               >
                 <Bell className="w-5 h-5" aria-hidden="true" />
-                <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-danger rounded-full ring-2 ring-background animate-pulse-dot" />
+                {unreadCount > 0 && (
+                  <span className="absolute top-1.5 right-1.5 min-w-[14px] h-4 px-1 bg-danger text-white text-[9px] font-bold rounded-full flex items-center justify-center ring-2 ring-background">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
               </button>
               <AnimatePresence>
                 {notifOpen && (
@@ -321,23 +345,36 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                   >
                     <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-muted/30">
                       <h3 className="font-heading font-bold text-sm text-foreground">Notifikasi</h3>
-                      <span className="text-[10px] font-bold bg-danger/10 text-danger px-2 py-0.5 rounded-full">3 baru</span>
+                      <span className="text-[10px] font-bold bg-danger/10 text-danger px-2 py-0.5 rounded-full">{unreadCount} baru</span>
                     </div>
                     <div className="max-h-80 overflow-y-auto">
-                      {notifications.map((n) => (
-                        <button
-                          key={n.id}
-                          onClick={() => { setNotifOpen(false); navigate('/notifications'); }}
-                          className={cn(
-                            'w-full text-left px-4 py-3 hover:bg-muted/50 transition-colors border-b border-border/50 last:border-0',
-                            n.unread && 'bg-primary-light/30 dark:bg-primary/10',
-                          )}
-                        >
-                          <p className="text-sm font-semibold text-foreground truncate">{n.title}</p>
-                          <p className="text-xs text-muted-foreground truncate">{n.desc}</p>
-                          <p className="text-[10px] text-muted-foreground/60 mt-0.5">{n.time}</p>
-                        </button>
-                      ))}
+                      {notifications.length === 0 ? (
+                        <div className="px-4 py-8 text-center">
+                          <Bell className="w-8 h-8 mx-auto text-muted-foreground/40 mb-2" aria-hidden="true" />
+                          <p className="text-sm text-muted-foreground">Belum ada notifikasi</p>
+                        </div>
+                      ) : (
+                        notifications.map((n) => {
+                          const data = (n.data ?? {}) as Record<string, unknown>;
+                          const complaintId = typeof data.complaint_id === 'number' ? data.complaint_id : null;
+                          return (
+                            <button
+                              key={n.id}
+                              onClick={() => { setNotifOpen(false); navigate(complaintId ? `/complaints/${complaintId}` : '/notifications'); }}
+                              className={cn(
+                                'w-full text-left px-4 py-3 hover:bg-muted/50 transition-colors border-b border-border/50 last:border-0',
+                                !n.is_read && 'bg-primary-light/30 dark:bg-primary/10',
+                              )}
+                            >
+                              <p className="text-sm font-semibold text-foreground truncate">{n.title}</p>
+                              <p className="text-xs text-muted-foreground truncate">{n.message}</p>
+                              <p className="text-[10px] text-muted-foreground/60 mt-0.5">
+                                {n.created_at ? formatDateTime(n.created_at) : ''}
+                              </p>
+                            </button>
+                          );
+                        })
+                      )}
                     </div>
                     <button
                       onClick={() => { setNotifOpen(false); navigate('/notifications'); }}
