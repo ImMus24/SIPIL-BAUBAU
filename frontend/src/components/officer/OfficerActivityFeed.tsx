@@ -3,8 +3,7 @@ import { Card } from '../ui/Card';
 import { Skeleton } from '../dashboard/LoadingSkeleton';
 import { StatusBadge } from '../ui/Badge';
 import {
-  Activity, AlertTriangle, Clock, CheckCircle2,
-  Navigation, Camera, Loader2, ArrowUpRight,
+  Activity, AlertTriangle, Clock, CheckCircle2, ArrowUpRight,
 } from 'lucide-react';
 import type { Complaint } from '../../types';
 

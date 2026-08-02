@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { DashboardLayout } from '../components/layout/DashboardLayout';
 import { Breadcrumb } from '../components/ui/Breadcrumb';
 import { Skeleton } from '../components/dashboard/LoadingSkeleton';
@@ -121,9 +121,9 @@ export function NotificationPage() {
                         <CheckCircle2 className="w-4 h-4" />
                       </button>
                     )}
-                    {n.data?.ticket_code && (
+                    {typeof (n.data as Record<string, unknown> | undefined)?.ticket_code === 'string' && (
                       <Link
-                        to={`/complaint/${n.data.ticket_code}`}
+                        to={`/complaint/${(n.data as Record<string, unknown>).ticket_code as string}`}
                         className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
                         title="Lihat detail"
                       >

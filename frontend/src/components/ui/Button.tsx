@@ -3,7 +3,7 @@ import { Loader2, type LucideIcon } from 'lucide-react';
 import { clsx } from 'clsx';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'accent' | 'outline' | 'ghost' | 'danger';
+  variant?: 'primary' | 'secondary' | 'accent' | 'outline' | 'ghost' | 'danger' | 'success';
   size?: 'sm' | 'md' | 'lg';
   loading?: boolean;
   icon?: LucideIcon;
@@ -24,6 +24,8 @@ const variants = {
     'bg-transparent hover:bg-muted text-foreground active:scale-[0.98]',
   danger:
     'bg-danger text-white hover:bg-red-700 shadow-sm active:scale-[0.98]',
+  success:
+    'bg-success text-white hover:bg-green-700 shadow-sm active:scale-[0.98]',
 };
 
 const sizes = {

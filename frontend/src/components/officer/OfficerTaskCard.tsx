@@ -4,7 +4,7 @@ import { Button } from '../ui/Button';
 import { StatusBadge, UrgencyBadge } from '../ui/Badge';
 import {
   MapPin, ExternalLink, ArrowUpCircle, CheckCircle2,
-  Clock, Navigation, Camera, ChevronRight,
+  Clock, Navigation, Camera,
 } from 'lucide-react';
 import type { Complaint } from '../../types';
 

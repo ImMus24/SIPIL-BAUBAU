@@ -16,17 +16,20 @@ export default {
           light: "var(--color-primary-light)",
           foreground: "var(--color-primary-foreground)",
         },
-        secondary: {
-          DEFAULT: "var(--color-secondary)",
-          hover: "var(--color-secondary-hover)",
-          light: "var(--color-secondary-light)",
-          foreground: "var(--color-secondary-foreground)",
+        navy: {
+          DEFAULT: "var(--color-navy)",
+          light: "var(--color-navy-light)",
+          foreground: "var(--color-navy-foreground)",
         },
-        accent: {
-          DEFAULT: "var(--color-accent)",
-          hover: "var(--color-accent-hover)",
-          light: "var(--color-accent-light)",
-          foreground: "var(--color-accent-foreground)",
+        golden: {
+          DEFAULT: "var(--color-golden)",
+          hover: "var(--color-golden-hover)",
+          light: "var(--color-golden-light)",
+          foreground: "var(--color-golden-foreground)",
+        },
+        "soft-yellow": {
+          DEFAULT: "var(--color-soft-yellow)",
+          light: "var(--color-soft-yellow-light)",
         },
         card: {
           DEFAULT: "var(--color-card)",
@@ -47,24 +50,29 @@ export default {
           DEFAULT: "var(--color-success)",
           bg: "var(--color-success-bg)",
           border: "var(--color-success-border)",
+          foreground: "var(--color-success-foreground)",
         },
         warning: {
           DEFAULT: "var(--color-warning)",
           bg: "var(--color-warning-bg)",
           border: "var(--color-warning-border)",
+          foreground: "var(--color-warning-foreground)",
         },
         danger: {
           DEFAULT: "var(--color-danger)",
           bg: "var(--color-danger-bg)",
           border: "var(--color-danger-border)",
+          foreground: "var(--color-danger-foreground)",
         },
         info: {
           DEFAULT: "var(--color-info)",
           bg: "var(--color-info-bg)",
           border: "var(--color-info-border)",
+          foreground: "var(--color-info-foreground)",
         },
       },
       borderRadius: {
+        xs: "var(--radius-xs)",
         sm: "var(--radius-sm)",
         md: "var(--radius-md)",
         lg: "var(--radius-lg)",
@@ -74,9 +82,9 @@ export default {
         full: "var(--radius-full)",
       },
       fontFamily: {
-        sans: ["Inter", "sans-serif"],
-        heading: ["Poppins", "sans-serif"],
-        mono: ["ui-monospace", "monospace"],
+        sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+        heading: ["Plus Jakarta Sans", "Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+        mono: ["ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
       },
       boxShadow: {
         xs: "var(--shadow-xs)",
@@ -86,15 +94,15 @@ export default {
         xl: "var(--shadow-xl)",
         "2xl": "var(--shadow-2xl)",
         glow: "var(--shadow-glow-blue)",
+        "glow-golden": "var(--shadow-glow-golden)",
       },
       animation: {
         float: "float 6s ease-in-out infinite",
-        "fade-in": "fadeIn 200ms ease-out",
-        "fade-in-up": "fadeInUp 300ms ease-out",
-        "slide-in-right": "slideInRight 200ms ease-out",
-        "scale-in": "scaleIn 200ms ease-out",
+        "fade-in": "fadeIn 250ms ease-out",
+        "fade-in-up": "fadeInUp 400ms ease-out",
+        "slide-in-right": "slideInRight 250ms ease-out",
+        "scale-in": "scaleIn 250ms ease-out",
         "pulse-dot": "pulse-dot 2s ease-in-out infinite",
-        "bounce-short": "bounce-short 0.5s ease-out",
         shimmer: "shimmer 1.5s infinite linear",
       },
       keyframes: {
@@ -128,7 +136,10 @@ export default {
         },
       },
       spacing: {
-        "container": "1280px",
+        container: "1440px",
+      },
+      maxWidth: {
+        container: "1440px",
       },
     },
   },

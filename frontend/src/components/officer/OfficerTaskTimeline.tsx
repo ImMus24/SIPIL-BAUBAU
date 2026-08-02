@@ -2,7 +2,7 @@ import React from 'react';
 import { Card } from '../ui/Card';
 import { Skeleton } from '../dashboard/LoadingSkeleton';
 import {
-  Clock, CheckCircle2, Navigation, Camera,
+  Clock, CheckCircle2, Navigation,
   AlertTriangle, Loader2, Activity,
 } from 'lucide-react';
 import type { TimelineItem } from '../../types';

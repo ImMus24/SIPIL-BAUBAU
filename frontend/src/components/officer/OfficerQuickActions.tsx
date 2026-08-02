@@ -1,6 +1,4 @@
 import React from 'react';
-import { Button } from '../ui/Button';
-import { Card } from '../ui/Card';
 import {
   Play, Map, ListChecks, Camera, History, Calendar,
 } from 'lucide-react';
@@ -24,7 +22,7 @@ interface OfficerQuickActionsProps {
 }
 
 export const OfficerQuickActions: React.FC<OfficerQuickActionsProps> = ({
-  hasUnfinishedTasks, onStartToday, onViewMap,
+  onStartToday, onViewMap,
   onViewComplaints, onUploadDoc, onViewHistory,
 }) => {
   const actions: QuickAction[] = [

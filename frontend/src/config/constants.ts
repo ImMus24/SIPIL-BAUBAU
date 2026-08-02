@@ -1,6 +1,6 @@
 export const APP_NAME = 'SIPIL BAUBAU';
 export const APP_DESCRIPTION = 'Sistem Pengaduan Infrastruktur Berbasis Web dengan Pemetaan Lokasi dan Monitoring Penanganan Laporan';
-export const APP_VERSION = '2.0.0';
+export const APP_VERSION = '3.0.0';
 
 export const API_CONFIG = {
   BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1',

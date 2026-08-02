@@ -7,7 +7,7 @@ import { complaintService } from '../../services/complaintService';
 import type { Complaint } from '../../types';
 import {
   Camera, Send, X, MapPin, Clock, Navigation,
-  CheckCircle2, Loader2, Image,
+  CheckCircle2, Loader2,
 } from 'lucide-react';
 
 const OFFICER_STATUSES = [
@@ -114,7 +114,6 @@ export const OfficerProgressModal: React.FC<OfficerProgressModalProps> = ({
     }
   };
 
-  const hasAnyPhoto = photos.some(p => p.file !== null);
   const canComplete = isComplete || selectedStatus === 'selesai';
 
   return (

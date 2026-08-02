@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Skeleton } from '../dashboard/LoadingSkeleton';
-import { dashboardService } from '../../services/dashboardService';
 import { MapPin, Navigation, ExternalLink, Layers } from 'lucide-react';
 import type { MapPoint } from '../../types';
 
@@ -13,7 +12,7 @@ interface OfficerTaskMapProps {
 }
 
 export const OfficerTaskMap: React.FC<OfficerTaskMapProps> = ({
-  assignedTasks, loading, onNavigateToLocation,
+  assignedTasks, loading,
 }) => {
   const [filterUrgency, setFilterUrgency] = useState<string>('all');
 
