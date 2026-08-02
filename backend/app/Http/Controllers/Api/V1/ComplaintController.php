@@ -5,7 +5,12 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreComplaintRequest;
 use App\Http\Requests\UpdateComplaintStatusRequest;
+use App\Http\Requests\StoreComplaintCommentRequest;
+use App\Http\Requests\UploadComplaintFileRequest;
 use App\Http\Resources\ComplaintResource;
+use App\Http\Resources\ComplaintDetailResource;
+use App\Http\Resources\ComplaintCommentResource;
+use App\Http\Resources\ComplaintFileResource;
 use App\DTOs\StoreComplaintDTO;
 use App\DTOs\UpdateComplaintStatusDTO;
 use App\Services\ComplaintService;
@@ -62,6 +67,83 @@ class ComplaintController extends Controller
             'message' => 'Detail pengaduan ditemukan.',
             'data' => new ComplaintResource($complaint),
         ]);
+    }
+
+    /**
+     * GET /complaints/{id} — the central complaint detail endpoint.
+     * RBAC: citizen may only view their own complaint; officer/admin/head view all.
+     */
+    public function show(Request $request, int $id): JsonResponse
+    {
+        $complaint = $this->complaintService->getComplaintDetail($id);
+
+        if (!$complaint) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pengaduan tidak ditemukan.',
+            ], 404);
+        }
+
+        $this->authorize('view', $complaint);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Detail pengaduan berhasil dimuat.',
+            'data' => new ComplaintDetailResource($complaint),
+        ]);
+    }
+
+    /**
+     * POST /complaints/{id}/comments
+     */
+    public function storeComment(StoreComplaintCommentRequest $request, int $id): JsonResponse
+    {
+        $complaint = $this->complaintService->getComplaintById($id);
+        if (!$complaint) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pengaduan tidak ditemukan.',
+            ], 404);
+        }
+
+        $this->authorize('view', $complaint);
+
+        $comment = $this->complaintService->addComment($id, $request->validated()['body'], $request->user()?->id);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Komentar berhasil ditambahkan.',
+            'data' => new ComplaintCommentResource($comment),
+        ], 201);
+    }
+
+    /**
+     * POST /complaints/{id}/files — upload a photo/support file.
+     */
+    public function uploadFile(UploadComplaintFileRequest $request, int $id): JsonResponse
+    {
+        $complaint = $this->complaintService->getComplaintById($id);
+        if (!$complaint) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pengaduan tidak ditemukan.',
+            ], 404);
+        }
+
+        $this->authorize('updateStatus', $complaint);
+
+        $file = $this->complaintService->uploadFile(
+            $id,
+            $request->file('file'),
+            $request->validated()['category'] ?? 'support',
+            $request->user()?->id
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Berkas berhasil diunggah.',
+            'data' => new ComplaintFileResource($file),
+        ], 201);
     }
 
     public function updateStatus(UpdateComplaintStatusRequest $request, int $id): JsonResponse

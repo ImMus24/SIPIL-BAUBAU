@@ -38,6 +38,12 @@ Route::middleware([SecurityHeaders::class])->prefix('v1')->group(function () {
 
         Route::get('/complaints/my-reports', [ComplaintController::class, 'myReports']);
 
+        // Central complaint detail + collaboration endpoints
+        // NOTE: must stay AFTER ticket/{ticket_code} and my-reports so {id} doesn't shadow them
+        Route::get('/complaints/{id}', [ComplaintController::class, 'show']);
+        Route::post('/complaints/{id}/comments', [ComplaintController::class, 'storeComment']);
+        Route::post('/complaints/{id}/files', [ComplaintController::class, 'uploadFile']);
+
         // Role-specific Dashboard Endpoints
         Route::get('/dashboard', [DashboardController::class, 'index']);
         Route::get('/dashboard/citizen', [DashboardController::class, 'citizenDashboard']);

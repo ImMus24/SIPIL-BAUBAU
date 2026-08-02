@@ -100,6 +100,42 @@ class ComplaintRepository implements ComplaintRepositoryInterface
         return Complaint::with(['category', 'agency', 'attachments', 'statusLogs'])->find($id);
     }
 
+    public function findWithDetail(int $id): ?Complaint
+    {
+        return Complaint::with([
+            'category',
+            'agency',
+            'attachments',
+            'statusLogs',
+            'comments.user',
+            'activityLogs.user',
+            'files.uploader',
+            'notifications',
+        ])->find($id);
+    }
+
+    public function getRelated(int $id, int $categoryId, string $subdistrict, int $limit = 6): Collection
+    {
+        return Complaint::with(['category', 'agency'])
+            ->where('id', '!=', $id)
+            ->where(function ($q) use ($categoryId, $subdistrict) {
+                $q->where('category_id', $categoryId)
+                  ->orWhere('subdistrict', $subdistrict);
+            })
+            ->latest()
+            ->limit($limit)
+            ->get();
+    }
+
+    public function getNotificationHistory(int $id, int $limit = 20): Collection
+    {
+        return \App\Models\Notification::query()
+            ->where('data->complaint_id', $id)
+            ->latest()
+            ->limit($limit)
+            ->get();
+    }
+
     public function findByTicketCode(string $ticketCode): ?Complaint
     {
         return Complaint::with(['category', 'agency', 'attachments', 'statusLogs'])

@@ -12,6 +12,12 @@ interface ComplaintRepositoryInterface
 
     public function findById(int $id): ?Complaint;
 
+    public function findWithDetail(int $id): ?Complaint;
+
+    public function getRelated(int $id, int $categoryId, string $subdistrict, int $limit = 6): Collection;
+
+    public function getNotificationHistory(int $id, int $limit = 20): Collection;
+
     public function findByTicketCode(string $ticketCode): ?Complaint;
 
     public function getByUserId(int $userId): Collection;

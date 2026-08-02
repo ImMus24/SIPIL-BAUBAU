@@ -8,6 +8,8 @@ use App\Events\ComplaintStatusUpdated;
 use App\Exceptions\ComplaintNotFoundException;
 use App\Exceptions\InvalidStatusTransitionException;
 use App\Models\Complaint;
+use App\Models\ComplaintActivityLog;
+use App\Models\ComplaintFile;
 use App\Models\ComplaintStatusLog;
 use App\Traits\Auditable;
 use Illuminate\Support\Facades\DB;
@@ -58,6 +60,28 @@ class UpdateComplaintStatusAction
                 'updated_by' => $dto->updatedByName,
                 'photo_proof' => $photoPath,
             ]);
+
+            // Activity log entry
+            ComplaintActivityLog::create([
+                'complaint_id' => $complaint->id,
+                'action' => 'status_changed',
+                'description' => "Status berubah: {$oldStatusValue} → {$dto->status}",
+                'user_id' => request()->user()?->id,
+                'old_value' => $oldStatusValue,
+                'new_value' => $dto->status,
+            ]);
+
+            // Store uploaded proof photo as a complaint file (progress or after)
+            if ($photoPath) {
+                ComplaintFile::create([
+                    'complaint_id' => $complaint->id,
+                    'file_path' => $photoPath,
+                    'file_type' => $dto->photoProof?->getMimeType() ?? 'image/jpeg',
+                    'category' => $dto->status === 'selesai' ? 'after' : 'progress',
+                    'file_size' => $dto->photoProof?->getSize(),
+                    'uploaded_by' => request()->user()?->id,
+                ]);
+            }
 
             $this->auditLog('COMPLAINT_STATUS_UPDATED',
                 "Status {$complaint->ticket_code}: {$oldStatusValue} → {$dto->status}",

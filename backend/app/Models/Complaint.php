@@ -63,4 +63,27 @@ class Complaint extends Model
     {
         return $this->hasMany(ComplaintStatusLog::class)->orderBy('created_at', 'asc');
     }
+
+    public function comments(): HasMany
+    {
+        return $this->hasMany(ComplaintComment::class)->orderBy('created_at', 'asc');
+    }
+
+    public function activityLogs(): HasMany
+    {
+        return $this->hasMany(ComplaintActivityLog::class)->orderBy('created_at', 'asc');
+    }
+
+    public function files(): HasMany
+    {
+        return $this->hasMany(ComplaintFile::class)->orderBy('created_at', 'asc');
+    }
+
+    /**
+     * Notifications referencing this complaint via the data->complaint_id JSON field.
+     */
+    public function notifications(): HasMany
+    {
+        return $this->hasMany(Notification::class, 'data->complaint_id', 'id');
+    }
 }
