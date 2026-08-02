@@ -321,3 +321,74 @@ export interface MapPoint {
 }
 
 export type DashboardData = CitizenDashboardData | AdminDashboardData | OfficerDashboardData | HeadOfAgencyDashboardData;
+
+// ─── Complaint Detail (central page) ───────────────────────────────
+
+export interface ComplaintCommentUser {
+  id: number;
+  name: string;
+  role?: string;
+}
+
+export interface ComplaintComment {
+  id: number;
+  complaint_id: number;
+  user_id: number | null;
+  body: string;
+  user?: ComplaintCommentUser | null;
+  created_at: string;
+}
+
+export interface ComplaintActivityLog {
+  id: number;
+  complaint_id: number;
+  action: string;
+  description: string | null;
+  old_value: string | null;
+  new_value: string | null;
+  user_id: number | null;
+  user?: ComplaintCommentUser | null;
+  created_at: string;
+}
+
+export type ComplaintFileCategory = 'before' | 'progress' | 'after' | 'support';
+
+export interface ComplaintFile {
+  id: number;
+  complaint_id: number;
+  file_path: string;
+  file_type: string;
+  category: ComplaintFileCategory;
+  file_size?: number | null;
+  uploaded_by?: number | null;
+  uploader?: { id: number; name: string } | null;
+  created_at: string;
+}
+
+export interface ComplaintSla {
+  days: number;
+  status: 'selesai' | 'unknown' | 'overdue' | 'on_track';
+  label: string;
+  deadline: string | null;
+}
+
+export interface ComplaintNotificationRef {
+  id: number;
+  type: string;
+  title: string;
+  message: string;
+  is_read: boolean;
+  created_at: string;
+}
+
+export interface ComplaintDetail extends Complaint {
+  current_officer?: string | null;
+  progress_percentage: number;
+  progress_label: string;
+  sla: ComplaintSla;
+  comments: ComplaintComment[];
+  activity_logs: ComplaintActivityLog[];
+  files: ComplaintFile[];
+  notifications: ComplaintNotificationRef[];
+  related: Complaint[];
+}

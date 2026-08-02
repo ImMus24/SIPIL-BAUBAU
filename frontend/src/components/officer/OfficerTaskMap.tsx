@@ -12,6 +12,7 @@ interface OfficerTaskMapProps {
   assignedTasks: MapPoint[];
   loading: boolean;
   onNavigateToLocation?: (task: MapPoint) => void;
+  onSelectComplaint?: (task: MapPoint) => void;
 }
 
 const createUrgencyIcon = (color: string) => {
@@ -42,7 +43,7 @@ const URGENCY_LABELS: Record<string, string> = {
 };
 
 export const OfficerTaskMap: React.FC<OfficerTaskMapProps> = ({
-  assignedTasks, loading,
+  assignedTasks, loading, onSelectComplaint,
 }) => {
   const { isDark } = useTheme();
   const [filterUrgency, setFilterUrgency] = useState<string>('all');
@@ -140,6 +141,15 @@ export const OfficerTaskMap: React.FC<OfficerTaskMapProps> = ({
                     <Navigation className="w-3 h-3" aria-hidden="true" />
                     Buka Navigasi
                   </button>
+                  {onSelectComplaint && (
+                    <button
+                      onClick={() => onSelectComplaint(point)}
+                      className="w-full inline-flex items-center justify-center gap-1.5 mt-1 px-2.5 py-1.5 text-[11px] font-bold bg-card border border-border text-foreground hover:border-primary/40 hover:text-primary rounded-lg transition-colors"
+                    >
+                      <MapPin className="w-3 h-3" aria-hidden="true" />
+                      Lihat Detail
+                    </button>
+                  )}
                 </div>
               </Popup>
             </Marker>

@@ -72,7 +72,7 @@ export const OfficerDashboard: React.FC = () => {
   };
 
   const viewComplaintDetail = (task: Complaint) => {
-    openStatusModal(task);
+    navigate(`/complaints/${task.id}`);
   };
 
   const completeTask = (task: Complaint) => {
@@ -156,7 +156,7 @@ export const OfficerDashboard: React.FC = () => {
           hasUnfinishedTasks={hasUnfinishedTasks}
           onStartToday={() => { if (firstUnfinished) openStatusModal(firstUnfinished); }}
           onViewMap={() => navigate('/map')}
-          onViewComplaints={() => navigate('/complaints')}
+          onViewComplaints={() => navigate('/map')}
           onUploadDoc={() => { if (firstWithPhoto) openStatusModal(firstWithPhoto); }}
           onViewHistory={() => {}}
         />
@@ -190,12 +190,13 @@ export const OfficerDashboard: React.FC = () => {
               onNavigateToLocation={(point) => {
                 window.open(`https://www.google.com/maps/dir/?api=1&destination=${point.latitude},${point.longitude}`, '_blank');
               }}
+              onSelectComplaint={(point) => navigate(`/complaints/${point.id}`)}
             />
           </div>
 
           {/* Right: Timeline + Activity */}
           <div className="space-y-6">
-            <OfficerTaskTimeline timeline={timeline} loading={loading} />
+            <OfficerTaskTimeline timeline={timeline} loading={loading} onSelect={(id) => navigate(`/complaints/${id}`)} />
             <OfficerActivityFeed activities={tasks} loading={loading} />
           </div>
         </div>
@@ -210,14 +211,14 @@ export const OfficerDashboard: React.FC = () => {
             </div>
             <div className="space-y-2">
               {priority.slice(0, 5).map((c) => (
-                <div key={c.id} className="flex items-center justify-between p-3 bg-card rounded-xl border border-border">
+                <div key={c.id} onClick={() => navigate(`/complaints/${c.id}`)} className="flex items-center justify-between p-3 bg-card rounded-xl border border-border cursor-pointer hover:border-primary/30 transition-colors">
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-semibold text-foreground truncate">{c.title}</p>
                     <p className="text-xs text-muted-foreground">{c.ticket_code} · {c.subdistrict}</p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <Button variant="outline" size="sm" icon={ArrowUpCircle} onClick={() => openStatusModal(c)}>Proses</Button>
-                    <Button variant="ghost" size="sm" icon={Navigation} onClick={() => openGoogleMaps(c)} />
+                    <Button variant="outline" size="sm" icon={ArrowUpCircle} onClick={(e) => { e.stopPropagation(); openStatusModal(c); }}>Proses</Button>
+                    <Button variant="ghost" size="sm" icon={Navigation} onClick={(e) => { e.stopPropagation(); openGoogleMaps(c); }} />
                   </div>
                 </div>
               ))}

@@ -10,6 +10,7 @@ import type { TimelineItem } from '../../types';
 interface OfficerTaskTimelineProps {
   timeline: TimelineItem[];
   loading: boolean;
+  onSelect?: (complaintId: number) => void;
 }
 
 const STATUS_ICONS: Record<string, React.ElementType> = {
@@ -42,7 +43,7 @@ const STATUS_LABELS: Record<string, string> = {
   ditolak: 'Ditolak',
 };
 
-export const OfficerTaskTimeline: React.FC<OfficerTaskTimelineProps> = ({ timeline, loading }) => {
+export const OfficerTaskTimeline: React.FC<OfficerTaskTimelineProps> = ({ timeline, loading, onSelect }) => {
   if (loading) return <Skeleton variant="rectangular" height={300} />;
 
   const displayTimeline = timeline.slice(0, 8);
@@ -81,7 +82,7 @@ export const OfficerTaskTimeline: React.FC<OfficerTaskTimelineProps> = ({ timeli
             const label = STATUS_LABELS[item.status] || item.status;
 
             return (
-              <div key={`${item.complaint_id}-${idx}`} className="flex items-start gap-3 relative">
+              <div key={`${item.complaint_id}-${idx}`} onClick={() => onSelect?.(item.complaint_id)} className={`flex items-start gap-3 relative ${onSelect ? 'cursor-pointer hover:bg-muted/40 rounded-xl px-2 -mx-2 transition-colors' : ''}`}>
                 {/* Icon */}
                 <div className={`relative z-10 w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${colorClass}`}>
                   <Icon className="w-4 h-4" />

@@ -135,6 +135,7 @@ export function App() {
                     <Route path="/map" element={<MapPage />} />
                     <Route path="/submit" element={<SubmitComplaintPage />} />
                     <Route path="/track" element={<TrackComplaintPage />} />
+                    <Route path="/complaints/:id" element={<ComplaintDetailPage />} />
                     <Route path="/complaint/:ticket_code" element={<ComplaintDetailPage />} />
                     <Route path="/stats" element={<StatsPage />} />
                     <Route path="/about" element={<AboutPage />} />

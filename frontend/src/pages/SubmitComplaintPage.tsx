@@ -61,6 +61,7 @@ export const SubmitComplaintPage: React.FC = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [ticketCode, setTicketCode] = useState('');
+  const [complaintId, setComplaintId] = useState<number | null>(null);
 
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [subdistrict, setSubdistrict] = useState('');
@@ -151,6 +152,7 @@ export const SubmitComplaintPage: React.FC = () => {
         photos: files.length > 0 ? files : undefined,
       });
       setTicketCode(result.ticket_code);
+      setComplaintId(result.id);
       setSuccess(true);
       clearDraft();
       toast.success('Laporan Terkirim!', `Kode tiket: ${result.ticket_code}`);
@@ -186,7 +188,7 @@ export const SubmitComplaintPage: React.FC = () => {
             Simpan kode tiket ini untuk melacak status laporan Anda.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Button onClick={() => navigate(`/complaint/${ticketCode}`)}>
+            <Button onClick={() => navigate(complaintId ? `/complaints/${complaintId}` : `/track?ticket=${ticketCode}`)}>
               Lihat Detail Laporan
             </Button>
             <Button variant="outline" onClick={() => navigate('/')}>

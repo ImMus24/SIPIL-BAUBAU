@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import { StatCard } from '../../components/ui/StatCard';
 import { Card } from '../../components/ui/Card';
@@ -28,6 +28,7 @@ import {
 type TabId = 'semua' | 'menunggu' | 'diproses' | 'selesai';
 
 export const AdminDashboard: React.FC = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [data, setData] = useState<AdminDashboardData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -153,14 +154,14 @@ export const AdminDashboard: React.FC = () => {
             </div>
             <div className="space-y-2">
               {verification.slice(0, 5).map((c) => (
-                <div key={c.id} className="flex items-center justify-between p-3 bg-card rounded-xl border border-border">
+                <div key={c.id} onClick={() => navigate(`/complaints/${c.id}`)} className="flex items-center justify-between p-3 bg-card rounded-xl border border-border cursor-pointer hover:border-primary/30 transition-colors">
                   <div className="min-w-0">
                     <p className="text-sm font-semibold text-foreground truncate">{c.title}</p>
                     <p className="text-xs text-muted-foreground">{c.ticket_code} · {c.subdistrict} · {c.reporter_name}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <UrgencyBadge urgency={c.urgency} />
-                    <Button variant="ghost" size="sm" icon={ArrowUpCircle} onClick={() => openStatusModal(c)}>Proses</Button>
+                    <Button variant="ghost" size="sm" icon={ArrowUpCircle} onClick={(e) => { e.stopPropagation(); openStatusModal(c); }}>Proses</Button>
                   </div>
                 </div>
               ))}
@@ -203,7 +204,7 @@ export const AdminDashboard: React.FC = () => {
                       </thead>
                       <tbody className="divide-y divide-border">
                         {filtered.map((item) => (
-                          <tr key={item.id} className="hover:bg-muted/30 transition-colors">
+                          <tr key={item.id} onClick={() => navigate(`/complaints/${item.id}`)} className="hover:bg-muted/30 transition-colors cursor-pointer">
                             <td className="py-3 pr-3 text-sm font-mono text-foreground font-medium">{item.ticket_code}</td>
                             <td className="py-3 pr-3"><p className="text-sm font-semibold text-foreground truncate">{item.title}</p><p className="text-xs text-muted-foreground">{item.subdistrict}</p></td>
                             <td className="py-3 pr-3 text-sm text-foreground">{item.category?.name || '-'}</td>
@@ -372,13 +373,13 @@ export const AdminDashboard: React.FC = () => {
                       </thead>
                       <tbody className="divide-y divide-border">
                         {verification.map((c) => (
-                          <tr key={c.id} className="hover:bg-muted/30 transition-colors">
+                          <tr key={c.id} onClick={() => navigate(`/complaints/${c.id}`)} className="hover:bg-muted/30 transition-colors cursor-pointer">
                             <td className="py-3 pr-3 text-sm font-mono text-foreground font-medium">{c.ticket_code}</td>
                             <td className="py-3 pr-3"><p className="text-sm font-semibold text-foreground truncate">{c.title}</p><p className="text-xs text-muted-foreground">{c.subdistrict}</p></td>
                             <td className="py-3 pr-3 text-sm text-muted-foreground">{c.reporter_name}</td>
                             <td className="py-3 pr-3"><UrgencyBadge urgency={c.urgency} size="sm" /></td>
                             <td className="py-3 pr-3 text-xs text-muted-foreground">{new Date(c.created_at).toLocaleDateString('id-ID')}</td>
-                            <td className="py-3"><Button variant="ghost" size="sm" icon={ArrowUpCircle} onClick={() => openStatusModal(c)}>Proses</Button></td>
+                            <td className="py-3"><Button variant="ghost" size="sm" icon={ArrowUpCircle} onClick={(e) => { e.stopPropagation(); openStatusModal(c); }}>Proses</Button></td>
                           </tr>
                         ))}
                       </tbody>

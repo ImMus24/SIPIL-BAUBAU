@@ -188,7 +188,7 @@ export const KepalaDinasDashboard: React.FC = () => {
             {loading ? <Skeleton.Table rows={5} cols={3} /> : reports.length > 0 ? (
               <div className="divide-y divide-border">
                 {reports.slice(0, 8).map((report) => (
-                  <div key={report.id} onClick={() => navigate(`/track?ticket=${report.ticket_code}`)}
+                  <div key={report.id} onClick={() => navigate(`/complaints/${report.id}`)}
                     className="flex items-center justify-between py-3 first:pt-0 hover:bg-muted/30 px-2 -mx-2 rounded-xl transition-colors cursor-pointer group">
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-semibold text-foreground truncate group-hover:text-primary transition-colors">{report.title}</p>

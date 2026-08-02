@@ -121,9 +121,9 @@ export function NotificationPage() {
                         <CheckCircle2 className="w-4 h-4" />
                       </button>
                     )}
-                    {typeof (n.data as Record<string, unknown> | undefined)?.ticket_code === 'string' && (
+                    {typeof (n.data as Record<string, unknown> | undefined)?.complaint_id === 'number' && (
                       <Link
-                        to={`/complaint/${(n.data as Record<string, unknown>).ticket_code as string}`}
+                        to={`/complaints/${(n.data as Record<string, unknown>).complaint_id as number}`}
                         className="p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors"
                         title="Lihat detail"
                       >

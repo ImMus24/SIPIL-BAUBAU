@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { StatusBadge } from '../components/ui/Badge';
 import { Skeleton } from '../components/ui/Skeleton';
 import { complaintService } from '../services/complaintService';
 import type { Complaint } from '../types';
-import { MapPin, Search, Clock, User, Building2 } from 'lucide-react';
+import { MapPin, Search, Clock, User, Building2, ExternalLink } from 'lucide-react';
 
 export const TrackComplaintPage: React.FC = () => {
   const [ticketCode, setTicketCode] = useState('');
@@ -79,7 +80,13 @@ export const TrackComplaintPage: React.FC = () => {
                   </div>
                   <p className="text-sm text-muted-foreground font-mono">{complaint.ticket_code}</p>
                 </div>
-                <StatusBadge status={complaint.status} size="lg" />
+                <div className="flex items-center gap-3">
+                  <StatusBadge status={complaint.status} size="lg" />
+                  <Link to={`/complaints/${complaint.id}`} className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-bold hover:bg-primary-hover transition-colors">
+                    <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
+                    Lihat Detail Lengkap
+                  </Link>
+                </div>
               </div>
             </Card>
 

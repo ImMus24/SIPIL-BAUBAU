@@ -172,7 +172,7 @@ export const CitizenDashboard: React.FC = () => {
               ) : (
                 <div className="divide-y divide-border">
                   {filtered.slice(0, 10).map((report) => (
-                    <div key={report.id} onClick={() => navigate(`/track?ticket=${report.ticket_code}`)}
+                    <div key={report.id} onClick={() => navigate(`/complaints/${report.id}`)}
                       className="flex items-center justify-between p-3 hover:bg-muted/50 rounded-xl transition-colors cursor-pointer group">
                       <div className="flex items-start gap-3 min-w-0 flex-1">
                         <div className="shrink-0 w-10 h-10 rounded-xl bg-muted flex items-center justify-center">

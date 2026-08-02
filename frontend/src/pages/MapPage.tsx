@@ -8,7 +8,7 @@ import { EmptyState } from '../components/ui/EmptyState';
 import type { Complaint } from '../types';
 import { MapPin, List, Loader2 } from 'lucide-react';
 import { cn } from '../lib/utils';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const STATUS_BADGE_VARIANT: Record<string, 'success' | 'info' | 'danger' | 'warning'> = {
   selesai: 'success',
@@ -25,6 +25,7 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 export const MapPage: React.FC = () => {
+  const navigate = useNavigate();
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -96,6 +97,7 @@ export const MapPage: React.FC = () => {
               complaints={mapComplaints}
               height="100%"
               selectedSubdistrict="all"
+              onSelectComplaint={(c) => navigate(`/complaints/${c.id}`)}
             />
           )}
 
@@ -130,7 +132,7 @@ export const MapPage: React.FC = () => {
                   {mapComplaints.map((c) => (
                     <Link
                       key={c.id}
-                      to={`/complaint/${c.ticket_code}`}
+                      to={`/complaints/${c.id}`}
                       className={cn(
                         'block p-3 rounded-xl border border-border hover:border-primary/30 hover:bg-muted/50 hover:shadow-sm transition-all group',
                       )}

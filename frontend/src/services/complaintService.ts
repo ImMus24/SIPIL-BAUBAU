@@ -1,5 +1,8 @@
 import api from './api';
-import type { Complaint, ComplaintFilter, StatSummary, Category, Agency } from '../types';
+import type {
+  Complaint, ComplaintDetail, ComplaintFilter, StatSummary, Category, Agency,
+  ComplaintComment, ComplaintFile, ComplaintFileCategory,
+} from '../types';
 
 /**
  * Real API service for complaints.
@@ -13,6 +16,31 @@ export const complaintService = {
 
   async getComplaintByTicket(ticketCode: string): Promise<Complaint | null> {
     const response = await api.get(`/complaints/ticket/${ticketCode}`);
+    return response.data.data;
+  },
+
+  /** Central detail endpoint — rich payload with comments, activity, files, related. */
+  async getComplaintById(id: number): Promise<ComplaintDetail> {
+    const response = await api.get(`/complaints/${id}`);
+    return response.data.data;
+  },
+
+  async addComment(id: number, body: string): Promise<ComplaintComment> {
+    const response = await api.post(`/complaints/${id}/comments`, { body });
+    return response.data.data;
+  },
+
+  async uploadComplaintFile(
+    id: number,
+    file: File,
+    category: ComplaintFileCategory = 'support',
+  ): Promise<ComplaintFile> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('category', category);
+    const response = await api.post(`/complaints/${id}/files`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
     return response.data.data;
   },
 
