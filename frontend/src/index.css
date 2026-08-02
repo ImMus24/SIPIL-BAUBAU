@@ -16,9 +16,19 @@
   --color-primary-light: #E8F1FE;
   --color-primary-foreground: #FFFFFF;
 
+  /* Navy */
   --color-navy: #0A2540;
   --color-navy-light: #12294A;
   --color-navy-foreground: #FFFFFF;
+
+  /* Legacy aliases: accent = golden, secondary = navy (backward compat) */
+  --color-accent: #FFC107;
+  --color-accent-hover: #E6AD08;
+  --color-accent-light: #FFF8E1;
+  --color-accent-foreground: #0A2540;
+  --color-secondary: #0A2540;
+  --color-secondary-light: #E8F1FE;
+  --color-secondary-foreground: #FFFFFF;
 
   --color-golden: #FFC107;
   --color-golden-hover: #E6AD08;
@@ -129,6 +139,15 @@
   --color-navy-light: #132C4C;
   --color-navy-foreground: #F8FAFC;
 
+  /* Legacy aliases (dark) */
+  --color-accent: #FFC107;
+  --color-accent-hover: #FFD54F;
+  --color-accent-light: #3A2E06;
+  --color-accent-foreground: #0A2540;
+  --color-secondary: #0A2540;
+  --color-secondary-light: #172F5E;
+  --color-secondary-foreground: #F8FAFC;
+
   --color-golden: #FFC107;
   --color-golden-hover: #FFD54F;
   --color-golden-light: #3A2E06;
@@ -202,6 +221,14 @@
 
   --color-soft-yellow: var(--color-soft-yellow);
   --color-soft-yellow-light: var(--color-soft-yellow-light);
+
+  --color-accent: var(--color-accent);
+  --color-accent-hover: var(--color-accent-hover);
+  --color-accent-light: var(--color-accent-light);
+  --color-accent-foreground: var(--color-accent-foreground);
+  --color-secondary: var(--color-secondary);
+  --color-secondary-light: var(--color-secondary-light);
+  --color-secondary-foreground: var(--color-secondary-foreground);
 
   --color-background: var(--color-background);
   --color-foreground: var(--color-foreground);

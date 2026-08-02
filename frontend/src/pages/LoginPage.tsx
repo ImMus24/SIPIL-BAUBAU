@@ -4,7 +4,8 @@ import { useAuth } from '../context/AuthContext';
 import { authService } from '../services/authService';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
-import { ShieldCheck, Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
+import { Modal } from '../components/ui/Modal';
+import { ShieldCheck, Mail, Lock, Eye, EyeOff, ArrowRight, KeyRound, Info } from 'lucide-react';
 import loginPng from '../assets/login.png';
 
 export const LoginPage: React.FC = () => {
@@ -15,6 +16,9 @@ export const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [forgotOpen, setForgotOpen] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetSent, setResetSent] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,23 +42,29 @@ export const LoginPage: React.FC = () => {
 
   const fillQuick = (e: string) => { setEmail(e); setPassword('password123'); };
 
+  const handleForgotSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!resetEmail) return;
+    setResetSent(true);
+  };
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4 sm:p-6 pt-24">
       <div className="max-w-5xl w-full bg-card rounded-3xl border border-border shadow-2xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[680px] animate-fade-in-up">
         
         {/* Left Panel */}
-        <div className="lg:col-span-6 bg-gradient-to-br from-primary to-primary-hover text-primary-foreground p-8 sm:p-12 flex flex-col justify-between relative overflow-hidden min-h-[500px]">
+        <div className="lg:col-span-6 bg-gradient-to-br from-primary to-navy text-primary-foreground p-8 sm:p-12 flex flex-col justify-between relative overflow-hidden min-h-[500px]">
           {/* Background decorative elements */}
           <div className="absolute inset-0 opacity-[0.08]"
             style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '20px 20px' }}
           />
-          <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-secondary/20 blur-3xl rounded-full" />
-          <div className="absolute top-40 -right-20 w-60 h-60 bg-accent/10 blur-3xl rounded-full" />
+          <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-golden/20 blur-3xl rounded-full" />
+          <div className="absolute top-40 -right-20 w-60 h-60 bg-navy-light/40 blur-3xl rounded-full" />
 
           <div className="space-y-6 relative z-10">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center ring-1 ring-white/40">
-                <ShieldCheck className="w-7 h-7 text-accent" />
+                <ShieldCheck className="w-7 h-7 text-golden" />
               </div>
               <h2 className="font-heading font-black text-2xl tracking-tight">SIPIL BAUBAU</h2>
             </div>
@@ -81,8 +91,8 @@ export const LoginPage: React.FC = () => {
           <div className="space-y-3 relative z-10 mt-4">
             {['Keamanan Data Terjamin', 'Respon Cepat Tanggap OPD', 'Pantau Real-time via Dashboard'].map((h) => (
               <div key={h} className="flex items-center gap-2.5 text-sm text-white/90 font-medium">
-                <div className="w-5 h-5 rounded-full bg-accent/30 flex items-center justify-center">
-                  <span className="text-accent text-xs font-bold">✓</span>
+                <div className="w-5 h-5 rounded-full bg-golden/30 flex items-center justify-center">
+                  <span className="text-golden text-xs font-bold">✓</span>
                 </div>
                 <span>{h}</span>
               </div>
@@ -99,7 +109,7 @@ export const LoginPage: React.FC = () => {
             </div>
 
             {errorMsg && (
-              <div className="p-4 bg-danger-bg border border-danger-border text-danger text-sm font-bold rounded-xl">
+              <div className="p-4 bg-danger-bg border border-danger-border text-danger text-sm font-bold rounded-xl" role="alert">
                 {errorMsg}
               </div>
             )}
@@ -124,15 +134,19 @@ export const LoginPage: React.FC = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   icon={<Lock className="w-4 h-4" />}
                   rightIcon={
-                    <button type="button" onClick={() => setShowPassword(!showPassword)} tabIndex={-1}>
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} tabIndex={-1} aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}>
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   }
                 />
                 <div className="flex justify-end mt-1.5">
-                  <a href="#" onClick={(e) => { e.preventDefault(); alert('Silakan hubungi admin di pengaduan@baubaukota.go.id'); }} className="text-xs font-semibold text-primary hover:underline">
+                  <button
+                    type="button"
+                    onClick={() => { setForgotOpen(true); setResetSent(false); setResetEmail(''); }}
+                    className="text-xs font-semibold text-primary hover:underline"
+                  >
                     Lupa Sandi?
-                  </a>
+                  </button>
                 </div>
               </div>
 
@@ -148,7 +162,7 @@ export const LoginPage: React.FC = () => {
                 <button type="button" onClick={() => fillQuick('admin@baubaukota.go.id')} className="px-3.5 py-2 bg-primary-light text-primary text-xs font-bold rounded-lg hover:bg-primary hover:text-primary-foreground transition-colors">
                   Admin
                 </button>
-                <button type="button" onClick={() => fillQuick('officer.pupr@baubaukota.go.id')} className="px-3.5 py-2 bg-secondary-light text-secondary text-xs font-bold rounded-lg hover:bg-secondary hover:text-secondary-foreground transition-colors">
+                <button type="button" onClick={() => fillQuick('officer.pupr@baubaukota.go.id')} className="px-3.5 py-2 bg-navy-light text-white text-xs font-bold rounded-lg hover:bg-navy hover:text-white transition-colors">
                   Petugas PUPR
                 </button>
                 <button type="button" onClick={() => fillQuick('warga@gmail.com')} className="px-3.5 py-2 bg-muted text-muted-foreground text-xs font-bold rounded-lg hover:bg-foreground hover:text-background transition-colors">
@@ -166,6 +180,57 @@ export const LoginPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Forgot Password Modal */}
+      <Modal
+        isOpen={forgotOpen}
+        onClose={() => setForgotOpen(false)}
+        title="Lupa Kata Sandi"
+        description="Masukkan email terdaftar untuk mengatur ulang kata sandi"
+        size="md"
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setForgotOpen(false)}>
+              Batal
+            </Button>
+            {!resetSent && (
+              <Button type="submit" form="forgot-form" icon={KeyRound}>
+                Kirim Permintaan
+              </Button>
+            )}
+          </>
+        }
+      >
+        {resetSent ? (
+          <div className="text-center py-4">
+            <div className="w-14 h-14 rounded-2xl bg-success-bg flex items-center justify-center mx-auto mb-3">
+              <KeyRound className="w-7 h-7 text-success" aria-hidden="true" />
+            </div>
+            <h3 className="font-heading font-bold text-foreground mb-1">Permintaan Terkirim!</h3>
+            <p className="text-sm text-muted-foreground">
+              Jika email <span className="font-semibold text-foreground">{resetEmail}</span> terdaftar, tautan reset akan dikirim ke inbox Anda. Silakan hubungi admin di <span className="font-semibold text-primary">pengaduan@baubaukota.go.id</span> jika tidak menerima email.
+            </p>
+          </div>
+        ) : (
+          <form id="forgot-form" onSubmit={handleForgotSubmit} className="space-y-4">
+            <div className="p-3 rounded-xl bg-info-bg border border-info-border flex items-start gap-2.5">
+              <Info className="w-4 h-4 text-info shrink-0 mt-0.5" aria-hidden="true" />
+              <p className="text-xs text-foreground/80">
+                Tautan reset kata sandi akan dikirim ke alamat email yang terdaftar pada akun Anda.
+              </p>
+            </div>
+            <Input
+              label="Alamat Email"
+              type="email"
+              required
+              placeholder="nama@email.com"
+              value={resetEmail}
+              onChange={(e) => setResetEmail(e.target.value)}
+              icon={<Mail className="w-4 h-4" />}
+            />
+          </form>
+        )}
+      </Modal>
     </div>
   );
 };

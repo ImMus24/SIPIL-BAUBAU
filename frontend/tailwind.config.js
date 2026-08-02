@@ -31,6 +31,17 @@ export default {
           DEFAULT: "var(--color-soft-yellow)",
           light: "var(--color-soft-yellow-light)",
         },
+        accent: {
+          DEFAULT: "var(--color-accent)",
+          hover: "var(--color-accent-hover)",
+          light: "var(--color-accent-light)",
+          foreground: "var(--color-accent-foreground)",
+        },
+        secondary: {
+          DEFAULT: "var(--color-secondary)",
+          light: "var(--color-secondary-light)",
+          foreground: "var(--color-secondary-foreground)",
+        },
         card: {
           DEFAULT: "var(--color-card)",
           foreground: "var(--color-card-foreground)",

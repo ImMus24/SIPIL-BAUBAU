@@ -19,6 +19,14 @@ import {
   Sparkles,
   ArrowRight,
   Building2,
+  Road,
+  Lightbulb,
+  Waves,
+  TreePine,
+  Trash2,
+  Droplets,
+  TrafficCone,
+  MoreHorizontal,
 } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { StatCard } from '../components/ui/StatCard';
@@ -82,14 +90,14 @@ export const HomePage: React.FC = () => {
   }, []);
 
   const categories = [
-    { name: 'Jalan Rusak', icon: 'edit_road', desc: 'Laporkan jalan berlubang atau rusak', color: 'from-amber-500 to-orange-600' },
-    { name: 'Lampu Jalan', icon: 'light', desc: 'Lampu penerangan umum mati', color: 'from-yellow-400 to-amber-500' },
-    { name: 'Drainase', icon: 'waves', desc: 'Saluran air tersumbat atau rusak', color: 'from-sky-400 to-blue-600' },
-    { name: 'Taman Kota', icon: 'park', desc: 'Fasilitas taman umum rusak', color: 'from-emerald-400 to-green-600' },
-    { name: 'Sampah', icon: 'delete_sweep', desc: 'Tumpukan sampah tak terangkut', color: 'from-teal-400 to-emerald-600' },
-    { name: 'Pipa Bocor', icon: 'water_drop', desc: 'Kebocoran air bersih', color: 'from-cyan-400 to-sky-600' },
-    { name: 'Rambu Lalu Lintas', icon: 'traffic', desc: 'Rambu rusak atau hilang', color: 'from-red-400 to-rose-600' },
-    { name: 'Lainnya', icon: 'more_horiz', desc: 'Infrastruktur publik lainnya', color: 'from-slate-400 to-slate-600' },
+    { name: 'Jalan Rusak', icon: Road, desc: 'Laporkan jalan berlubang atau rusak', color: 'from-amber-500 to-orange-600' },
+    { name: 'Lampu Jalan', icon: Lightbulb, desc: 'Lampu penerangan umum mati', color: 'from-yellow-400 to-amber-500' },
+    { name: 'Drainase', icon: Waves, desc: 'Saluran air tersumbat atau rusak', color: 'from-sky-400 to-blue-600' },
+    { name: 'Taman Kota', icon: TreePine, desc: 'Fasilitas taman umum rusak', color: 'from-emerald-400 to-green-600' },
+    { name: 'Sampah', icon: Trash2, desc: 'Tumpukan sampah tak terangkut', color: 'from-teal-400 to-emerald-600' },
+    { name: 'Pipa Bocor', icon: Droplets, desc: 'Kebocoran air bersih', color: 'from-cyan-400 to-sky-600' },
+    { name: 'Rambu Lalu Lintas', icon: TrafficCone, desc: 'Rambu rusak atau hilang', color: 'from-red-400 to-rose-600' },
+    { name: 'Lainnya', icon: MoreHorizontal, desc: 'Infrastruktur publik lainnya', color: 'from-slate-400 to-slate-600' },
   ];
 
   const testimonials = [
@@ -288,7 +296,7 @@ export const HomePage: React.FC = () => {
                 className="bg-card border border-border rounded-2xl p-5 text-center hover-lift cursor-pointer group h-full"
               >
                 <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${cat.color} flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
-                  <span className="material-symbols-outlined text-white text-2xl">{cat.icon}</span>
+                  <cat.icon className="w-6 h-6 text-white" />
                 </div>
                 <h3 className="font-heading font-bold text-foreground text-sm mb-1">{cat.name}</h3>
                 <p className="text-xs text-muted-foreground">{cat.desc}</p>
@@ -372,7 +380,7 @@ export const HomePage: React.FC = () => {
 
         <RevealSection delay={150}>
           <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300" style={{ height: '450px' }}>
-            <BaubauMap />
+            <BaubauMap complaints={_complaints} height="450px" />
           </div>
         </RevealSection>
       </section>
