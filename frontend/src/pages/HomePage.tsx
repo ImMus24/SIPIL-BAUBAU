@@ -114,7 +114,7 @@ export const HomePage: React.FC = () => {
       setTestimonialIdx((p) => (p === testimonials.length - 1 ? 0 : p + 1));
     }, 5000);
     return () => clearInterval(timer);
-  }, [autoPlay]);
+  }, [autoPlay, testimonials.length]);
 
   const faqs = [
     { q: 'Apa itu SIPIL BAUBAU?', a: 'SIPIL BAUBAU adalah Sistem Pengaduan Infrastruktur Berbasis Web milik Pemerintah Kota Baubau yang memungkinkan warga melaporkan kerusakan fasilitas publik secara cepat, transparan, dan terpantau.' },

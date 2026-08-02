@@ -60,7 +60,7 @@ export const StatusUpdateModal: React.FC<StatusUpdateModalProps> = ({
       setPhotoPreview(null);
       setError('');
     }
-  }, [open, complaint.status]);
+  }, [open, complaint.status, complaint.agency_id, availableStatuses]);
 
   // Determine if agency selection is needed (for status 'diproses')
   const needsAgency = status === 'diproses' && !complaint.agency_id;
