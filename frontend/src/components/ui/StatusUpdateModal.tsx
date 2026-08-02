@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Button } from './Button';
 import { Textarea } from './Textarea';
 import { Select } from './Select';
@@ -41,7 +41,7 @@ export const StatusUpdateModal: React.FC<StatusUpdateModalProps> = ({
   agencies = [],
   onSuccess,
 }) => {
-  const availableStatuses = STATUS_TRANSITIONS[complaint.status] ?? [];
+  const availableStatuses = useMemo(() => STATUS_TRANSITIONS[complaint.status] ?? [], [complaint.status]);
   const [status, setStatus] = useState(availableStatuses[0] ?? '');
   const [notes, setNotes] = useState('');
   const [agencyId, setAgencyId] = useState<number | ''>(complaint.agency_id ?? '');
