@@ -1,5 +1,5 @@
 import React from 'react';
-import { clsx } from 'clsx';
+import { cn } from '../../lib/utils';
 
 interface SkeletonProps {
   className?: string;
@@ -13,7 +13,7 @@ export const Skeleton: React.FC<SkeletonProps> = ({ className = '', variant = 'r
     rectangular: 'rounded-xl',
   };
 
-  return <div className={clsx('shimmer rounded-lg', variantClasses[variant], className)} />;
+  return <div className={cn('shimmer', variantClasses[variant], className)} />;
 };
 
 export const CardSkeleton: React.FC = () => (

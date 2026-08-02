@@ -13,7 +13,7 @@ export const RadialChart: React.FC<RadialChartProps> = ({
   series,
   labels,
   height = 280,
-  colors = ['#3b82f6', '#22c55e', '#f59e0b'],
+  colors = ['#0B5ED7', '#16A34A', '#FFC107'],
   title,
 }) => {
   const chartRef = useRef<HTMLDivElement>(null);

@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 'react-leaflet';
 import L from 'leaflet';
+import 'leaflet.markercluster';
 import type { Complaint, BaubauSubdistrict } from '../../types';
 import { useTheme } from '../../context/ThemeContext';
 import { StatusBadge, UrgencyBadge } from '../ui/Badge';
-import { MapPin, Navigation, Eye } from 'lucide-react';
+import { MapPin, Navigation, Eye, LocateFixed, Layers, AlertTriangle } from 'lucide-react';
+import { cn } from '../../lib/utils';
 
 const createCustomIcon = (color: string) => {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 36" width="30" height="42">
@@ -20,11 +22,18 @@ const createCustomIcon = (color: string) => {
 };
 
 const icons = {
-  menunggu: createCustomIcon('#f59e0b'), // Amber/Yellow
-  diproses: createCustomIcon('#0284c7'), // Baubau Royal Blue
-  selesai: createCustomIcon('#16a34a'),  // Baubau Green
-  ditolak: createCustomIcon('#ef4444'),   // Red
-  picker: createCustomIcon('#0369a1'),    // Baubau Deep Royal Blue
+  menunggu: createCustomIcon('#F59E0B'),
+  diproses: createCustomIcon('#0B5ED7'),
+  selesai: createCustomIcon('#16A34A'),
+  ditolak: createCustomIcon('#DC2626'),
+  picker: createCustomIcon('#0A2540'),
+};
+
+const STATUS_LABELS: Record<string, string> = {
+  menunggu: 'Menunggu',
+  diproses: 'Diproses',
+  selesai: 'Selesai',
+  ditolak: 'Ditolak',
 };
 
 interface BaubauMapProps {
@@ -36,7 +45,19 @@ interface BaubauMapProps {
   onLocationSelect?: (lat: number, lng: number) => void;
   height?: string;
   selectedSubdistrict?: BaubauSubdistrict | 'all';
+  /** Enable marker clustering (default true when complaints > 30) */
+  enableClustering?: boolean;
+  /** Show status filter legend */
+  showLegend?: boolean;
 }
+
+const MapController: React.FC<{ center: [number, number]; zoom: number }> = ({ center, zoom }) => {
+  const map = useMap();
+  useEffect(() => {
+    map.flyTo(center, Math.max(map.getZoom(), zoom), { animate: true, duration: 0.8 });
+  }, [center, zoom, map]);
+  return null;
+};
 
 const LocationPickerMarker: React.FC<{
   position: [number, number];
@@ -44,30 +65,78 @@ const LocationPickerMarker: React.FC<{
 }> = ({ position, onLocationSelect }) => {
   const map = useMap();
   useEffect(() => {
-    map.flyTo(position, map.getZoom(), { animate: true });
+    map.flyTo(position, Math.max(map.getZoom(), 15), { animate: true });
   }, [position, map]);
 
   useMapEvents({
     click(e) {
-      if (onLocationSelect) {
-        onLocationSelect(e.latlng.lat, e.latlng.lng);
-      }
+      if (onLocationSelect) onLocationSelect(e.latlng.lat, e.latlng.lng);
     },
   });
 
   return (
     <Marker position={position} icon={icons.picker}>
       <Popup>
-        <div className="p-2 text-center text-slate-900 dark:text-slate-100">
-          <p className="text-xs font-bold text-sky-900 dark:text-sky-300">Lokasi Terpilih</p>
-          <p className="text-[10px] text-slate-500 dark:text-slate-400 font-mono mt-0.5">
+        <div className="p-3 text-center">
+          <p className="text-xs font-bold text-navy dark:text-primary">📍 Lokasi Terpilih</p>
+          <p className="text-[10px] text-muted-foreground font-mono mt-0.5">
             {position[0].toFixed(5)}, {position[1].toFixed(5)}
           </p>
-          <p className="text-[11px] text-slate-600 dark:text-slate-300 mt-1">Klik area lain di peta Kota Baubau untuk memindahkan pin.</p>
+          <p className="text-[11px] text-muted-foreground mt-1">
+            Klik area lain di peta untuk memindahkan pin.
+          </p>
         </div>
       </Popup>
     </Marker>
   );
+};
+
+/** Layer to create the marker cluster group when clustering is enabled */
+const MarkerClusterLayer: React.FC<{
+  complaints: Complaint[];
+  onSelectComplaint?: (complaint: Complaint) => void;
+}> = ({ complaints, onSelectComplaint }) => {
+  const map = useMap();
+  const clusterRef = useRef<L.MarkerClusterGroup | null>(null);
+
+  useEffect(() => {
+    if (!map) return;
+    const cluster = L.markerClusterGroup({
+      maxClusterRadius: 48,
+      spiderfyOnMaxZoom: true,
+      showCoverageOnHover: true,
+      iconCreateFunction: (c) => {
+        const count = c.getChildCount();
+        const cls = count < 10 ? 'marker-cluster-small' : count < 30 ? 'marker-cluster-medium' : 'marker-cluster-large';
+        const html = `<div class="${cls}" style="width:100%;height:100%">${count}</div>`;
+        return L.divIcon({ html, className: cls, iconSize: L.point(42, 42) });
+      },
+    });
+
+    complaints.forEach((item) => {
+      if (item.latitude == null || item.longitude == null) return;
+      const marker = L.marker([item.latitude, item.longitude], { icon: icons[item.status] || icons.menunggu });
+      const popupContent = document.createElement('div');
+      popupContent.innerHTML = `<div class="p-3 max-w-[260px]">
+        <div class="flex items-center justify-between gap-2 border-b pb-2 mb-2">
+          <span class="font-mono text-[10px] font-bold text-primary bg-primary-light px-1.5 py-0.5 rounded border border-primary/20">${item.ticket_code}</span>
+        </div>
+        <h4 class="font-bold text-xs leading-tight line-clamp-2 mb-1">${item.title}</h4>
+        <p class="text-[11px] text-muted-foreground truncate">${item.address} · ${item.subdistrict}</p>
+      </div>`;
+      marker.bindPopup(popupContent);
+      marker.on('click', () => onSelectComplaint?.(item));
+      cluster.addLayer(marker);
+    });
+
+    map.addLayer(cluster);
+    clusterRef.current = cluster;
+    return () => {
+      map.removeLayer(cluster);
+    };
+  }, [map, complaints, onSelectComplaint]);
+
+  return null;
 };
 
 export const BaubauMap: React.FC<BaubauMapProps> = ({
@@ -79,41 +148,65 @@ export const BaubauMap: React.FC<BaubauMapProps> = ({
   onLocationSelect,
   height = '500px',
   selectedSubdistrict = 'all',
+  enableClustering = true,
+  showLegend = true,
 }) => {
   const { isDark } = useTheme();
   const [pickerPos, setPickerPos] = useState<[number, number]>([selectedLat, selectedLng]);
+  const [statusFilter, setStatusFilter] = useState<string>('all');
 
   useEffect(() => {
     setPickerPos([selectedLat, selectedLng]);
   }, [selectedLat, selectedLng]);
 
-  const filteredComplaints = complaints.filter((c) => {
-    if (selectedSubdistrict && selectedSubdistrict !== 'all') {
-      return c.subdistrict === selectedSubdistrict;
-    }
-    return true;
-  });
+  const filteredComplaints = useMemo(() => {
+    return complaints.filter((c) => {
+      if (selectedSubdistrict && selectedSubdistrict !== 'all' && c.subdistrict !== selectedSubdistrict) return false;
+      if (statusFilter !== 'all' && c.status !== statusFilter) return false;
+      return true;
+    });
+  }, [complaints, selectedSubdistrict, statusFilter]);
 
   const lightTileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
   const darkTileUrl = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
 
+  const useClustering = enableClustering && !pickLocation && filteredComplaints.length > 12;
+
+  const statusCounts = useMemo(() => {
+    const counts: Record<string, number> = { all: complaints.length };
+    complaints.forEach((c) => { counts[c.status] = (counts[c.status] || 0) + 1; });
+    return counts;
+  }, [complaints]);
+
   return (
-    <div className="relative rounded-2xl overflow-hidden shadow-lg border border-slate-200 dark:border-slate-800" style={{ height }}>
-      {/* Map Control Header Bar */}
-      <div className="absolute top-3 left-3 right-3 z-10 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-xl p-3 shadow-md border border-sky-100 dark:border-slate-800 flex items-center justify-between pointer-events-auto">
-        <div className="flex items-center space-x-2">
-          <div className="p-2 bg-sky-700 dark:bg-sky-600 text-white rounded-lg">
-            <MapPin className="w-4 h-4 text-amber-300" />
+    <div className="relative rounded-2xl overflow-hidden shadow-lg border border-border bg-card" style={{ height }}>
+      {/* Map Control Header */}
+      <div className="absolute top-3 left-3 right-3 z-[500] bg-card/90 dark:bg-card/90 backdrop-blur-md rounded-xl p-3 shadow-md border border-border flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="p-2 bg-gradient-to-br from-primary to-navy text-white rounded-lg shrink-0">
+            <MapPin className="w-4 h-4 text-golden" aria-hidden="true" />
           </div>
-          <div>
-            <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">Pemetaan Lokasi GIS Kota Baubau</h4>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400">Sulawesi Tenggara • Live Interactive Map</p>
+          <div className="min-w-0">
+            <h4 className="text-xs font-bold text-foreground uppercase tracking-wider truncate">Peta Sebaran SIPIL</h4>
+            <p className="text-[11px] text-muted-foreground truncate">Kota Baubau, Sulawesi Tenggara</p>
           </div>
         </div>
-        <div className="hidden sm:flex items-center space-x-3 text-xs text-slate-700 dark:text-slate-300">
-          <span className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-amber-500 mr-1.5"></span>Menunggu</span>
-          <span className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-sky-600 mr-1.5"></span>Diproses</span>
-          <span className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-emerald-600 mr-1.5"></span>Selesai</span>
+        {/* Status filter pills */}
+        <div className="hidden sm:flex items-center gap-1.5 overflow-x-auto">
+          {['all', 'menunggu', 'diproses', 'selesai', 'ditolak'].map((s) => (
+            <button
+              key={s}
+              onClick={() => setStatusFilter(s)}
+              className={cn(
+                'px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all shrink-0',
+                statusFilter === s
+                  ? 'bg-primary text-primary-foreground shadow-sm'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+              )}
+            >
+              {STATUS_LABELS[s] || 'Semua'} ({statusCounts[s] || 0})
+            </button>
+          ))}
         </div>
       </div>
 
@@ -122,6 +215,7 @@ export const BaubauMap: React.FC<BaubauMapProps> = ({
         zoom={13}
         scrollWheelZoom={true}
         style={{ width: '100%', height: '100%' }}
+        className="z-0"
       >
         <TileLayer
           key={isDark ? 'dark-tiles' : 'light-tiles'}
@@ -132,6 +226,9 @@ export const BaubauMap: React.FC<BaubauMapProps> = ({
           }
           url={isDark ? darkTileUrl : lightTileUrl}
         />
+
+        {/* Recenter controller */}
+        <MapController center={[-5.4642, 122.6035]} zoom={13} />
 
         {/* Location Picker Mode */}
         {pickLocation && (
@@ -144,44 +241,85 @@ export const BaubauMap: React.FC<BaubauMapProps> = ({
           />
         )}
 
-        {/* Complaint Markers Mode */}
-        {!pickLocation &&
-          filteredComplaints.map((item) => (
-            <Marker
-              key={item.id}
-              position={[item.latitude, item.longitude]}
-              icon={icons[item.status] || icons.menunggu}
-            >
-              <Popup>
-                <div className="p-3 max-w-xs space-y-2 text-slate-900 dark:text-slate-100">
-                  <div className="flex items-center justify-between gap-2 border-b dark:border-slate-700 pb-2">
-                    <span className="font-mono text-[10px] font-bold text-sky-900 dark:text-sky-300 bg-sky-50 dark:bg-sky-950 px-1.5 py-0.5 rounded border border-sky-200 dark:border-sky-800">
-                      {item.ticket_code}
-                    </span>
-                    <StatusBadge status={item.status} size="sm" />
-                  </div>
-                  <h4 className="font-bold text-xs text-slate-800 dark:text-white line-clamp-2 leading-tight">{item.title}</h4>
-                  <div className="text-[11px] text-slate-600 dark:text-slate-300 flex items-center space-x-1">
-                    <Navigation className="w-3 h-3 text-sky-600 dark:text-sky-400 shrink-0" />
-                    <span className="truncate">{item.address} ({item.subdistrict})</span>
-                  </div>
-                  <div className="pt-1 flex items-center justify-between">
-                    <UrgencyBadge urgency={item.urgency} />
-                    {onSelectComplaint && (
-                      <button
-                        onClick={() => onSelectComplaint(item)}
-                        className="inline-flex items-center space-x-1 px-2.5 py-1 text-xs font-semibold bg-sky-700 dark:bg-sky-600 hover:bg-sky-800 dark:hover:bg-sky-500 text-white rounded-md transition-colors"
-                      >
-                        <Eye className="w-3 h-3" />
-                        <span>Detail</span>
-                      </button>
-                    )}
-                  </div>
+        {/* Complaint Markers — clustered when many */}
+        {!pickLocation && useClustering && (
+          <MarkerClusterLayer complaints={filteredComplaints} onSelectComplaint={onSelectComplaint} />
+        )}
+
+        {!pickLocation && !useClustering && filteredComplaints.map((item) => (
+          <Marker
+            key={item.id}
+            position={[item.latitude, item.longitude]}
+            icon={icons[item.status] || icons.menunggu}
+          >
+            <Popup>
+              <div className="p-3 max-w-xs space-y-2">
+                <div className="flex items-center justify-between gap-2 border-b border-border pb-2">
+                  <span className="font-mono text-[10px] font-bold text-primary bg-primary-light px-1.5 py-0.5 rounded border border-primary/20">
+                    {item.ticket_code}
+                  </span>
+                  <StatusBadge status={item.status} size="sm" />
                 </div>
-              </Popup>
-            </Marker>
-          ))}
+                <h4 className="font-bold text-xs text-foreground line-clamp-2 leading-tight">{item.title}</h4>
+                <div className="text-[11px] text-muted-foreground flex items-center gap-1">
+                  <Navigation className="w-3 h-3 text-primary shrink-0" aria-hidden="true" />
+                  <span className="truncate">{item.address} ({item.subdistrict})</span>
+                </div>
+                <div className="pt-1 flex items-center justify-between">
+                  <UrgencyBadge urgency={item.urgency} />
+                  {onSelectComplaint && (
+                    <button
+                      onClick={() => onSelectComplaint(item)}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold bg-primary hover:bg-primary-hover text-white rounded-md transition-colors"
+                    >
+                      <Eye className="w-3 h-3" aria-hidden="true" />
+                      Detail
+                    </button>
+                  )}
+                </div>
+              </div>
+            </Popup>
+          </Marker>
+        ))}
       </MapContainer>
+
+      {/* Legend */}
+      {showLegend && !pickLocation && (
+        <div className="absolute bottom-4 left-3 z-[500] bg-card/90 backdrop-blur-md rounded-xl p-3 shadow-md border border-border">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1">
+            <Layers className="w-3 h-3" aria-hidden="true" /> Legenda
+          </p>
+          <div className="space-y-1.5">
+            {(['menunggu', 'diproses', 'selesai', 'ditolak'] as const).map((s) => (
+              <div key={s} className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full" style={{ background: s === 'menunggu' ? '#F59E0B' : s === 'diproses' ? '#0B5ED7' : s === 'selesai' ? '#16A34A' : '#DC2626' }} />
+                <span className="text-[11px] font-medium text-foreground">{STATUS_LABELS[s]}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Location indicator */}
+      {pickLocation && (
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-[500] bg-card/90 backdrop-blur-md rounded-xl px-4 py-2 shadow-md border border-border flex items-center gap-2">
+          <LocateFixed className="w-3.5 h-3.5 text-primary" aria-hidden="true" />
+          <span className="text-[11px] font-semibold text-foreground">
+            {pickerPos[0].toFixed(5)}, {pickerPos[1].toFixed(5)}
+          </span>
+        </div>
+      )}
+
+      {/* Empty state */}
+      {!pickLocation && filteredComplaints.length === 0 && (
+        <div className="absolute inset-0 z-[600] flex items-center justify-center pointer-events-none">
+          <div className="bg-card/95 backdrop-blur rounded-2xl p-6 text-center shadow-xl border border-border max-w-xs pointer-events-auto">
+            <AlertTriangle className="w-8 h-8 text-warning mx-auto mb-2" aria-hidden="true" />
+            <p className="text-sm font-bold text-foreground">Tidak ada laporan di area ini</p>
+            <p className="text-xs text-muted-foreground mt-1">Coba ubah filter status atau pilih kecamatan lain.</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

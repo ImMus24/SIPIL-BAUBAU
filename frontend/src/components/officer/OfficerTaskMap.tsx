@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Card } from '../ui/Card';
-import { Button } from '../ui/Button';
 import { Skeleton } from '../dashboard/LoadingSkeleton';
-import { MapPin, Navigation, ExternalLink, Layers } from 'lucide-react';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import L from 'leaflet';
+import { MapPin, Navigation, AlertTriangle } from 'lucide-react';
+import { useTheme } from '../../context/ThemeContext';
 import type { MapPoint } from '../../types';
+import { cn } from '../../lib/utils';
 
 interface OfficerTaskMapProps {
   assignedTasks: MapPoint[];
@@ -11,126 +14,166 @@ interface OfficerTaskMapProps {
   onNavigateToLocation?: (task: MapPoint) => void;
 }
 
+const createUrgencyIcon = (color: string) => {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 36" width="30" height="42">
+    <path fill="${color}" stroke="#ffffff" stroke-width="1.5" d="M12 0C5.37 0 0 5.37 0 12c0 9 12 24 12 24s12-15 12-24c0-6.63-5.37-12-12-12z"/>
+    <circle cx="12" cy="12" r="5" fill="#ffffff"/>
+  </svg>`;
+  return L.icon({
+    iconUrl: `data:image/svg+xml;base64,${btoa(svg)}`,
+    iconSize: [30, 42],
+    iconAnchor: [15, 42],
+    popupAnchor: [0, -38],
+  });
+};
+
+const URGENCY_ICONS: Record<string, L.Icon> = {
+  darurat: createUrgencyIcon('#DC2626'),
+  tinggi: createUrgencyIcon('#F59E0B'),
+  sedang: createUrgencyIcon('#0EA5E9'),
+  rendah: createUrgencyIcon('#16A34A'),
+};
+
+const URGENCY_LABELS: Record<string, string> = {
+  darurat: 'Darurat',
+  tinggi: 'Tinggi',
+  sedang: 'Sedang',
+  rendah: 'Rendah',
+};
+
 export const OfficerTaskMap: React.FC<OfficerTaskMapProps> = ({
   assignedTasks, loading,
 }) => {
+  const { isDark } = useTheme();
   const [filterUrgency, setFilterUrgency] = useState<string>('all');
 
-  const points = assignedTasks.filter(p => p.latitude && p.longitude);
+  const points = useMemo(
+    () => assignedTasks.filter((p) => p.latitude != null && p.longitude != null),
+    [assignedTasks],
+  );
 
-  const filtered = filterUrgency === 'all'
-    ? points
-    : points.filter(p => p.urgency === filterUrgency);
-
-  const getMarkerColor = (urgency: string) => {
-    switch (urgency) {
-      case 'tinggi': case 'darurat': return 'bg-red-500 border-red-200';
-      case 'sedang': return 'bg-orange-500 border-orange-200';
-      default: return 'bg-emerald-500 border-emerald-200';
-    }
-  };
-
-  const getMarkerIcon = (urgency: string) => {
-    switch (urgency) {
-      case 'tinggi': case 'darurat': return '🔴';
-      case 'sedang': return '🟠';
-      default: return '🟢';
-    }
-  };
+  const filtered = useMemo(
+    () => (filterUrgency === 'all' ? points : points.filter((p) => p.urgency === filterUrgency)),
+    [points, filterUrgency],
+  );
 
   const openGoogleMaps = (lat: number, lng: number) => {
-    window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`, '_blank');
+    window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`, '_blank', 'noopener');
   };
+
+  const lightTileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+  const darkTileUrl = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
 
   if (loading) return <Skeleton variant="rectangular" height={400} />;
 
   return (
     <Card padding="none" className="overflow-hidden">
+      {/* Header */}
       <div className="p-4 border-b border-border flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-2">
-          <MapPin className="w-5 h-5 text-primary" />
-          <h3 className="font-heading font-bold text-foreground">Peta Tugas</h3>
-          <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-            {filtered.length} titik
-          </span>
+          <div className="p-2 bg-primary-light dark:bg-primary/20 rounded-xl">
+            <MapPin className="w-5 h-5 text-primary" aria-hidden="true" />
+          </div>
+          <div>
+            <h3 className="font-heading font-bold text-foreground leading-tight">Peta Tugas</h3>
+            <p className="text-xs text-muted-foreground">{filtered.length} titik tugas</p>
+          </div>
         </div>
-        <div className="flex gap-1">
-          {['all', 'tinggi', 'sedang', 'rendah'].map((u) => (
+        <div className="flex gap-1 flex-wrap">
+          {['all', 'darurat', 'tinggi', 'sedang', 'rendah'].map((u) => (
             <button
               key={u}
               onClick={() => setFilterUrgency(u)}
-              className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all ${
+              className={cn(
+                'px-2.5 py-1 rounded-lg text-xs font-semibold transition-all',
                 filterUrgency === u
-                  ? 'bg-primary/10 text-primary'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-accent'
-              }`}
+                  ? 'bg-primary text-primary-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted',
+              )}
             >
-              {u === 'all' ? 'Semua' : u.charAt(0).toUpperCase() + u.slice(1)}
+              {u === 'all' ? 'Semua' : URGENCY_LABELS[u]}
             </button>
           ))}
         </div>
       </div>
 
-      {filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 px-4 bg-muted/30">
-          <Layers className="w-12 h-12 text-muted-foreground/30 mb-3" />
-          <p className="text-sm text-muted-foreground font-medium">Belum ada data peta</p>
-          <p className="text-xs text-muted-foreground/60 mt-1">
-            {points.length === 0
-              ? 'Tidak ada tugas dengan koordinat lokasi'
-              : 'Tidak ada titik dengan filter ini'}
-          </p>
-        </div>
-      ) : (
-        <div className="p-4 space-y-2 max-h-[400px] overflow-y-auto">
-          {filtered.map((point) => (
-            <div
-              key={point.id}
-              className="flex items-center justify-between p-3 rounded-xl hover:bg-muted/50 transition-colors border border-border/50 group"
-            >
-              <div className="flex items-center gap-3 min-w-0 flex-1">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg ${getMarkerColor(point.urgency)}`}>
-                  <span>{getMarkerIcon(point.urgency)}</span>
-                </div>
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold text-foreground truncate">{point.title}</p>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <span className="font-mono">{point.ticket_code}</span>
-                    <span>·</span>
-                    <span>{point.subdistrict}</span>
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center gap-1 shrink-0">
-                {point.latitude && point.longitude && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    icon={Navigation}
-                    onClick={() => openGoogleMaps(point.latitude, point.longitude)}
-                  >
-                    Navigasi
-                  </Button>
-                )}
-                <ExternalLink className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      {/* Real Map */}
+      <div className="relative h-[400px] bg-muted/30">
+        <MapContainer
+          center={[-5.4642, 122.6035]}
+          zoom={13}
+          scrollWheelZoom={false}
+          style={{ width: '100%', height: '100%' }}
+        >
+          <TileLayer
+            key={isDark ? 'dark-tiles' : 'light-tiles'}
+            attribution={
+              isDark
+                ? '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }
+            url={isDark ? darkTileUrl : lightTileUrl}
+          />
 
-      {/* Map placeholder - shows count stats */}
+          {filtered.map((point) => (
+            <Marker
+              key={point.id}
+              position={[point.latitude, point.longitude]}
+              icon={URGENCY_ICONS[point.urgency] || URGENCY_ICONS.sedang}
+            >
+              <Popup>
+                <div className="p-3 max-w-[240px] space-y-1.5">
+                  <div className="flex items-center justify-between gap-2 border-b border-border pb-1.5">
+                    <span className="font-mono text-[10px] font-bold text-primary bg-primary-light px-1.5 py-0.5 rounded border border-primary/20">
+                      {point.ticket_code}
+                    </span>
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-danger-bg text-danger">
+                      {URGENCY_LABELS[point.urgency] || point.urgency}
+                    </span>
+                  </div>
+                  <h4 className="font-bold text-xs text-foreground line-clamp-2 leading-tight">{point.title}</h4>
+                  <p className="text-[11px] text-muted-foreground truncate">{point.subdistrict}</p>
+                  <button
+                    onClick={() => openGoogleMaps(point.latitude, point.longitude)}
+                    className="w-full inline-flex items-center justify-center gap-1.5 mt-1 px-2.5 py-1.5 text-[11px] font-bold bg-primary hover:bg-primary-hover text-white rounded-lg transition-colors"
+                  >
+                    <Navigation className="w-3 h-3" aria-hidden="true" />
+                    Buka Navigasi
+                  </button>
+                </div>
+              </Popup>
+            </Marker>
+          ))}
+        </MapContainer>
+
+        {/* Empty overlay */}
+        {filtered.length === 0 && (
+          <div className="absolute inset-0 z-[500] flex items-center justify-center pointer-events-none">
+            <div className="bg-card/95 backdrop-blur rounded-2xl p-6 text-center shadow-xl border border-border max-w-xs pointer-events-auto">
+              <AlertTriangle className="w-8 h-8 text-warning mx-auto mb-2" aria-hidden="true" />
+              <p className="text-sm font-bold text-foreground">Tidak ada titik tugas</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {points.length === 0
+                  ? 'Tidak ada tugas dengan koordinat lokasi'
+                  : 'Tidak ada titik dengan filter ini'}
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Stats footer */}
       <div className="p-4 border-t border-border bg-muted/30 grid grid-cols-3 gap-4 text-center text-sm">
         <div>
-          <span className="text-lg font-black text-red-500">{points.filter(p => p.urgency === 'tinggi' || p.urgency === 'darurat').length}</span>
+          <span className="text-lg font-black text-danger">{points.filter(p => p.urgency === 'tinggi' || p.urgency === 'darurat').length}</span>
           <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Prioritas</p>
         </div>
         <div>
-          <span className="text-lg font-black text-orange-500">{points.filter(p => p.urgency === 'sedang').length}</span>
+          <span className="text-lg font-black text-info">{points.filter(p => p.urgency === 'sedang').length}</span>
           <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Sedang</p>
         </div>
         <div>
-          <span className="text-lg font-black text-emerald-500">{points.filter(p => p.urgency === 'rendah').length}</span>
+          <span className="text-lg font-black text-success">{points.filter(p => p.urgency === 'rendah').length}</span>
           <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">Rendah</p>
         </div>
       </div>

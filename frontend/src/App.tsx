@@ -1,6 +1,7 @@
 import React, { Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
+import { AnimatePresence, motion } from 'framer-motion';
 import { queryClient } from './lib/query-client';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
@@ -35,12 +36,33 @@ const ForbiddenPage = lazy(() => import('./pages/ForbiddenPage').then(m => ({ de
 // Loading
 const PageLoader: React.FC = () => (
   <div className="min-h-[60vh] flex items-center justify-center">
-    <div className="flex flex-col items-center gap-3">
-      <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-      <p className="text-sm text-muted-foreground">Memuat halaman…</p>
+    <div className="flex flex-col items-center gap-4">
+      <div className="relative w-12 h-12">
+        <div className="absolute inset-0 rounded-2xl bg-primary/10 animate-pulse" />
+        <div className="absolute inset-1 rounded-xl border-2 border-primary border-t-transparent animate-spin" />
+      </div>
+      <p className="text-sm font-medium text-muted-foreground">Memuat halaman…</p>
     </div>
   </div>
 );
+
+// Animated route wrapper for public pages
+const AnimatedOutlet: React.FC = () => {
+  const location = useLocation();
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={location.pathname}
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -8 }}
+        transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <Outlet />
+      </motion.div>
+    </AnimatePresence>
+  );
+};
 
 // Layouts
 const PublicLayout: React.FC = () => (
@@ -48,7 +70,7 @@ const PublicLayout: React.FC = () => (
     <Navbar />
     <main className="flex-1">
       <Suspense fallback={<PageLoader />}>
-        <Outlet />
+        <AnimatedOutlet />
       </Suspense>
     </main>
     <Footer />

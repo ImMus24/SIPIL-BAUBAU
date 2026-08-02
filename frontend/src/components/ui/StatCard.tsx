@@ -1,5 +1,5 @@
 import React from 'react';
-import { clsx } from 'clsx';
+import { cn } from '../../lib/utils';
 import { TrendingUp, TrendingDown, type LucideIcon } from 'lucide-react';
 
 interface StatCardProps {
@@ -7,7 +7,7 @@ interface StatCardProps {
   value: string | number;
   subtitle?: string;
   icon: LucideIcon;
-  variant?: 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info';
+  variant?: 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'golden';
   trend?: { value: string; up: boolean };
 }
 
@@ -18,6 +18,7 @@ const variantConfig = {
   warning: { bg: 'bg-warning-bg', iconColor: 'text-warning' },
   danger: { bg: 'bg-danger-bg', iconColor: 'text-danger' },
   info: { bg: 'bg-info-bg', iconColor: 'text-info' },
+  golden: { bg: 'bg-golden-light', iconColor: 'text-golden-foreground' },
 };
 
 export const StatCard: React.FC<StatCardProps> = ({
@@ -31,21 +32,21 @@ export const StatCard: React.FC<StatCardProps> = ({
   const config = variantConfig[variant];
 
   return (
-    <div className="bg-card border border-border rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow">
-      <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{title}</p>
-          <p className="text-2xl font-heading font-black text-foreground">{value}</p>
-          {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
+    <div className="group bg-card border border-border rounded-2xl p-5 shadow-sm hover:shadow-lg hover:border-primary/20 hover:-translate-y-0.5 transition-all duration-200">
+      <div className="flex items-center justify-between gap-3">
+        <div className="space-y-1 min-w-0">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground truncate">{title}</p>
+          <p className="text-2xl font-heading font-extrabold text-foreground leading-tight">{value}</p>
+          {subtitle && <p className="text-xs text-muted-foreground truncate">{subtitle}</p>}
           {trend && (
-            <div className={clsx('flex items-center gap-1 text-xs font-bold mt-1', trend.up ? 'text-success' : 'text-danger')}>
+            <div className={cn('flex items-center gap-1 text-xs font-bold mt-1', trend.up ? 'text-success' : 'text-danger')}>
               {trend.up ? <TrendingUp className="w-3.5 h-3.5" /> : <TrendingDown className="w-3.5 h-3.5" />}
-              <span>{trend.value}</span>
+              <span className="truncate">{trend.value}</span>
             </div>
           )}
         </div>
-        <div className={clsx('p-3.5 rounded-xl', config.bg)}>
-          <Icon className={clsx('w-6 h-6', config.iconColor)} />
+        <div className={cn('p-3.5 rounded-xl shrink-0 transition-transform duration-200 group-hover:scale-110', config.bg)}>
+          <Icon className={cn('w-6 h-6', config.iconColor)} />
         </div>
       </div>
     </div>

@@ -1,5 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import ApexCharts from 'apexcharts';
+import { Download } from 'lucide-react';
+import { downloadChartImage } from '../../lib/export';
 
 interface AreaChartProps {
   series: { name: string; data: number[] }[];
@@ -8,15 +10,18 @@ interface AreaChartProps {
   colors?: string[];
   title?: string;
   subtitle?: string;
+  /** Show PNG export button */
+  exportable?: boolean;
 }
 
 export const AreaChart: React.FC<AreaChartProps> = ({
   series,
   categories,
   height = 300,
-  colors = ['#3b82f6', '#22c55e'],
+  colors = ['#0B5ED7', '#16A34A'],
   title,
   subtitle,
+  exportable = false,
 }) => {
   const chartRef = useRef<HTMLDivElement>(null);
   const chartInstance = useRef<ApexCharts | null>(null);
@@ -50,7 +55,7 @@ export const AreaChart: React.FC<AreaChartProps> = ({
         },
       },
       grid: {
-        borderColor: isDark ? '#334155' : '#e2e8f0',
+        borderColor: isDark ? '#24344A' : '#E5E7EB',
         strokeDashArray: 3,
         padding: { left: 0, right: 0 },
       },
@@ -92,7 +97,7 @@ export const AreaChart: React.FC<AreaChartProps> = ({
         const isDark = document.documentElement.classList.contains('dark');
         chartInstance.current.updateOptions({
           chart: { foreColor: isDark ? '#94a3b8' : '#64748b' },
-          grid: { borderColor: isDark ? '#334155' : '#e2e8f0' },
+          grid: { borderColor: isDark ? '#24344A' : '#E5E7EB' },
           xaxis: { labels: { style: { colors: isDark ? '#94a3b8' : '#64748b' } } },
           yaxis: { labels: { style: { colors: isDark ? '#94a3b8' : '#64748b' } } },
           tooltip: { theme: isDark ? 'dark' : 'light' },
@@ -106,8 +111,24 @@ export const AreaChart: React.FC<AreaChartProps> = ({
 
   return (
     <div>
-      {title && <h3 className="font-heading font-bold text-foreground mb-1">{title}</h3>}
-      {subtitle && <p className="text-xs text-muted-foreground mb-4">{subtitle}</p>}
+      {(title || exportable) && (
+        <div className="flex items-start justify-between gap-3 mb-1">
+          <div>
+            {title && <h3 className="font-heading font-bold text-foreground">{title}</h3>}
+            {subtitle && <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>}
+          </div>
+          {exportable && (
+            <button
+              onClick={() => downloadChartImage(chartInstance.current, (title || 'chart').toLowerCase().replace(/\s+/g, '-'))}
+              className="p-2 rounded-lg border border-border text-muted-foreground hover:text-primary hover:border-primary/30 hover:bg-primary-light/30 transition-all shrink-0"
+              title="Unduh PNG"
+              aria-label="Unduh grafik sebagai PNG"
+            >
+              <Download className="w-4 h-4" aria-hidden="true" />
+            </button>
+          )}
+        </div>
+      )}
       <div ref={chartRef} />
     </div>
   );

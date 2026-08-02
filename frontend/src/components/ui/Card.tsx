@@ -1,9 +1,9 @@
 import React from 'react';
-import { clsx } from 'clsx';
+import { cn } from '../../lib/utils';
 
 interface CardProps {
   children: React.ReactNode;
-  variant?: 'default' | 'interactive' | 'bordered' | 'flat';
+  variant?: 'default' | 'interactive' | 'bordered' | 'flat' | 'premium';
   padding?: 'none' | 'sm' | 'md' | 'lg';
   className?: string;
   onClick?: () => void;
@@ -13,9 +13,10 @@ interface CardProps {
 
 const variantClasses = {
   default: 'bg-card border border-border shadow-sm',
-  interactive: 'bg-card border border-border shadow-sm hover-lift cursor-pointer',
+  interactive: 'bg-card border border-border shadow-sm hover-lift cursor-pointer hover:border-primary/30',
   bordered: 'bg-card border-2 border-border shadow-none',
   flat: 'bg-muted border-none shadow-none',
+  premium: 'bg-card border border-border shadow-md gradient-border',
 };
 
 const paddingClasses = {
@@ -40,16 +41,17 @@ export const Card: React.FC<CardProps> & {
 }) => {
   return (
     <div
-      className={clsx(
-        'rounded-2xl overflow-hidden transition-all duration-150',
+      className={cn(
+        'rounded-2xl overflow-hidden transition-all duration-200',
         variantClasses[variant],
         onClick && !className?.includes('cursor') && 'cursor-pointer',
-        className
+        className,
       )}
       onClick={onClick}
       role={onClick ? 'button' : undefined}
       tabIndex={onClick ? 0 : undefined}
-      onKeyDown={onClick ? (e) => { if (e.key === 'Enter' || e.key === ' ') onClick(); } : undefined}
+      onKeyDown={onClick ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick(); } } : undefined}
+      aria-label={onClick ? 'Kartu interaktif' : undefined}
     >
       {header && <div className="px-6 py-4 border-b border-border">{header}</div>}
       <div className={paddingClasses[padding]}>{children}</div>
@@ -59,13 +61,13 @@ export const Card: React.FC<CardProps> & {
 };
 
 Card.Header = ({ children, className }: { children: React.ReactNode; className?: string }) => (
-  <div className={clsx('px-6 py-4 border-b border-border', className)}>{children}</div>
+  <div className={cn('px-6 py-4 border-b border-border', className)}>{children}</div>
 );
 
 Card.Body = ({ children, className }: { children: React.ReactNode; className?: string }) => (
-  <div className={clsx('p-6', className)}>{children}</div>
+  <div className={cn('p-6', className)}>{children}</div>
 );
 
 Card.Footer = ({ children, className }: { children: React.ReactNode; className?: string }) => (
-  <div className={clsx('px-6 py-4 border-t border-border bg-muted/50', className)}>{children}</div>
+  <div className={cn('px-6 py-4 border-t border-border bg-muted/50', className)}>{children}</div>
 );

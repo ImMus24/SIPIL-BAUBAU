@@ -13,7 +13,7 @@ export const DonutChart: React.FC<DonutChartProps> = ({
   series,
   labels,
   height = 300,
-  colors = ['#3b82f6', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6'],
+  colors = ['#0B5ED7', '#16A34A', '#FFC107', '#DC2626', '#0EA5E9'],
   title,
 }) => {
   const chartRef = useRef<HTMLDivElement>(null);

@@ -1,5 +1,6 @@
 import React from 'react';
-import { clsx } from 'clsx';
+import { motion } from 'framer-motion';
+import { cn } from '../../lib/utils';
 import { Check } from 'lucide-react';
 
 interface Step {
@@ -25,11 +26,7 @@ export const Stepper: React.FC<StepperProps> = ({
 }) => {
   return (
     <div
-      className={clsx(
-        orientation === 'horizontal' ? 'flex' : 'flex-col',
-        'gap-0',
-        className
-      )}
+      className={cn(orientation === 'horizontal' ? 'flex' : 'flex-col', className)}
       aria-label="Progress"
     >
       {steps.map((step, idx) => {
@@ -40,60 +37,74 @@ export const Stepper: React.FC<StepperProps> = ({
         return (
           <div
             key={step.id}
-            className={clsx(
+            className={cn(
               'flex',
-              orientation === 'horizontal' ? 'flex-1 flex-col items-center' : 'items-start gap-4'
+              orientation === 'horizontal' ? 'flex-1 flex-col items-center' : 'items-start gap-4',
             )}
           >
-            <div
-              className={clsx(
-                'flex items-center',
-                orientation === 'horizontal' ? 'w-full' : 'flex-col'
-              )}
-            >
+            <div className={cn('flex items-center', orientation === 'horizontal' ? 'w-full' : 'flex-col')}>
               {/* Step indicator */}
               <button
                 onClick={() => onChange?.(idx)}
                 disabled={isUpcoming}
-                className={clsx(
-                  'relative flex items-center justify-center w-10 h-10 rounded-full border-2 font-bold text-sm transition-all duration-200 shrink-0',
+                className={cn(
+                  'relative flex items-center justify-center w-10 h-10 rounded-full border-2 font-bold text-sm transition-colors duration-200 shrink-0 focus-visible:outline-2 focus-visible:outline-ring',
                   isCompleted && 'bg-primary border-primary text-primary-foreground',
                   isCurrent && 'border-primary text-primary bg-primary-light',
-                  isUpcoming && 'border-border text-muted-foreground bg-card cursor-not-allowed'
+                  isUpcoming && 'border-border text-muted-foreground bg-card cursor-not-allowed',
                 )}
+                aria-current={isCurrent ? 'step' : undefined}
+                aria-label={`Langkah ${idx + 1}: ${step.label}`}
               >
-                {isCompleted ? <Check className="w-5 h-5" /> : idx + 1}
+                {isCompleted ? (
+                  <motion.span
+                    initial={{ scale: 0.5, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ type: 'spring', duration: 0.35, bounce: 0.4 }}
+                  >
+                    <Check className="w-5 h-5" />
+                  </motion.span>
+                ) : (
+                  idx + 1
+                )}
+                {isCurrent && (
+                  <motion.span
+                    className="absolute inset-0 rounded-full border-2 border-primary"
+                    animate={{ scale: [1, 1.35, 1.1], opacity: [0.6, 0, 0] }}
+                    transition={{ duration: 1.6, repeat: Infinity, ease: 'easeOut' }}
+                    aria-hidden="true"
+                  />
+                )}
               </button>
 
               {/* Connector line */}
               {idx < steps.length - 1 && (
                 <div
-                  className={clsx(
-                    orientation === 'horizontal'
-                      ? 'flex-1 h-0.5 mx-2 mt-0'
-                      : 'w-0.5 h-8 ml-5',
-                    'rounded-full transition-colors duration-200',
-                    isCompleted ? 'bg-primary' : 'bg-border'
+                  className={cn(
+                    orientation === 'horizontal' ? 'flex-1 h-0.5 mx-2' : 'w-0.5 h-8 ml-5',
+                    'rounded-full overflow-hidden bg-border',
                   )}
-                />
+                >
+                  <motion.div
+                    className="h-full w-full bg-primary"
+                    initial={false}
+                    animate={{ width: isCompleted ? '100%' : '0%', height: isCompleted ? '100%' : '0%' }}
+                    transition={{ duration: 0.4, ease: 'easeOut' }}
+                  />
+                </div>
               )}
             </div>
 
             {/* Label */}
             <div
-              className={clsx(
-                orientation === 'horizontal'
-                  ? 'text-center mt-2'
-                  : 'mt-0',
+              className={cn(
+                orientation === 'horizontal' ? 'text-center mt-2' : '',
                 isCurrent && 'text-foreground',
                 isCompleted && 'text-muted-foreground',
-                isUpcoming && 'text-muted-foreground/50'
+                isUpcoming && 'text-muted-foreground/50',
               )}
             >
-              <span className={clsx(
-                'block text-sm font-semibold',
-                isCurrent && 'text-primary'
-              )}>
+              <span className={cn('block text-sm font-semibold', isCurrent && 'text-primary')}>
                 {step.label}
               </span>
               {step.description && (
