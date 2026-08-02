@@ -8,7 +8,10 @@ use App\Contracts\UserRepositoryInterface;
 use App\DTOs\RegisterUserDTO;
 use App\Models\AuditLog;
 use App\Models\User;
+use App\Notifications\PasswordResetNotification;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class AuthService
@@ -62,5 +65,63 @@ class AuthService
     public function logout(?User $user): void
     {
         $this->logoutUserAction->execute($user);
+    }
+
+    /**
+     * Send a password reset link. Uses a token stored in password_reset_tokens
+     * (expires after 60 minutes). Always succeeds silently for non-existent
+     * emails to avoid user enumeration.
+     */
+    public function sendPasswordResetLink(string $email): void
+    {
+        $user = $this->userRepository->findByEmail($email);
+        if (!$user) {
+            return; // Do not reveal whether the email exists.
+        }
+
+        $token = Str::random(64);
+
+        DB::table('password_reset_tokens')->updateOrInsert(
+            ['email' => $user->email],
+            ['token' => Hash::make($token), 'created_at' => now()]
+        );
+
+        $user->notify(new PasswordResetNotification($token));
+    }
+
+    /**
+     * Reset the password using a valid token.
+     *
+     * @throws ValidationException when the token is invalid or expired.
+     */
+    public function resetPassword(array $validated): void
+    {
+        $record = DB::table('password_reset_tokens')->where('email', $validated['email'])->first();
+
+        if (!$record || !Hash::check($validated['token'], $record->token)) {
+            throw ValidationException::withMessages([
+                'token' => ['Tautan reset tidak valid. Silakan ulangi permintaan reset.'],
+            ]);
+        }
+
+        if (now()->diffInMinutes($record->created_at) > 60) {
+            DB::table('password_reset_tokens')->where('email', $validated['email'])->delete();
+            throw ValidationException::withMessages([
+                'token' => ['Tautan reset telah kedaluwarsa. Silakan ulangi permintaan reset.'],
+            ]);
+        }
+
+        $user = $this->userRepository->findByEmail($validated['email']);
+        if (!$user) {
+            throw ValidationException::withMessages([
+                'email' => ['Akun tidak ditemukan.'],
+            ]);
+        }
+
+        $user->update(['password' => Hash::make($validated['password'])]);
+
+        // Invalidate the token + all existing sessions (force re-login).
+        DB::table('password_reset_tokens')->where('email', $validated['email'])->delete();
+        $user->tokens()->delete();
     }
 }

@@ -42,10 +42,16 @@ export const LoginPage: React.FC = () => {
 
   const fillQuick = (e: string) => { setEmail(e); setPassword('password123'); };
 
-  const handleForgotSubmit = (e: React.FormEvent) => {
+  const handleForgotSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!resetEmail) return;
-    setResetSent(true);
+    try {
+      await authService.forgotPassword(resetEmail);
+      setResetSent(true);
+    } catch {
+      // Non-blocking: show success anyway to avoid user enumeration.
+      setResetSent(true);
+    }
   };
 
   return (

@@ -103,7 +103,17 @@ class ComplaintService
             return null;
         }
 
-        $extension = strtolower($file->getClientOriginalExtension());
+        // Derive extension from the validated mime type — never trust the
+        // client-supplied original extension (defense against spoofing).
+        $mimeToExt = [
+            'image/jpeg' => 'jpg',
+            'image/png' => 'png',
+            'image/webp' => 'webp',
+            'application/pdf' => 'pdf',
+            'video/mp4' => 'mp4',
+            'video/quicktime' => 'mov',
+        ];
+        $extension = $mimeToExt[$file->getMimeType()] ?? 'bin';
         $filename = 'complaint_' . $complaintId . '_' . Str::uuid()->toString() . '.' . $extension;
         $path = $file->storeAs('complaint-files', $filename, 'public');
 

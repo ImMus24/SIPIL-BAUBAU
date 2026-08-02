@@ -116,13 +116,18 @@ const MarkerClusterLayer: React.FC<{
     complaints.forEach((item) => {
       if (item.latitude == null || item.longitude == null) return;
       const marker = L.marker([item.latitude, item.longitude], { icon: icons[item.status] || icons.menunggu });
+      // Escape all user-controlled values to prevent stored XSS via innerHTML.
+      const esc = (v: unknown) =>
+        String(v ?? '').replace(/[&<>"']/g, (c) => (
+          { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' } as Record<string, string>
+        )[c] as string);
       const popupContent = document.createElement('div');
       popupContent.innerHTML = `<div class="p-3 max-w-[260px]">
         <div class="flex items-center justify-between gap-2 border-b pb-2 mb-2">
-          <span class="font-mono text-[10px] font-bold text-primary bg-primary-light px-1.5 py-0.5 rounded border border-primary/20">${item.ticket_code}</span>
+          <span class="font-mono text-[10px] font-bold text-primary bg-primary-light px-1.5 py-0.5 rounded border border-primary/20">${esc(item.ticket_code)}</span>
         </div>
-        <h4 class="font-bold text-xs leading-tight line-clamp-2 mb-1">${item.title}</h4>
-        <p class="text-[11px] text-muted-foreground truncate">${item.address} · ${item.subdistrict}</p>
+        <h4 class="font-bold text-xs leading-tight line-clamp-2 mb-1">${esc(item.title)}</h4>
+        <p class="text-[11px] text-muted-foreground truncate">${esc(item.address)} · ${esc(item.subdistrict)}</p>
       </div>`;
       marker.bindPopup(popupContent);
       marker.on('click', () => onSelectComplaint?.(item));

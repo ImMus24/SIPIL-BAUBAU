@@ -78,6 +78,10 @@ class ComplaintRepository implements ComplaintRepositoryInterface
             $query->where('agency_id', $filters['agency_id']);
         }
 
+        if (!empty($filters['user_id'])) {
+            $query->where('user_id', $filters['user_id']);
+        }
+
         if (!empty($filters['search'])) {
             $q = trim(strip_tags($filters['search']));
             $query->where(function ($sub) use ($q) {

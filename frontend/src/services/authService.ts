@@ -59,6 +59,14 @@ export const authService = {
     }
   },
 
+  async forgotPassword(email: string): Promise<void> {
+    await api.post('/auth/forgot-password', { email });
+  },
+
+  async resetPassword(token: string, email: string, password: string, passwordConfirmation: string): Promise<void> {
+    await api.post('/auth/reset-password', { token, email, password, password_confirmation: passwordConfirmation });
+  },
+
   async fetchCurrentUser(): Promise<User | null> {
     const token = localStorage.getItem('sipil_auth_token');
     if (!token) return null;

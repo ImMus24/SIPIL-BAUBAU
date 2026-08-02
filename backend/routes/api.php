@@ -16,6 +16,8 @@ Route::middleware([SecurityHeaders::class])->prefix('v1')->group(function () {
     Route::middleware('throttle:5,1')->group(function () {
         Route::post('/auth/register', [AuthController::class, 'register']);
         Route::post('/auth/login', [AuthController::class, 'login']);
+        Route::post('/auth/forgot-password', [AuthController::class, 'forgotPassword']);
+        Route::post('/auth/reset-password', [AuthController::class, 'resetPassword']);
     });
 
     // Public Categories & Agencies (cached 1 hour)
@@ -45,11 +47,17 @@ Route::middleware([SecurityHeaders::class])->prefix('v1')->group(function () {
         Route::post('/complaints/{id}/files', [ComplaintController::class, 'uploadFile']);
 
         // Role-specific Dashboard Endpoints
+        // NOTE: each endpoint is gated by RoleMiddleware so a citizen cannot
+        // fetch admin/officer/head data (privilege escalation fix).
         Route::get('/dashboard', [DashboardController::class, 'index']);
-        Route::get('/dashboard/citizen', [DashboardController::class, 'citizenDashboard']);
-        Route::get('/dashboard/officer', [DashboardController::class, 'officerDashboard']);
-        Route::get('/dashboard/admin', [DashboardController::class, 'adminDashboard']);
-        Route::get('/dashboard/head', [DashboardController::class, 'headDashboard']);
+        Route::get('/dashboard/citizen', [DashboardController::class, 'citizenDashboard'])
+            ->middleware(RoleMiddleware::class . ':citizen');
+        Route::get('/dashboard/officer', [DashboardController::class, 'officerDashboard'])
+            ->middleware(RoleMiddleware::class . ':officer');
+        Route::get('/dashboard/admin', [DashboardController::class, 'adminDashboard'])
+            ->middleware(RoleMiddleware::class . ':admin');
+        Route::get('/dashboard/head', [DashboardController::class, 'headDashboard'])
+            ->middleware(RoleMiddleware::class . ':head_of_agency');
         Route::get('/dashboard/map-data', [DashboardController::class, 'mapData']);
         Route::get('/dashboard/search', [DashboardController::class, 'quickSearch']);
         Route::get('/dashboard/activities', [DashboardController::class, 'activities']);

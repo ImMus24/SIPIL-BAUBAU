@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RegisterRequest;
 use App\Http\Requests\LoginRequest;
+use App\Http\Requests\ForgotPasswordRequest;
+use App\Http\Requests\ResetPasswordRequest;
 use App\Http\Resources\UserResource;
 use App\DTOs\RegisterUserDTO;
 use App\Services\AuthService;
@@ -63,6 +65,34 @@ class AuthController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Berhasil keluar akun dari seluruh perangkat.',
+        ]);
+    }
+
+    /**
+     * POST /auth/forgot-password — request a password reset link.
+     * Always returns the same success message regardless of whether the
+     * email exists (avoids user enumeration).
+     */
+    public function forgotPassword(ForgotPasswordRequest $request): JsonResponse
+    {
+        $this->authService->sendPasswordResetLink($request->validated()['email']);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Jika email terdaftar, tautan reset kata sandi telah dikirim.',
+        ]);
+    }
+
+    /**
+     * POST /auth/reset-password — actually reset the password with a valid token.
+     */
+    public function resetPassword(ResetPasswordRequest $request): JsonResponse
+    {
+        $this->authService->resetPassword($request->validated());
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Kata sandi berhasil direset. Silakan login dengan kata sandi baru.',
         ]);
     }
 }

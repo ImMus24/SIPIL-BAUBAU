@@ -125,9 +125,20 @@ class DashboardController extends Controller
             return $this->success([], 'Masukkan minimal 2 karakter.');
         }
 
+        $user = $request->user();
+        $filters = ['search' => $search];
+
+        // Role-based scoping: citizen → own reports, officer → agency reports,
+        // admin/head → all reports.
+        if ($user->isCitizen()) {
+            $filters['user_id'] = $user->id;
+        } elseif ($user->isOfficer() && $user->agency_id) {
+            $filters['agency_id'] = $user->agency_id;
+        }
+
         return $this->success(
             ComplaintResource::collection(
-                app(ComplaintRepositoryInterface::class)->getAllFiltered(['search' => $search], 10)
+                app(ComplaintRepositoryInterface::class)->getAllFiltered($filters, 10)
             ),
             'Hasil pencarian.'
         );

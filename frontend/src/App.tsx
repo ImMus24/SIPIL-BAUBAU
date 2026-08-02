@@ -19,6 +19,7 @@ const AboutPage = lazy(() => import('./pages/AboutPage').then(m => ({ default: m
 const FAQPage = lazy(() => import('./pages/FAQPage').then(m => ({ default: m.FAQPage })));
 const LoginPage = lazy(() => import('./pages/LoginPage').then(m => ({ default: m.LoginPage })));
 const RegisterPage = lazy(() => import('./pages/RegisterPage').then(m => ({ default: m.RegisterPage })));
+const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage').then(m => ({ default: m.ResetPasswordPage })));
 const ComplaintDetailPage = lazy(() => import('./pages/ComplaintDetailPage').then(m => ({ default: m.ComplaintDetailPage })));
 
 // Dashboard pages
@@ -142,6 +143,7 @@ export function App() {
                     <Route path="/faq" element={<FAQPage />} />
                     <Route path="/login" element={<GuestRoute><LoginPage /></GuestRoute>} />
                     <Route path="/register" element={<GuestRoute><RegisterPage /></GuestRoute>} />
+                    <Route path="/reset-password" element={<ResetPasswordPage />} />
                   </Route>
 
                   {/* /dashboard: citizen lihat dashboard warga, role lain diredirect */}
