@@ -65,7 +65,7 @@ export function FAQPage() {
             >
               <button
                 onClick={() => setOpenIndex(isOpen ? null : i)}
-                className="w-full flex items-center justify-between gap-4 p-5 text-left hover:bg-accent/50 transition-colors"
+                className="w-full flex items-center justify-between gap-4 p-5 text-left hover:bg-muted/50 transition-colors"
                 aria-expanded={isOpen}
               >
                 <span className="font-medium text-sm leading-relaxed">{faq.q}</span>

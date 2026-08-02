@@ -241,7 +241,7 @@ export const OfficerDashboard: React.FC = () => {
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                     activeTab === tab.id
                       ? 'bg-primary/10 text-primary'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                   }`}
                 >
                   {tab.label}

@@ -217,7 +217,7 @@ export const OfficerProgressModal: React.FC<OfficerProgressModalProps> = ({
                     </div>
                   </div>
                 ) : (
-                  <label className="flex flex-col items-center justify-center gap-1.5 aspect-[4/3] rounded-xl border-2 border-dashed border-border cursor-pointer hover:border-primary/50 hover:bg-accent/50 transition-all">
+                  <label className="flex flex-col items-center justify-center gap-1.5 aspect-[4/3] rounded-xl border-2 border-dashed border-border cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-all">
                     <Camera className="w-6 h-6 text-muted-foreground" />
                     <span className="text-[10px] text-muted-foreground font-medium">Upload Foto</span>
                     <input

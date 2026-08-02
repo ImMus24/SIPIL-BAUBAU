@@ -39,7 +39,7 @@ export const OfficerWelcomeHeader: React.FC<OfficerWelcomeHeaderProps> = ({
             <Clock className="w-4 h-4 text-info" />
             <span className="text-sm font-semibold text-foreground">{welcome.time} WITA</span>
           </div>
-          <button className="relative p-2.5 rounded-xl bg-muted hover:bg-accent transition-colors">
+          <button className="relative p-2.5 rounded-xl bg-muted hover:bg-muted/70 transition-colors">
             <Bell className="w-5 h-5 text-muted-foreground" />
             {unreadNotifications > 0 && (
               <span className="absolute -top-1 -right-1 w-5 h-5 bg-danger text-white text-[10px] font-bold rounded-full flex items-center justify-center ring-2 ring-card">

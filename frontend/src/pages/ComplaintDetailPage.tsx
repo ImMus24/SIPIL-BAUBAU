@@ -33,7 +33,7 @@ export function ComplaintDetailPage() {
           {error instanceof Error ? error.message : 'Kode tiket tidak valid atau laporan telah dihapus.'}
         </p>
         <div className="flex gap-3 justify-center">
-          <button onClick={() => navigate('/track')} className="px-5 py-2.5 rounded-xl border border-border hover:bg-accent transition-all text-sm">
+          <button onClick={() => navigate('/track')} className="px-5 py-2.5 rounded-xl border border-border hover:bg-muted transition-all text-sm">
             Coba Lagi
           </button>
           <Link to="/" className="px-5 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-all">
@@ -50,7 +50,7 @@ export function ComplaintDetailPage() {
     <div className="max-w-3xl mx-auto px-4 py-8 sm:px-6">
       {/* Back + Breadcrumb */}
       <div className="flex items-center gap-4 mb-6">
-        <button onClick={() => navigate(-1)} className="p-2 rounded-lg hover:bg-accent transition-colors">
+        <button onClick={() => navigate(-1)} className="p-2 rounded-lg hover:bg-muted transition-colors">
           <ArrowLeft className="w-4 h-4" />
         </button>
         <nav className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -218,7 +218,7 @@ export function ComplaintDetailPage() {
         </Link>
         <Link
           to="/"
-          className="px-5 py-3 rounded-xl border border-border text-sm font-medium hover:bg-accent transition-all"
+          className="px-5 py-3 rounded-xl border border-border text-sm font-medium hover:bg-muted transition-all"
         >
           Kembali
         </Link>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import { StatCard } from '../../components/ui/StatCard';
 import { Card } from '../../components/ui/Card';
@@ -14,6 +14,9 @@ import { AreaChart } from '../../components/charts/AreaChart';
 import { dashboardService } from '../../services/dashboardService';
 import { useAuth } from '../../context/AuthContext';
 import type { Complaint, AdminDashboardData } from '../../types';
+import { exportCSV } from '../../lib/export';
+import { EmptyState } from '../../components/ui/EmptyState';
+import { cn } from '../../lib/utils';
 import {
   FileText, Clock, CheckCircle2, AlertTriangle, X,
   Activity, Users, Download, Filter,
@@ -25,7 +28,6 @@ import {
 type TabId = 'semua' | 'menunggu' | 'diproses' | 'selesai';
 
 export const AdminDashboard: React.FC = () => {
-  const navigate = useNavigate();
   const { user } = useAuth();
   const [data, setData] = useState<AdminDashboardData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -34,6 +36,8 @@ export const AdminDashboard: React.FC = () => {
   const [selectedComplaint, setSelectedComplaint] = useState<Complaint | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeSection = searchParams.get('tab') || 'beranda';
 
   const fetchData = useCallback(async () => {
     setLoading(true); setError(null);
@@ -61,6 +65,7 @@ export const AdminDashboard: React.FC = () => {
 
   const handleStatusUpdated = () => setRefreshKey((k) => k + 1);
   const openStatusModal = (c: Complaint) => { setSelectedComplaint(c); setModalOpen(true); };
+  const goToSection = (tab: string) => setSearchParams({ tab });
 
   const stats = data?.stats ?? { total: 0, menunggu: 0, diproses: 0, selesai: 0, ditolak: 0, completion_rate: 0 };
   const reports: Complaint[] = data?.recent_reports ?? [];
@@ -95,7 +100,37 @@ export const AdminDashboard: React.FC = () => {
           <span className="px-3 py-1 rounded-lg bg-primary/10 text-primary text-sm font-semibold">{user?.name}</span>
         </div>
 
-        {loading ? <Skeleton.KPIGrid count={7} /> : (
+        {/* Section tabs */}
+        <div className="flex flex-wrap gap-1.5">
+          {[
+            { id: 'beranda', label: 'Beranda', icon: Activity },
+            { id: 'verifikasi', label: 'Verifikasi', icon: ClipboardCheck },
+            { id: 'pengguna', label: 'Pengguna', icon: Users },
+            { id: 'kategori', label: 'Kategori', icon: Building2 },
+            { id: 'audit', label: 'Audit Log', icon: History },
+            { id: 'laporan', label: 'Laporan', icon: Download },
+          ].map((s) => {
+            const Icon = s.icon;
+            return (
+              <button
+                key={s.id}
+                onClick={() => goToSection(s.id)}
+                className={cn(
+                  'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all',
+                  activeSection === s.id
+                    ? 'bg-primary text-primary-foreground shadow-sm shadow-primary/20'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted',
+                )}
+              >
+                <Icon className="w-3.5 h-3.5" aria-hidden="true" />
+                {s.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* KPI grid (beranda only) */}
+        {activeSection === 'beranda' && (loading ? <Skeleton.KPIGrid count={7} /> : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
             <StatCard title="Total Laporan" value={stats.total} icon={FileText} variant="primary" />
             <StatCard title="Menunggu Verifikasi" value={stats.menunggu} icon={AlertTriangle} variant="warning" />
@@ -105,8 +140,10 @@ export const AdminDashboard: React.FC = () => {
             <StatCard title="Total Pengguna" value={userSummary.total} icon={Users} variant="default" />
             <StatCard title="Petugas Aktif" value={userSummary.officers} icon={UserCheck} variant="default" />
           </div>
-        )}
+        ))}
 
+        {activeSection === 'beranda' && (
+          <>
         {!loading && verification.length > 0 && (
           <Card variant="bordered" className="border-warning/20 bg-warning/5">
             <div className="flex items-center gap-2 mb-4">
@@ -145,12 +182,12 @@ export const AdminDashboard: React.FC = () => {
                 <div className="flex flex-wrap gap-1">
                   {tabs.map((tab) => (
                     <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${activeTab === tab.id ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground hover:bg-accent'}`}>
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${activeTab === tab.id ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground hover:bg-muted'}`}>
                       {tab.label}{tab.badge > 0 && <span className="ml-1 text-[10px] opacity-60">({tab.badge})</span>}
                     </button>
                   ))}
                 </div>
-                <div className="flex gap-2"><Button variant="outline" size="sm" icon={Filter}>Filter</Button><Button variant="outline" size="sm" icon={Download}>Ekspor</Button></div>
+                <div className="flex gap-2"><Button variant="outline" size="sm" icon={Filter} onClick={() => setActiveTab('menunggu')}>Filter</Button><Button variant="outline" size="sm" icon={Download} onClick={() => exportCSV('laporan-admin', filtered, [{ key: 'ticket_code', header: 'Kode Tiket' }, { key: 'title', header: 'Judul' }, { key: 'subdistrict', header: 'Kecamatan' }, { key: 'status', header: 'Status' }, { key: 'urgency', header: 'Urgensi' }])}>Ekspor</Button></div>
               </div>
 
               {loading ? <Skeleton.Table rows={6} cols={5} /> : filtered.length === 0 ? (
@@ -227,11 +264,11 @@ export const AdminDashboard: React.FC = () => {
               <div className="flex items-center gap-2 mb-4"><Activity className="w-5 h-5 text-primary" /><h3 className="font-heading font-bold text-foreground">Aksi Cepat</h3></div>
               <div className="space-y-2">
                 <QuickActionCard label="Verifikasi Laporan" description="Proses laporan menunggu verifikasi" icon={ClipboardCheck} color="bg-warning/10 text-warning" onClick={() => setActiveTab('menunggu')} />
-                <QuickActionCard label="Tugaskan Petugas" description="Assign laporan ke OPD" icon={UserCheck} color="bg-primary/10 text-primary" onClick={() => navigate('/admin?tab=verifikasi')} />
-                <QuickActionCard label="Kelola Pengguna" description="Atur akun warga & petugas" icon={Users} color="bg-info/10 text-info" onClick={() => navigate('/admin?tab=pengguna')} />
-                <QuickActionCard label="Kelola Kategori" description="Tambah/edit kategori" icon={Building2} color="bg-success/10 text-success" onClick={() => navigate('/admin?tab=kategori')} />
-                <QuickActionCard label="Lihat Audit Log" description="Rekam jejak aktivitas" icon={History} color="bg-muted-foreground/10 text-muted-foreground" onClick={() => navigate('/admin?tab=audit')} />
-                <QuickActionCard label="Generate Laporan" description="Ekspor data" icon={Download} color="bg-danger/10 text-danger" onClick={() => navigate('/admin?tab=laporan')} />
+                <QuickActionCard label="Tugaskan Petugas" description="Assign laporan ke OPD" icon={UserCheck} color="bg-primary/10 text-primary" onClick={() => goToSection('verifikasi')} />
+                <QuickActionCard label="Kelola Pengguna" description="Atur akun warga & petugas" icon={Users} color="bg-info/10 text-info" onClick={() => goToSection('pengguna')} />
+                <QuickActionCard label="Kelola Kategori" description="Tambah/edit kategori" icon={Building2} color="bg-success/10 text-success" onClick={() => goToSection('kategori')} />
+                <QuickActionCard label="Lihat Audit Log" description="Rekam jejak aktivitas" icon={History} color="bg-muted-foreground/10 text-muted-foreground" onClick={() => goToSection('audit')} />
+                <QuickActionCard label="Generate Laporan" description="Ekspor data" icon={Download} color="bg-danger/10 text-danger" onClick={() => goToSection('laporan')} />
               </div>
             </Card>
 
@@ -289,6 +326,168 @@ export const AdminDashboard: React.FC = () => {
             )}
           </div>
         </div>
+          </>
+        )}
+
+        {/* ─── DEDICATED SECTIONS ─── */}
+        {activeSection !== 'beranda' && (
+          <div className="space-y-6">
+            {/* Section header */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div>
+                <h2 className="font-heading text-xl font-black text-foreground">
+                  {activeSection === 'verifikasi' && 'Verifikasi Laporan'}
+                  {activeSection === 'pengguna' && 'Kelola Pengguna'}
+                  {activeSection === 'kategori' && 'Kelola Kategori'}
+                  {activeSection === 'audit' && 'Audit Log'}
+                  {activeSection === 'laporan' && 'Laporan & Ekspor'}
+                </h2>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {activeSection === 'verifikasi' && 'Tinjau dan verifikasi laporan yang menunggu persetujuan.'}
+                  {activeSection === 'pengguna' && 'Kelola akun warga dan petugas OPD.'}
+                  {activeSection === 'kategori' && 'Atur kategori pengaduan infrastruktur.'}
+                  {activeSection === 'audit' && 'Rekam jejak aktivitas seluruh sistem.'}
+                  {activeSection === 'laporan' && 'Ekspor data laporan untuk keperluan pelaporan.'}
+                </p>
+              </div>
+            </div>
+
+            {/* Verifikasi */}
+            {activeSection === 'verifikasi' && (
+              <Card>
+                <div className="flex items-center gap-2 mb-4">
+                  <ClipboardCheck className="w-5 h-5 text-primary" />
+                  <h3 className="font-heading font-bold text-foreground">Antrian Verifikasi</h3>
+                  <span className="ml-auto text-xs bg-warning/10 text-warning px-2 py-0.5 rounded-full font-bold">{verification.length} menunggu</span>
+                </div>
+                {loading ? <Skeleton.Table rows={5} cols={4} /> : verification.length === 0 ? (
+                  <EmptyState icon="inbox" title="Tidak ada antrian" description="Semua laporan sudah diverifikasi." className="py-10" />
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-border text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                          <th className="pb-3 pr-3">Kode</th><th className="pb-3 pr-3">Judul</th><th className="pb-3 pr-3">Pelapor</th><th className="pb-3 pr-3">Urgensi</th><th className="pb-3 pr-3">Tanggal</th><th className="pb-3">Aksi</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-border">
+                        {verification.map((c) => (
+                          <tr key={c.id} className="hover:bg-muted/30 transition-colors">
+                            <td className="py-3 pr-3 text-sm font-mono text-foreground font-medium">{c.ticket_code}</td>
+                            <td className="py-3 pr-3"><p className="text-sm font-semibold text-foreground truncate">{c.title}</p><p className="text-xs text-muted-foreground">{c.subdistrict}</p></td>
+                            <td className="py-3 pr-3 text-sm text-muted-foreground">{c.reporter_name}</td>
+                            <td className="py-3 pr-3"><UrgencyBadge urgency={c.urgency} size="sm" /></td>
+                            <td className="py-3 pr-3 text-xs text-muted-foreground">{new Date(c.created_at).toLocaleDateString('id-ID')}</td>
+                            <td className="py-3"><Button variant="ghost" size="sm" icon={ArrowUpCircle} onClick={() => openStatusModal(c)}>Proses</Button></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </Card>
+            )}
+
+            {/* Pengguna */}
+            {activeSection === 'pengguna' && (
+              <Card>
+                <div className="flex items-center gap-2 mb-4">
+                  <Users className="w-5 h-5 text-primary" />
+                  <h3 className="font-heading font-bold text-foreground">Ringkasan Pengguna</h3>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="p-4 rounded-2xl bg-primary-light/50 dark:bg-primary/10 border border-primary/20">
+                    <p className="text-2xl font-black text-primary">{userSummary.total}</p>
+                    <p className="text-sm text-muted-foreground font-medium">Total Pengguna</p>
+                  </div>
+                  <div className="p-4 rounded-2xl bg-info-bg border border-info-border">
+                    <p className="text-2xl font-black text-info">{userSummary.officers}</p>
+                    <p className="text-sm text-muted-foreground font-medium">Petugas OPD</p>
+                  </div>
+                  <div className="p-4 rounded-2xl bg-success-bg border border-success-border">
+                    <p className="text-2xl font-black text-success">{userSummary.citizens}</p>
+                    <p className="text-sm text-muted-foreground font-medium">Warga Terdaftar</p>
+                  </div>
+                </div>
+                <div className="mt-4 p-4 rounded-xl bg-muted/50 text-sm text-muted-foreground">
+                  Manajemen detail pengguna (tambah, ubah, nonaktifkan) tersedia melalui halaman kelola pengguna di backend admin.
+                </div>
+              </Card>
+            )}
+
+            {/* Kategori */}
+            {activeSection === 'kategori' && (
+              <Card>
+                <div className="flex items-center gap-2 mb-4">
+                  <Building2 className="w-5 h-5 text-primary" />
+                  <h3 className="font-heading font-bold text-foreground">Kategori Pengaduan</h3>
+                </div>
+                {loading ? <Skeleton variant="text" count={5} /> : topCategories.length > 0 ? (
+                  <div className="space-y-3">
+                    {topCategories.map((cat) => {
+                      const maxC = Math.max(...topCategories.map((c) => c.count), 1);
+                      return (
+                        <div key={cat.category_name} className="space-y-1">
+                          <div className="flex justify-between text-sm"><span className="text-foreground font-medium">{cat.category_name}</span><span className="text-muted-foreground">{cat.count} laporan</span></div>
+                          <div className="w-full h-2 bg-muted rounded-full overflow-hidden"><div className="h-full rounded-full bg-primary/40" style={{ width: `${(cat.count / maxC) * 100}%` }} /></div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : <EmptyState icon="search" title="Belum ada data" description="Belum ada kategori pengaduan." className="py-10" />}
+              </Card>
+            )}
+
+            {/* Audit */}
+            {activeSection === 'audit' && (
+              <Card>
+                <div className="flex items-center gap-2 mb-4">
+                  <History className="w-5 h-5 text-primary" />
+                  <h3 className="font-heading font-bold text-foreground">Aktivitas Sistem</h3>
+                </div>
+                {loading ? <Skeleton.Table rows={6} cols={3} /> : auditLog.length === 0 ? (
+                  <EmptyState icon="search" title="Belum ada aktivitas" description="Log aktivitas sistem akan muncul di sini." className="py-10" />
+                ) : (
+                  <div className="space-y-2">
+                    {auditLog.map((log) => (
+                      <div key={log.id} className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 transition-colors">
+                        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0"><Activity className="w-4 h-4 text-primary" /></div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-foreground truncate">{log.description || log.action}</p>
+                          <p className="text-xs text-muted-foreground">{log.user?.name || 'Sistem'} · {new Date(log.created_at).toLocaleString('id-ID')}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </Card>
+            )}
+
+            {/* Laporan */}
+            {activeSection === 'laporan' && (
+              <Card>
+                <div className="flex items-center gap-2 mb-4">
+                  <Download className="w-5 h-5 text-primary" />
+                  <h3 className="font-heading font-bold text-foreground">Ekspor Data Laporan</h3>
+                </div>
+                <p className="text-sm text-muted-foreground mb-4">Unduh seluruh data laporan dalam format CSV untuk keperluan analisis dan pelaporan.</p>
+                <div className="flex flex-wrap gap-3">
+                  <Button icon={Download} onClick={() => exportCSV('laporan-admin', reports, [
+                    { key: 'ticket_code', header: 'Kode Tiket' },
+                    { key: 'title', header: 'Judul' },
+                    { key: 'subdistrict', header: 'Kecamatan' },
+                    { key: 'address', header: 'Alamat' },
+                    { key: 'status', header: 'Status' },
+                    { key: 'urgency', header: 'Urgensi' },
+                    { key: 'created_at', header: 'Dibuat' },
+                  ])}>
+                    Ekspor CSV
+                  </Button>
+                </div>
+              </Card>
+            )}
+          </div>
+        )}
       </div>
       {selectedComplaint && <StatusUpdateModal open={modalOpen} onClose={() => setModalOpen(false)} complaint={selectedComplaint} onSuccess={handleStatusUpdated} />}
     </DashboardLayout>

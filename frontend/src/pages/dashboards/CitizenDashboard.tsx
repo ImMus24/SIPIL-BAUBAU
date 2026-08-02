@@ -150,13 +150,13 @@ export const CitizenDashboard: React.FC = () => {
                 <input
                   type="text" placeholder="Cari berdasarkan tiket, judul..." value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="flex-1 sm:w-48 h-9 px-3 rounded-xl bg-accent border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  className="flex-1 sm:w-48 h-9 px-3 rounded-xl bg-muted border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
                 />
               </div>
               <div className="flex flex-wrap gap-1 mb-4">
                 {tabs.map((tab) => (
                   <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${activeTab === tab.id ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground hover:bg-accent'}`}>
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${activeTab === tab.id ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground hover:bg-muted'}`}>
                     {tab.label}
                     {tab.badge > 0 && <span className="ml-1.5 text-[10px] opacity-60">({tab.badge})</span>}
                   </button>

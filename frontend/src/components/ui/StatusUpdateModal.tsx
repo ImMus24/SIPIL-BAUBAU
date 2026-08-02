@@ -208,7 +208,7 @@ export const StatusUpdateModal: React.FC<StatusUpdateModalProps> = ({
               </button>
             </div>
           ) : (
-            <label className="flex items-center gap-3 px-4 py-3 rounded-xl border border-dashed border-border cursor-pointer hover:bg-accent transition-colors">
+            <label className="flex items-center gap-3 px-4 py-3 rounded-xl border border-dashed border-border cursor-pointer hover:bg-muted transition-colors">
               <Camera className="w-5 h-5 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">Klik untuk upload foto</span>
               <input type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />

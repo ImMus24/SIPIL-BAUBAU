@@ -2,9 +2,9 @@
  * Export helpers — CSV + image downloads.
  */
 
-export function exportCSV(
+export function exportCSV<T extends object>(
   filename: string,
-  rows: Record<string, unknown>[],
+  rows: T[],
   columns: { key: string; header: string }[],
 ): void {
   if (rows.length === 0) return;
@@ -18,7 +18,7 @@ export function exportCSV(
   };
 
   const header = columns.map((c) => escape(c.header)).join(',');
-  const body = rows.map((row) => columns.map((c) => escape(row[c.key])).join(','));
+  const body = rows.map((row) => columns.map((c) => escape((row as Record<string, unknown>)[c.key])).join(','));
 
   const csv = [header, ...body].join('\n');
   const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });

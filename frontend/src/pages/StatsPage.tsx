@@ -6,6 +6,8 @@ import { PageBreadcrumb } from '../components/ui/Breadcrumb';
 import { Button } from '../components/ui/Button';
 import { complaintService } from '../services/complaintService';
 import type { Complaint, StatSummary } from '../types';
+import { exportCSV } from '../lib/export';
+import { EmptyState } from '../components/ui/EmptyState';
 import {
   FileText,
   CheckCircle2,
@@ -38,6 +40,22 @@ export const StatsPage: React.FC = () => {
       resolved: complaints.filter((c) => c.subdistrict === s && c.status === 'selesai').length,
     }));
 
+  const handleExport = () => {
+    exportCSV(
+      'laporan-baubau',
+      complaints,
+      [
+        { key: 'ticket_code', header: 'Kode Tiket' },
+        { key: 'title', header: 'Judul' },
+        { key: 'subdistrict', header: 'Kecamatan' },
+        { key: 'address', header: 'Alamat' },
+        { key: 'status', header: 'Status' },
+        { key: 'urgency', header: 'Urgensi' },
+        { key: 'created_at', header: 'Dibuat' },
+      ],
+    );
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background pt-24 pb-12">
@@ -57,10 +75,15 @@ export const StatsPage: React.FC = () => {
   if (error) {
     return (
       <div className="min-h-screen bg-background pt-24 pb-12">
-        <div className="px-4 sm:px-8 max-w-container mx-auto text-center">
-          <AlertTriangle className="w-12 h-12 mx-auto text-warning mb-4" />
-          <p className="text-muted-foreground">{error}</p>
-          <Button className="mt-4" onClick={() => window.location.reload()}>Coba Lagi</Button>
+        <div className="px-4 sm:px-8 max-w-container mx-auto">
+          <EmptyState
+            icon="search"
+            title="Gagal memuat data"
+            description={error}
+            actionText="Coba Lagi"
+            onAction={() => window.location.reload()}
+            className="max-w-md mx-auto"
+          />
         </div>
       </div>
     );
@@ -77,7 +100,7 @@ export const StatsPage: React.FC = () => {
             <h1 className="font-heading text-3xl font-black text-foreground mt-2">Statistik Infrastruktur</h1>
             <p className="text-muted-foreground">Data real-time dari database SIPIL BAUBAU</p>
           </div>
-          <Button variant="outline" icon={Download}>Export Laporan</Button>
+          <Button variant="outline" icon={Download} onClick={handleExport}>Export Laporan</Button>
         </div>
 
         {/* KPI Cards */}
