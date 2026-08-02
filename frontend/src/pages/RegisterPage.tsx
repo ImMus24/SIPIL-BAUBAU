@@ -61,18 +61,18 @@ export const RegisterPage: React.FC = () => {
       <div className="max-w-4xl w-full bg-card rounded-3xl border border-border shadow-2xl overflow-hidden animate-fade-in-up">
         <div className="grid grid-cols-1 lg:grid-cols-12">
           {/* Left */}
-          <div className="lg:col-span-5 bg-gradient-to-br from-primary to-primary-hover text-primary-foreground p-8 sm:p-10 flex flex-col justify-between relative overflow-hidden">
+          <div className="lg:col-span-5 bg-gradient-to-br from-primary to-navy text-primary-foreground p-8 sm:p-10 flex flex-col justify-between relative overflow-hidden">
             {/* Background pattern */}
             <div className="absolute inset-0 opacity-[0.08]"
               style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '20px 20px' }}
             />
-            <div className="absolute -bottom-20 -right-20 w-60 h-60 bg-secondary/20 blur-3xl rounded-full" />
-            <div className="absolute top-20 -left-20 w-40 h-40 bg-accent/10 blur-3xl rounded-full" />
+            <div className="absolute -bottom-20 -right-20 w-60 h-60 bg-golden/20 blur-3xl rounded-full" />
+            <div className="absolute top-20 -left-20 w-40 h-40 bg-navy-light/40 blur-3xl rounded-full" />
 
             <div className="space-y-6 relative z-10">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center ring-1 ring-white/40">
-                  <ShieldCheck className="w-6 h-6 text-accent" />
+                  <ShieldCheck className="w-6 h-6 text-golden" />
                 </div>
                 <h2 className="font-heading font-black text-xl">SIPIL BAUBAU</h2>
               </div>
